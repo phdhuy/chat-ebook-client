@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 271 81% 56%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 271 81% 56%;
+
+    --radius: 0.5rem;
+  }
+}
+
+/* @layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
+
+/* Black Sidebar Styling */
+.black-sidebar {
+  background-color: #000000;
+  color: #ffffff;
+  width: 288px;
+  border-right: none;
+  transition: width 0.3s ease;
+}
+
+.black-sidebar-collapsed {
+  background-color: #000000;
+  width: 48px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+  transition: width 0.3s ease;
+}
+
+.black-sidebar-collapsed .collapse-button {
+  background-color: #8a2be2;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar-collapsed .collapse-button:hover {
+  background-color: #7722c9;
+}
+
+.black-sidebar .logo-container {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px 20px 16px;
+}
+
+.black-sidebar .logo {
+  background-color: #8a2be2;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.black-sidebar .brand-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 8px;
+}
+
+.black-sidebar .collapse-toggle-button {
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar .collapse-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.black-sidebar .action-button {
+  background-color: transparent;
+  border: 1px solid #333333;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 8px 0;
+  font-size: 14px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar .action-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.black-sidebar .action-button svg {
+  margin-right: 8px;
+}
+
+.black-sidebar .document-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: #ffffff;
+  border-radius: 6px;
+  margin: 4px 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar .document-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.black-sidebar .document-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.black-sidebar .document-item svg {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.black-sidebar .footer-section {
+  border-top: 1px solid #333333;
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.black-sidebar .footer-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar .footer-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.black-sidebar .footer-item svg {
+  margin-right: 10px;
+}
+
+.black-sidebar .avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #4169e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.black-sidebar .upgrade-button {
+  background-color: #8a2be2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-size: 14px;
+  width: calc(100% - 32px);
+  margin: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.black-sidebar .upgrade-button:hover {
+  background-color: #7722c9;
+}
+
+.black-sidebar .upgrade-button svg {
+  margin-right: 8px;
+}
+
+/* VS Code Explorer Styling */
+.vscode-explorer {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  user-select: none;
+}
+
+.vscode-explorer::-webkit-scrollbar {
+  width: 10px;
+}
+
+.vscode-explorer::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+.vscode-explorer::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+
+.vscode-explorer::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
