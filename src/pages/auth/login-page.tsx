@@ -42,7 +42,6 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FormData) => {
     console.log("Login attempt with:", data)
-    // Simulate an API call delay
     await new Promise((resolve) => setTimeout(resolve, 1500))
     // Redirect logic goes here after successful login
   }
