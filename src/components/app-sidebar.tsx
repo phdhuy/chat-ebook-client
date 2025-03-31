@@ -37,7 +37,7 @@ export default function AppSidebar() {
           onClick={() => setCollapsed(false)}
           title="Expand sidebar"
         >
-          <FileText className="h-5 w-5" />
+          <FileText className="h-5 w-5 text-purple-600"/>
         </Button>
       </div>
     );
@@ -56,16 +56,16 @@ export default function AppSidebar() {
           onClick={() => setCollapsed(true)}
           title="Collapse sidebar"
         >
-          <PanelLeftClose className="h-5 w-5" />
+          <PanelLeftClose className="h-5 w-5 " />
         </Button>
       </div>
 
       <div className="px-4 space-y-2">
-        <Button variant="outline" className="w-full justify-start">
+        <Button className="w-full justify-start">
           <Plus className="mr-2 h-4 w-4" />
           New Chat
         </Button>
-        <Button variant="outline" className="w-full justify-start">
+        <Button className="w-full justify-start">
           <FolderPlus className="mr-2 h-4 w-4" />
           New Folder
         </Button>
@@ -74,7 +74,7 @@ export default function AppSidebar() {
       {/* Document List */}
       <div className="flex-1 overflow-auto px-4 py-2">
         {documents.map((doc) => (
-          <Link to={`/pdf/${doc.id}`} key={doc.id}>
+          <Link to={`/chat/${doc.id}`} key={doc.id}>
             <div
               className={`document-item ${
                 pathname === `/pdf/${doc.id}` ? "active" : ""
