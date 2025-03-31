@@ -1,7 +1,4 @@
-"use client";
-
 import type React from "react";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Menu, Moon, Sun, Maximize, Minimize, Settings, X } from "lucide-react";
 import { usePdf } from "@/hooks/use-pdf";
@@ -43,7 +40,7 @@ export default function EbookViewPage() {
 
     const updateHeight = () => {
       if (containerRef.current) {
-        const newHeight = containerRef.current.clientHeight - 120;
+        const newHeight = containerRef.current.clientHeight - 120; // Adjust for header + toolbar
         setListHeight(newHeight);
       }
     };
@@ -66,14 +63,24 @@ export default function EbookViewPage() {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
+  const getItemSize = useCallback(() => {
+    if (!pageDimensions) {
+      return 800 * scale;
+    }
+    const { width, height } = pageDimensions;
+    const isRotated = rotation % 180 !== 0;
+    const baseHeight = isRotated ? width : height;
+    return baseHeight * scale;
+  }, [pageDimensions, scale, rotation]);
+
   const handleScroll = useCallback(
     ({ scrollOffset }: { scrollOffset: number }) => {
       if (!pdf || !numPages) return;
-      const itemHeight = 800 * scale;
+      const itemHeight = getItemSize();
       const pageIndex = Math.floor(scrollOffset / itemHeight) + 1;
       setCurrentPage(Math.min(Math.max(1, pageIndex), numPages));
     },
-    [pdf, numPages, scale]
+    [pdf, numPages, getItemSize]
   );
 
   const toggleBookmark = () => {
@@ -94,22 +101,12 @@ export default function EbookViewPage() {
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= numPages && listRef.current) {
-      listRef.current.scrollToItem(page - 1, "start");
+      listRef.current.scrollToItem(page - 1, "center");
       setCurrentPage(page);
     }
   };
 
   const isBookmarked = bookmarks.some((b) => b.pageNumber === currentPage);
-
-  const getItemSize = useCallback(() => {
-    if (!pageDimensions) {
-      return 800 * scale;
-    }
-    const { width, height } = pageDimensions;
-    const isRotated = rotation % 180 !== 0;
-    const baseHeight = isRotated ? width : height;
-    return baseHeight * scale;
-  }, [pageDimensions, scale, rotation]);
 
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
@@ -118,11 +115,12 @@ export default function EbookViewPage() {
           ...style,
           display: "flex",
           justifyContent: "center",
+          alignItems: "center",
         }}
         className="w-full"
       >
         {pdf && (
-          <div className="max-w-3xl w-full">
+          <div className="flex justify-center">
             <PdfPage
               pdf={pdf}
               pageNumber={index + 1}
@@ -202,9 +200,7 @@ export default function EbookViewPage() {
         onToggleBookmark={toggleBookmark}
       />
 
-      {/* Content area with fixed position sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Fixed position with z-index */}
         {showToc && (
           <div className="fixed top-[7.5rem] left-66 w-72 h-[calc(100vh-7.5rem)] z-20">
             <PdfSidebar
@@ -239,7 +235,7 @@ export default function EbookViewPage() {
 
         {/* Main Content */}
         <main
-          className={`flex-1 overflow-hidden bg-gray-100 dark:bg-gray-900 ${
+          className={`flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900 ${
             showToc ? "pl-72" : ""
           } ${showSettings ? "pr-72" : ""} transition-all duration-300`}
         >

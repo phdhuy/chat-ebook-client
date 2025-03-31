@@ -25,8 +25,16 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const documents = [
-    { id: "doc1", name: "_Building Microservices_Designing Fi...", icon: MessageSquare },
-    { id: "doc2", name: "sql_query_optimization_techniques.pdf", icon: MessageSquare },
+    {
+      id: "doc1",
+      name: "_Building Microservices_Designing Fi...",
+      icon: MessageSquare,
+    },
+    {
+      id: "doc2",
+      name: "sql_query_optimization_techniques.pdf",
+      icon: MessageSquare,
+    },
   ];
 
   if (collapsed) {
@@ -61,10 +69,12 @@ export default function AppSidebar() {
       </div>
 
       <div className="px-4 space-y-2">
-        <Button className="w-full justify-start">
-          <Plus className="mr-2 h-4 w-4" />
-          New Chat
-        </Button>
+        <Link to={`/`}>
+          <Button className="w-full justify-start">
+            <Plus className="mr-2 h-4 w-4" />
+            New Chat
+          </Button>
+        </Link>
         <Button className="w-full justify-start">
           <FolderPlus className="mr-2 h-4 w-4" />
           New Folder
