@@ -1,4 +1,4 @@
-export type meta = {
+export type Meta = {
     current_page: number;
     next_page: number;
     prev_page: number;
@@ -9,5 +9,5 @@ export type meta = {
 export type ApiResponse<T> = {
   status: string;
   data: T;
-  meta?: meta;
+  meta?: Meta;
 };
