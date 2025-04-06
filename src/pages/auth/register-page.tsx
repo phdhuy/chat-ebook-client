@@ -71,6 +71,11 @@ export default function RegisterPage() {
     console.log(response);
   };
 
+  const errorMessage = (error: void) => {
+    console.error('Login Failed:', error);
+    alert('Google sign-in failed. Please try again.');
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       {/* Left side - Image */}
@@ -197,7 +202,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <GoogleLogin onSuccess={responseMessage} />
+          <GoogleLogin onSuccess={responseMessage} onError={errorMessage}/>
         </div>
 
         <p className="text-center text-sm text-gray-500">
