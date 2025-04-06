@@ -8,9 +8,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const queryClient = new QueryClient();
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
 
 createRoot(document.getElementById("root")!).render(
-  <GoogleOAuthProvider clientId="36459084665-9c2fbt9abju1vrg9v7cp4ecarnm3jsbh.apps.googleusercontent.com">
+  <GoogleOAuthProvider clientId={CLIENT_ID} >
     <StrictMode>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
