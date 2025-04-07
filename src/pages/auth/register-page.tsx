@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -8,40 +8,32 @@ import * as yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useGoogleLogin } from "@react-oauth/google";
+import { useRegister } from "./hooks/use-register";
+import { useLoginWithGoogle } from "./hooks/use-login";
 
-type FormData = {
-  name: string;
+interface FormData {
   email: string;
   password: string;
-  agreeTerms: boolean;
-};
+  confirmPassword: string;
+}
 
-const schema = yup
-  .object({
-    name: yup.string().required("Full Name is required"),
-    email: yup
-      .string()
-      .email("Invalid email format")
-      .required("Email is required"),
-    password: yup
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .required("Password is required"),
-    agreeTerms: yup
-      .boolean()
-      .default(false)
-      .required("You must agree to the Terms of Service and Privacy Policy")
-      .oneOf(
-        [true],
-        "You must agree to the Terms of Service and Privacy Policy"
-      ),
-  })
-  .required();
+const schema = yup.object().shape({
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const registerMutation = useRegister();
+  const loginWithGoogle = useLoginWithGoogle();
 
   const {
     register,
@@ -49,27 +41,15 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      agreeTerms: false,
-    },
   });
 
   const onSubmit = (data: FormData) => {
-    console.log("Form submitted:", data);
+    registerMutation.mutate({
+      email: data.email,
+      password: data.password,
+      confirmation_password: data.confirmPassword,
+    });
   };
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => console.log(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
-
-  const handleLoginClick = () => {
-    login();
-  };
-
 
   return (
     <div className="flex min-h-screen w-full">
@@ -106,14 +86,6 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" placeholder="John Doe" {...register("name")} />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -149,9 +121,6 @@ export default function RegisterPage() {
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500">
-              Password must be at least 8 characters long
-            </p>
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.password.message}
@@ -159,25 +128,33 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="flex items-start space-x-2">
-            <Checkbox id="terms" {...register("agreeTerms")} />
-            <Label
-              htmlFor="terms"
-              className="text-sm font-normal leading-tight"
-            >
-              I agree to the{" "}
-              <Link to="/terms" className="text-primary hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="text-primary hover:underline">
-                Privacy Policy
-              </Link>
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
+                {...register("confirmPassword")}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.confirmPassword?.message}
+              </p>
+            )}
           </div>
-          {errors.agreeTerms && (
-            <p className="text-red-500 text-xs">{errors.agreeTerms.message}</p>
-          )}
 
           <Button type="submit" className="w-full">
             <UserPlus className="mr-2 h-4 w-4" />
@@ -200,7 +177,7 @@ export default function RegisterPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={handleLoginClick}
+            onClick={() => loginWithGoogle()}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path

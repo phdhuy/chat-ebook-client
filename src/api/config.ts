@@ -1,3 +1,4 @@
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
 import axios from "axios";
 
 const api = axios.create({
@@ -13,7 +14,7 @@ let refreshSubscribers: ((token: string) => void)[] = [];
 
 async function refreshToken() {
   try {
-    const refreshToken = localStorage.getItem("refreshToken");
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     if (!refreshToken) throw new Error("No refresh token available");
 
     const refreshApi = axios.create({
@@ -29,13 +30,13 @@ async function refreshToken() {
     const newAccessToken = response.data.data.access_token;
     console.log(response.data.data.access_token);
 
-    localStorage.setItem("accessToken", newAccessToken);
+    localStorage.setItem(ACCESS_TOKEN, newAccessToken);
 
     return newAccessToken;
   } catch (error) {
     console.error("Failed to refresh token", error);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(REFRESH_TOKEN);
     window.location.href = "/login";
     return null;
   }
@@ -48,7 +49,7 @@ function onRefreshed(token: string) {
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -64,7 +65,7 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401) {
       console.error("Unauthorized! Redirecting to login...");
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem(ACCESS_TOKEN);
       window.location.href = "/login";
       return Promise.reject(error);
     }
