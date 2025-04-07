@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FileText,
@@ -9,6 +9,7 @@ import {
   Sparkles,
   ChevronDown,
   PanelLeftClose,
+  LogIn
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +19,18 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ACCESS_TOKEN } from "@/common";
 
 export default function AppSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
   const [collapsed, setCollapsed] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem(ACCESS_TOKEN);
+    setIsAuthenticated(!!accessToken);
+  }, []);
 
   const documents = [
     {
@@ -116,12 +124,21 @@ export default function AppSidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex items-center space-x-2">
-          <Avatar>
-            <AvatarFallback>Wi</AvatarFallback>
-          </Avatar>
-          <span>Windy Official</span>
-        </div>
+        {isAuthenticated ? (
+          <div className="flex items-center space-x-2">
+            <Avatar>
+              <AvatarFallback>Wi</AvatarFallback>
+            </Avatar>
+            <span>Windy Official</span>
+          </div>
+        ) : (
+          <Link to="/login">
+            <Button className="w-full">
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In
+            </Button>
+          </Link>
+        )}
 
         <Button className="w-full">
           <Sparkles className="mr-2 h-4 w-4" />

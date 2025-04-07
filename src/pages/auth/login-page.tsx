@@ -7,59 +7,39 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useGoogleLogin } from "@react-oauth/google";
+import { useLogin, useLoginWithGoogle } from "./hooks/use-login";
+import { InferType } from "yup";
 
-type FormData = {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-};
+type LoginForm = InferType<typeof schema>;
 
-const schema = yup
-  .object({
-    email: yup
-      .string()
-      .required("Email is required")
-      .email("Invalid email format"),
-    password: yup.string().required("Password is required"),
-    rememberMe: yup.boolean().default(false),
-  })
-  .required();
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = React.useState(false);
+  const loginMutation = useLogin();
+  const loginWithGoogle = useLoginWithGoogle();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      email: "",
-      password: "",
-      rememberMe: false,
-    },
-  });
+    formState: { errors },
+  } = useForm<LoginForm>({ resolver: yupResolver(schema) });
 
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const onSubmit = async (data: FormData) => {
-    console.log("Login attempt with:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-  };
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => console.log(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
-
-  const handleLoginClick = () => {
-    login();
+  const onSubmit = async (data: LoginForm) => {
+    loginMutation.mutate(data);
   };
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side - Form */}
       <div className="flex w-full flex-col justify-center space-y-6 px-4 md:w-1/2 md:px-8 lg:px-12 xl:px-20">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-3xl font-bold">Welcome back</h1>
@@ -120,15 +100,12 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox id="remember" {...register("rememberMe")} />
-            <Label htmlFor="remember" className="text-sm font-normal">
-              Remember me
-            </Label>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? (
               <>
                 <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
                 Signing in...
@@ -154,7 +131,11 @@ export default function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button variant="outline" className="w-full" onClick={handleLoginClick}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => loginWithGoogle()}
+          >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

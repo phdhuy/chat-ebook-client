@@ -40,7 +40,7 @@ export default function EbookViewPage() {
 
     const updateHeight = () => {
       if (containerRef.current) {
-        const newHeight = containerRef.current.clientHeight - 120; // Adjust for header + toolbar
+        const newHeight = containerRef.current.clientHeight - 120;
         setListHeight(newHeight);
       }
     };
