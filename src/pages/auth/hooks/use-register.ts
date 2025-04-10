@@ -15,7 +15,7 @@ export const useRegister = () => {
     mutationFn: async (data: RegisterRequest) => authApi.register(data),
     onSuccess: (data) => {
       console.log("User Registered:", data);
-      navigate("/login");
+      navigate("/sign-in");
     },
     onError: (error) => {
       console.error(

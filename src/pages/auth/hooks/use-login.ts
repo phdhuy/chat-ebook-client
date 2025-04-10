@@ -57,7 +57,6 @@ export const useLoginWithGoogle = () => {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
-      console.log("Google login success:", codeResponse);
       const loginData: LoginWithGoogleRequest = {
         access_token: codeResponse.access_token,
       };

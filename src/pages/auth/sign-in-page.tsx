@@ -1,86 +1,50 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-
+import { Link } from "react-router-dom";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRegister } from "./hooks/use-register";
-import { useLoginWithGoogle } from "./hooks/use-login";
+import { useLogin, useLoginWithGoogle } from "./hooks/use-login";
+import { InferType } from "yup";
 
-interface FormData {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+type LoginForm = InferType<typeof schema>;
 
 const schema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
 });
 
-export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const registerMutation = useRegister();
+export default function SignInPage() {
+  const [showPassword, setShowPassword] = React.useState(false);
+  const loginMutation = useLogin();
   const loginWithGoogle = useLoginWithGoogle();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-  });
+  } = useForm<LoginForm>({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data: FormData) => {
-    registerMutation.mutate({
-      email: data.email,
-      password: data.password,
-      confirmation_password: data.confirmPassword,
-    });
+  const onSubmit = async (data: LoginForm) => {
+    loginMutation.mutate(data);
   };
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left side - Image */}
-      <div className="hidden bg-black md:block md:w-1/2">
-        <div className="relative h-full w-full">
-          <div className="absolute inset-0 bg-gradient-to-l from-black to-transparent z-10"></div>
-          <div className="absolute inset-0 flex flex-col items-end justify-center p-12 z-20">
-            <div className="max-w-md space-y-4 text-right">
-              <h2 className="text-3xl font-bold text-white">
-                Start Your Reading Journey
-              </h2>
-              <p className="text-gray-300">
-                Join thousands of readers who use our platform to read, analyze,
-                and interact with their documents.
-              </p>
-              <div className="flex justify-end space-x-2">
-                <div className="h-1 w-12 rounded-full bg-gray-600"></div>
-                <div className="h-1 w-12 rounded-full bg-gray-600"></div>
-                <div className="h-1 w-12 rounded-full bg-primary"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="flex w-full flex-col justify-center space-y-6 px-4 md:w-1/2 md:px-8 lg:px-12 xl:px-20">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Create an account</h1>
+          <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="text-sm text-gray-500">
-            Enter your details to create your account
+            Enter your credentials to access your account
           </p>
         </div>
 
@@ -101,7 +65,15 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <Input
                 id="password"
@@ -120,45 +92,30 @@ export default function RegisterPage() {
                   <Eye className="h-4 w-4" />
                 )}
               </button>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.password.message}
-              </p>
-            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••••"
-                {...register("confirmPassword")}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.confirmPassword?.message}
-              </p>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? (
+              <>
+                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
+                Signing in...
+              </>
+            ) : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign in
+              </>
             )}
-          </div>
-
-          <Button type="submit" className="w-full">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Create account
           </Button>
         </form>
 
@@ -198,15 +155,43 @@ export default function RegisterPage() {
               />
             </svg>
             Google
-          </Button>{" "}
+          </Button>
         </div>
 
         <p className="text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link to="/login" className="text-primary hover:underline">
-            Sign in
+          Don&apos;t have an account?{" "}
+          <Link to="/sign-up" className="text-primary hover:underline">
+            Sign up
           </Link>
         </p>
+      </div>
+
+      {/* Right side - Image */}
+      <div className="hidden bg-black md:block md:w-1/2">
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10"></div>
+          <img
+            src="/placeholder.svg?height=1080&width=1920"
+            alt="Digital library"
+            className="h-full w-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 flex flex-col items-start justify-center p-12 z-20">
+            <div className="max-w-md space-y-4">
+              <h2 className="text-3xl font-bold text-white">
+                Your Digital Library
+              </h2>
+              <p className="text-gray-300">
+                Access thousands of ebooks and documents. Read, annotate, and
+                chat with your documents using AI.
+              </p>
+              <div className="flex space-x-2">
+                <div className="h-1 w-12 rounded-full bg-primary"></div>
+                <div className="h-1 w-12 rounded-full bg-gray-600"></div>
+                <div className="h-1 w-12 rounded-full bg-gray-600"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

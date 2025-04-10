@@ -17,27 +17,19 @@ async function refreshToken() {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     if (!refreshToken) throw new Error("No refresh token available");
 
-    const refreshApi = axios.create({
-      baseURL: import.meta.env.VITE_BASE_ENDPOINT || "",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const response = await refreshApi.post("/v1/auth/refresh-token", {
+    const response = await api.post("/v1/auth/refresh-token", {
       refresh_token: refreshToken,
     });
 
-    console.log(response);
     const newAccessToken = response.data.data.access_token;
-    console.log(response.data.data.access_token);
 
     localStorage.setItem(ACCESS_TOKEN, newAccessToken);
-
     return newAccessToken;
   } catch (error) {
     console.error("Failed to refresh token", error);
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
-    window.location.href = "/login";
+    window.location.href = "/sign-in";
     return null;
   }
 }
@@ -62,11 +54,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    console.log("VAO DAY NE");
+
 
     if (error.response?.status === 401) {
       console.error("Unauthorized! Redirecting to login...");
       localStorage.removeItem(ACCESS_TOKEN);
-      window.location.href = "/login";
+      window.location.href = "/sign-in";
       return Promise.reject(error);
     }
 
