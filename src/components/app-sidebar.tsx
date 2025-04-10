@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FileText,
@@ -9,7 +9,7 @@ import {
   Sparkles,
   ChevronDown,
   PanelLeftClose,
-  LogIn
+  LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,32 +18,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ACCESS_TOKEN } from "@/common";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMyProfile } from "@/hooks/use-my-profile";
+import { useMyConversation } from "@/hooks/use-my-conversation";
 
 export default function AppSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
   const [collapsed, setCollapsed] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem(ACCESS_TOKEN);
-    setIsAuthenticated(!!accessToken);
-  }, []);
-
-  const documents = [
-    {
-      id: "doc1",
-      name: "_Building Microservices_Designing Fi...",
-      icon: MessageSquare,
-    },
-    {
-      id: "doc2",
-      name: "sql_query_optimization_techniques.pdf",
-      icon: MessageSquare,
-    },
-  ];
+  const { data: profile } = useMyProfile();
+  const { data: conversations } = useMyConversation();
 
   if (collapsed) {
     return (
@@ -53,7 +37,7 @@ export default function AppSidebar() {
           onClick={() => setCollapsed(false)}
           title="Expand sidebar"
         >
-          <FileText className="h-5 w-5 text-purple-600"/>
+          <FileText className="h-5 w-5 text-purple-600" />
         </Button>
       </div>
     );
@@ -62,10 +46,12 @@ export default function AppSidebar() {
   return (
     <div className="black-sidebar h-screen flex flex-col">
       <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-2">
-          <FileText className="h-5 w-5 text-white" />
-          <span className="brand-name">ChatEbook</span>
-        </div>
+        <Link to={`/`}>
+          <div className="flex items-center space-x-2">
+            <FileText className="h-5 w-5 text-white" />
+            <span className="brand-name">ChatEbook</span>
+          </div>
+        </Link>
         <Button
           variant="ghost"
           size="icon"
@@ -77,7 +63,7 @@ export default function AppSidebar() {
       </div>
 
       <div className="px-4 space-y-2">
-        <Link to={`/`}>
+        <Link to={`/upload`}>
           <Button className="w-full justify-start">
             <Plus className="mr-2 h-4 w-4" />
             New Chat
@@ -89,23 +75,21 @@ export default function AppSidebar() {
         </Button>
       </div>
 
-      {/* Document List */}
       <div className="flex-1 overflow-auto px-4 py-2">
-        {documents.map((doc) => (
-          <Link to={`/chat/${doc.id}`} key={doc.id}>
+        {conversations?.data.map((conversation) => (
+          <Link to={`/chat/${conversation.id}`} key={conversation.id}>
             <div
               className={`document-item ${
-                pathname === `/pdf/${doc.id}` ? "active" : ""
+                pathname === `/chat/${conversation.id}` ? "active" : ""
               }`}
             >
-              <doc.icon className="h-4 w-4" />
-              <span className="truncate">{doc.name}</span>
+              <MessageSquare className="h-4 w-4" />
+              <span className="truncate">{conversation.name}</span>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* Footer */}
       <div className="footer-section p-4 space-y-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -120,19 +104,22 @@ export default function AppSidebar() {
           <DropdownMenuContent>
             <DropdownMenuItem>English</DropdownMenuItem>
             <DropdownMenuItem>Spanish</DropdownMenuItem>
-            {/* Add more languages as needed */}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {isAuthenticated ? (
+        {profile?.data.username !== null ? (
           <div className="flex items-center space-x-2">
             <Avatar>
+              <AvatarImage
+                src={profile?.data.avatar_url}
+                referrerPolicy="no-referrer"
+              />
               <AvatarFallback>Wi</AvatarFallback>
             </Avatar>
-            <span>Windy Official</span>
+            <span>{profile?.data.username}</span>
           </div>
         ) : (
-          <Link to="/login">
+          <Link to="/sign-in">
             <Button className="w-full">
               <LogIn className="mr-2 h-4 w-4" />
               Sign In

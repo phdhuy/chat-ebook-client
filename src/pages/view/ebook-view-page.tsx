@@ -11,7 +11,7 @@ import type { Bookmark } from "@/types/pdf";
 import { FixedSizeList } from "react-window";
 
 const PDF_URL =
-  "/_Building Microservices_ Designing Fine-Grained Systems (2021, O'Reilly Media) - Sam Newman.pdf";
+  "https://res.cloudinary.com/dx5omabv0/image/upload/v1744101025/qt14qrnmmpyyd2cerawj.pdf";
 
 export default function EbookViewPage() {
   const {
