@@ -9,11 +9,17 @@ import { PdfSettings } from "@/components/pdf/pdf-setting";
 import { PdfPage } from "@/components/pdf/pdf-page";
 import type { Bookmark } from "@/types/pdf";
 import { FixedSizeList } from "react-window";
+import { useConversationDetail } from "@/hooks/use-conversation-detail";
+import { useParams } from "react-router-dom";
 
-const PDF_URL =
-  "https://res.cloudinary.com/dx5omabv0/image/upload/v1744101025/qt14qrnmmpyyd2cerawj.pdf";
 
 export default function EbookViewPage() {
+  const params = useParams()
+
+  const conversationId = params.id as string
+  const { data: conversation } = useConversationDetail(conversationId as string);
+
+  const pdfUrl = conversation?.data?.file?.secure_url || "";
   const {
     pdf,
     numPages,
@@ -22,7 +28,7 @@ export default function EbookViewPage() {
     outline,
     isLoading,
     pageDimensions,
-  } = usePdf(PDF_URL);
+  } = usePdf(pdfUrl);
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1.2);
   const [rotation, setRotation] = useState(0);
@@ -244,7 +250,7 @@ export default function EbookViewPage() {
               <div className="w-10 h-10 border-4 border-gray-300 dark:border-gray-600 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mb-4" />
               <p className="text-gray-600 dark:text-gray-300">Loading PDF...</p>
             </div>
-          ) : pdf ? (
+          ) : (
             <FixedSizeList
               ref={listRef}
               height={listHeight}
@@ -262,15 +268,6 @@ export default function EbookViewPage() {
             >
               {Row}
             </FixedSizeList>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-red-600 dark:text-red-400 mb-2">
-                Failed to load PDF
-              </p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Please try again or check the URL
-              </p>
-            </div>
           )}
         </main>
       </div>
