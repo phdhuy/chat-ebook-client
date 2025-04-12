@@ -22,6 +22,11 @@ export const conversationApi = {
     getMyConversation: async (): Promise<ApiResponse<ConversationInfoResponse[]>> => {
       const response = await api.get("/v1/conversations");
       return response.data;
+  },
+
+    getDetailConversation: async (conversationId: string): Promise<ApiResponse<ConversationInfoResponse>> => {
+      const response = await api.get(`/v1/conversations/${conversationId}`);
+      return response.data;
     },
 
     createConversation: async (file: File): Promise<ApiResponse<ConversationInfoResponse>> => {

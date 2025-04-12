@@ -9,6 +9,24 @@ const api = axios.create({
   },
 });
 
+const refreshApi = axios.create({
+  baseURL: import.meta.env.VITE_BASE_ENDPOINT || "",
+  headers: { "Content-Type": "application/json" },
+});
+
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
@@ -17,7 +35,7 @@ async function refreshToken() {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     if (!refreshToken) throw new Error("No refresh token available");
 
-    const response = await api.post("/v1/auth/refresh-token", {
+    const response = await refreshApi.post("/v1/auth/refresh-token", {
       refresh_token: refreshToken,
     });
 
@@ -39,23 +57,10 @@ function onRefreshed(token: string) {
   refreshSubscribers = [];
 }
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log("VAO DAY NE");
-
 
     if (error.response?.status === 401) {
       console.error("Unauthorized! Redirecting to login...");

@@ -1,17 +1,12 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCreateConversation } from "@/hooks/use-create-conversation";
 
-const allowedFileTypes = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "image/png",
-  "image/jpeg",
-];
+const allowedFileTypes = ["application/pdf"];
 
 interface IFormInputs {
   file: FileList;
@@ -29,9 +24,23 @@ const schema = yup.object({
     }),
 }) as yup.ObjectSchema<IFormInputs>;
 
+function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
+  return (value) => {
+    refs.forEach((ref) => {
+      if (!ref) return;
+      if (typeof ref === "function") {
+        ref(value);
+      } else {
+        (ref as React.MutableRefObject<T | null>).current = value;
+      }
+    });
+  };
+}
+
 export default function UploadFilePage() {
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSelectClick = () => {
     fileInputRef.current?.click();
@@ -42,79 +51,72 @@ export default function UploadFilePage() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<IFormInputs>({
-    resolver: yupResolver(schema),
+    watch,
+  } = useForm<IFormInputs>({ resolver: yupResolver(schema) });
+
+  const { ref: hookFormRef, ...fileInputProps } = register("file");
+  const selectedFile = watch("file")?.[0];
+
+  const { mutate: createConversation, isPending } = useCreateConversation({
+    onSuccess: (data) => {
+      console.log("File uploaded and conversation created:", data);
+      setUploadStatus('success');
+      reset();
+    },
+    onError: (error) => {
+      console.error("Failed to upload file:", error);
+      setUploadStatus('error');
+      setErrorMessage('Failed to upload file. Please try again.');
+    },
   });
 
-  const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
-    setIsUploading(true);
+  const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     const file = data.file[0];
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        console.log("File uploaded successfully");
-        reset();
-      } else {
-        console.error("File upload failed");
-      }
-    } catch (error) {
-      console.error("Error uploading file", error);
-    } finally {
-      setIsUploading(false);
-    }
+    console.log("Submitting file:", file);
+    createConversation(file);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-16">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Upload Your Ebook
-        </h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Upload Your Ebook</h1>
         <p className="text-lg text-gray-500 text-center mb-10">
           Drag & drop a file here or click to select one
         </p>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="border-2 border-dashed rounded-lg p-12 text-center hover:border-primary transition-colors">
             <Upload className="mx-auto mb-6 h-16 w-16 text-primary" />
-            <p className="text-xl text-gray-600 mb-6">
-              Drag & drop your file here
-            </p>
+            <p className="text-xl text-gray-600 mb-6">Drag & drop your file here</p>
             <input
               type="file"
               id="file-upload"
               className="sr-only"
-              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-              {...register("file")}
-              ref={fileInputRef}
+              accept=".pdf"
+              {...fileInputProps}
+              ref={mergeRefs(hookFormRef, fileInputRef)}
             />
-            <Button
-              size="lg"
-              disabled={isUploading}
-              type="button"
-              onClick={handleSelectClick}
-            >
-              {isUploading ? "Uploading..." : "Select File"}
+            <Button size="lg" disabled={isPending} type="button" onClick={handleSelectClick}>
+              {isPending ? "Uploading..." : "Select File"}
             </Button>
-
+            {selectedFile && (
+              <p className="mt-2 text-sm text-gray-600">Selected file: {selectedFile.name}</p>
+            )}
             {errors.file && (
-              <p className="mt-2 text-sm text-red-600">
-                {errors.file.message as string}
-              </p>
+              <p className="mt-2 text-sm text-red-600">{errors.file.message as string}</p>
             )}
           </div>
           <div className="mt-8 text-center">
-            <Button type="submit" size="lg" disabled={isUploading}>
-              {isUploading ? "Uploading..." : "Upload"}
+            <Button type="submit" size="lg" disabled={isPending}>
+              {isPending ? "Uploading..." : "Upload"}
             </Button>
           </div>
         </form>
+        {uploadStatus === 'success' && (
+          <p className="mt-4 text-green-600 text-center">File uploaded successfully!</p>
+        )}
+        {uploadStatus === 'error' && (
+          <p className="mt-4 text-red-600 text-center">{errorMessage}</p>
+        )}
       </div>
     </div>
   );
