@@ -10,6 +10,7 @@ import {
   ChevronDown,
   PanelLeftClose,
   LogIn,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import { useMyConversation } from "@/hooks/use-my-conversation";
+import { useRevokeToken } from "@/hooks/use-revoke-token";
 
 export default function AppSidebar() {
   const location = useLocation();
@@ -28,6 +30,26 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { data: profile } = useMyProfile();
   const { data: conversations } = useMyConversation();
+
+  const { mutate: revokeToken, isPending: revoking } = useRevokeToken({
+    onSuccess: () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/sign-in";
+    },
+    onError: (error) => {
+      console.error("Failed to revoke token: ", error);
+    },
+  });
+
+  const handleSignOut = () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+      revokeToken({ refresh_token: refreshToken });
+    } else {
+      window.location.href = "/sign-in";
+    }
+  };
 
   if (collapsed) {
     return (
@@ -58,7 +80,7 @@ export default function AppSidebar() {
           onClick={() => setCollapsed(true)}
           title="Collapse sidebar"
         >
-          <PanelLeftClose className="h-5 w-5 " />
+          <PanelLeftClose className="h-5 w-5" />
         </Button>
       </div>
 
@@ -107,17 +129,34 @@ export default function AppSidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {profile?.data.username !== null ? (
-          <div className="flex items-center space-x-2">
-            <Avatar>
-              <AvatarImage
-                src={profile?.data.avatar_url}
-                referrerPolicy="no-referrer"
-              />
-              <AvatarFallback>Wi</AvatarFallback>
-            </Avatar>
-            <span>{profile?.data.username}</span>
-          </div>
+        {profile?.data.username ? (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Avatar>
+                  <AvatarImage
+                    src={profile?.data.avatar_url}
+                    referrerPolicy="no-referrer"
+                  />
+                  <AvatarFallback>Wi</AvatarFallback>
+                </Avatar>
+                <span>{profile?.data.username}</span>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={handleSignOut}
+                title="Sign Out"
+                disabled={revoking}
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <Button className="w-full">
+              <Sparkles className="mr-2 h-4 w-4" />
+              Upgrade to Plus
+            </Button>
+          </>
         ) : (
           <Link to="/sign-in">
             <Button className="w-full">
@@ -126,11 +165,6 @@ export default function AppSidebar() {
             </Button>
           </Link>
         )}
-
-        <Button className="w-full">
-          <Sparkles className="mr-2 h-4 w-4" />
-          Upgrade to Plus
-        </Button>
       </div>
     </div>
   );

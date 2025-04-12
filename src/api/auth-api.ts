@@ -48,5 +48,10 @@ export const authApi = {
   loginWithGoogle: async (body: LoginWithGoogleRequest): Promise<ApiResponse<TokenResponse>> => {
     const response = await api.post("/v1/auth/google", body);
     return response.data;
-  }
+  },
+
+  revoketoken: async (body: RefreshTokenRequest): Promise<ApiResponse<void>> => {
+    const response = await api.post("/v1/auth/revoke-token", body);
+    return response.data;
+  },
 };
