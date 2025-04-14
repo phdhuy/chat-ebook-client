@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FileText,
   MessageSquare,
-  FolderPlus,
   Plus,
   Languages,
   Sparkles,
   ChevronDown,
   PanelLeftClose,
+  PanelLeftOpen,
   LogIn,
   LogOut,
 } from "lucide-react";
@@ -24,10 +23,14 @@ import { useMyProfile } from "@/hooks/use-my-profile";
 import { useMyConversation } from "@/hooks/use-my-conversation";
 import { useRevokeToken } from "@/hooks/use-revoke-token";
 
-export default function AppSidebar() {
+interface AppSidebarProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export default function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
-  const [collapsed, setCollapsed] = useState(false);
   const { data: profile } = useMyProfile();
   const { data: conversations } = useMyConversation();
 
@@ -51,15 +54,15 @@ export default function AppSidebar() {
     }
   };
 
-  if (collapsed) {
+  if (isCollapsed) {
     return (
-      <div className="black-sidebar-collapsed">
+      <div className="black-sidebar-collapsed flex justify-center items-center h-full">
         <Button
           variant="ghost"
-          onClick={() => setCollapsed(false)}
+          onClick={onToggleCollapse}
           title="Expand sidebar"
         >
-          <FileText className="h-5 w-5 text-purple-600" />
+          <PanelLeftOpen className="h-5 w-5 text-white" />
         </Button>
       </div>
     );
@@ -71,38 +74,34 @@ export default function AppSidebar() {
         <Link to={`/`}>
           <div className="flex items-center space-x-2">
             <FileText className="h-5 w-5 text-white" />
-            <span className="brand-name">ChatEbook</span>
+            <span className="brand-name truncate">ChatEbook</span>
           </div>
         </Link>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCollapsed(true)}
+          onClick={onToggleCollapse}
           title="Collapse sidebar"
         >
-          <PanelLeftClose className="h-5 w-5" />
+          <PanelLeftClose className="h-5 w-5 text-white" />
         </Button>
       </div>
 
       <div className="px-4 space-y-2">
         <Link to={`/upload`}>
-          <Button className="w-full justify-start">
+          <Button className="w-full justify-start truncate">
             <Plus className="mr-2 h-4 w-4" />
             New Chat
           </Button>
         </Link>
-        <Button className="w-full justify-start">
-          <FolderPlus className="mr-2 h-4 w-4" />
-          New Folder
-        </Button>
       </div>
 
       <div className="flex-1 overflow-auto px-4 py-2">
         {conversations?.data.map((conversation) => (
           <Link to={`/chat/${conversation.id}`} key={conversation.id}>
             <div
-              className={`document-item ${
-                pathname === `/chat/${conversation.id}` ? "active" : ""
+              className={`flex items-center space-x-2 p-2 rounded ${
+                pathname === `/chat/${conversation.id}` ? "bg-gray-700" : ""
               }`}
             >
               <MessageSquare className="h-4 w-4" />
@@ -140,7 +139,7 @@ export default function AppSidebar() {
                   />
                   <AvatarFallback>Wi</AvatarFallback>
                 </Avatar>
-                <span>{profile?.data.username}</span>
+                <span className="truncate">{profile?.data.username}</span>
               </div>
               <Button
                 variant="ghost"

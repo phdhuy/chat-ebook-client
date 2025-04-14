@@ -7,6 +7,7 @@ import UploadFilePage from "@/pages/upload/upload-file-page";
 import EbookViewPage from "@/pages/view/ebook-view-page";
 import SignInPage from "@/pages/auth/sign-in-page";
 import SignUpPage from "@/pages/auth/sign-up-page";
+import EbookViewLayout from "@/layouts/ebook-view-layout";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -24,6 +25,12 @@ const AppRoutes = () => {
       children: [
         { index: true, element: <HomePage /> },
         { path: "upload", element: <UploadFilePage /> },
+      ],
+    },
+    {
+      path: "/",
+      element: <EbookViewLayout />,
+      children: [
         { path: "chat/:id", element: <EbookViewPage /> }
       ],
     },
