@@ -271,14 +271,6 @@ export default function EbookViewPage() {
           )}
         </main>
       </div>
-
-      {/* Reading Progress */}
-      <div className="h-1 bg-gray-200 dark:bg-gray-700 fixed bottom-0 left-0 right-0 z-30">
-        <div
-          className="h-full bg-purple-600 dark:bg-purple-500 transition-all duration-300"
-          style={{ width: `${(currentPage / (numPages || 1)) * 100}%` }}
-        />
-      </div>
     </div>
   );
 }
