@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import type { Bookmark, PdfOutlineItem } from "@/types/pdf"
@@ -47,7 +45,6 @@ export const PdfSidebar: React.FC<PdfSidebarProps> = ({
           className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           aria-label="Close sidebar"
         >
-          <X size={18} />
         </button>
       </div>
 
