@@ -108,15 +108,6 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto shadow-lg rounded-lg overflow-hidden bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Customer Support Chat
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Get help with your account and services
-          </p>
-        </div>
 
         {/* Messages Area */}
         <ScrollArea className="flex-1 p-4 overflow-y-auto">
@@ -129,7 +120,6 @@ export default function ChatPage() {
                   key={message.id}
                   className={cn(
                     "flex gap-3 max-w-[85%] animate-in fade-in-0 slide-in-from-bottom-3 duration-300",
-                    // If it's a user message, push it to the right
                     isUser ? "ml-auto flex-row-reverse" : ""
                   )}
                 >

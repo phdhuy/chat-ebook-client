@@ -12,3 +12,4 @@ export const formatDateTime = (timestamp: number) => {
 
 export const ACCESS_TOKEN = "accessToken";
 export const REFRESH_TOKEN = "refreshToken";
+export const ALLOW_FILE_TYPES = ["application/pdf"];

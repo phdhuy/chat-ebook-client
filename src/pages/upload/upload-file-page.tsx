@@ -5,8 +5,9 @@ import * as yup from "yup";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCreateConversation } from "@/hooks/use-create-conversation";
-
-const allowedFileTypes = ["application/pdf"];
+import { useQueryClient } from "@tanstack/react-query";
+import { ALLOW_FILE_TYPES } from "@/common";
+import { useNavigate } from "react-router-dom";
 
 interface IFormInputs {
   file: FileList;
@@ -18,7 +19,7 @@ const schema = yup.object({
     .required("A file is required")
     .test("fileType", "Unsupported file format", (value) => {
       if (value && value instanceof FileList && value.length > 0) {
-        return allowedFileTypes.includes(value[0].type);
+        return ALLOW_FILE_TYPES.includes(value[0].type);
       }
       return false;
     }),
@@ -41,6 +42,8 @@ export default function UploadFilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleSelectClick = () => {
     fileInputRef.current?.click();
@@ -59,8 +62,9 @@ export default function UploadFilePage() {
 
   const { mutate: createConversation, isPending } = useCreateConversation({
     onSuccess: (data) => {
-      console.log("File uploaded and conversation created:", data);
       setUploadStatus('success');
+      queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+      navigate(`/chat/${data?.data.id}`);
       reset();
     },
     onError: (error) => {
