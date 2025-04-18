@@ -82,30 +82,12 @@ export default function EbookViewPage() {
     [pdf, numPages, getItemSize],
   )
 
-  const toggleBookmark = () => {
-    const exists = bookmarks.some((b) => b.pageNumber === currentPage)
-    if (exists) {
-      setBookmarks(bookmarks.filter((b) => b.pageNumber !== currentPage))
-    } else {
-      setBookmarks([
-        ...bookmarks,
-        {
-          pageNumber: currentPage,
-          title: `Page ${currentPage}`,
-          timestamp: new Date(),
-        },
-      ])
-    }
-  }
-
   const goToPage = (page: number) => {
     if (page >= 1 && page <= numPages && listRef.current) {
       listRef.current.scrollToItem(page - 1, "center")
       setCurrentPage(page)
     }
   }
-
-  const isBookmarked = bookmarks.some((b) => b.pageNumber === currentPage)
 
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
@@ -295,19 +277,6 @@ export default function EbookViewPage() {
           </main>
         </div>
       </div>
-
-      {/* Floating Bookmark Button - Always visible */}
-      <button
-        onClick={toggleBookmark}
-        className={`absolute bottom-4 right-4 z-40 p-2 rounded-full shadow-md transition-colors ${
-          isBookmarked
-            ? "bg-purple-500 text-white hover:bg-purple-600"
-            : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
-        }`}
-        aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-      >
-        {isBookmarked ? "★" : "☆"}
-      </button>
 
       {/* Floating Page Navigation - Only visible when controls are hidden */}
       {!showControls && (
