@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCreateConversation } from "@/hooks/use-create-conversation";
+import { useCreateConversation } from "@/pages/upload/hooks/use-create-conversation";
 import { useQueryClient } from "@tanstack/react-query";
 import { ALLOW_FILE_TYPES } from "@/common";
 import { useNavigate } from "react-router-dom";

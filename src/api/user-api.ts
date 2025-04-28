@@ -21,7 +21,7 @@ export const userApi = {
     return response.data;
   },
 
-  createQueue: async (): Promise<ApiResponse<UserInfoResponse>> => {
+  createQueue: async (): Promise<ApiResponse<QueueInfoResponse>> => {
     const response = await api.post("/v1/users/queues");
     return response.data;
   },
