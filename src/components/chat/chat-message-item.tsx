@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Copy, Check, Download, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface Message {
@@ -18,6 +18,19 @@ interface ChatMessageItemProps {
 
 export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCopy, onFeedback }) => {
   const isUser = message.role === "user";
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [copied]);
+
+  const handleCopy = () => {
+    onCopy?.(message.content);
+    setCopied(true);
+  };
 
   return (
     <div
@@ -41,8 +54,13 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCop
 
       {/* Bubble + Timestamp */}
       <div className="space-y-2">
-        <div className={cn("flex items-center gap-2", isUser ? "justify-end" : "justify-start")}>  
-          <span className={cn("text-sm font-medium", isUser ? "text-gray-700 dark:text-gray-300" : "text-gray-700 dark:text-gray-300")}>  
+        <div className={cn("flex items-center gap-2", isUser ? "justify-end" : "justify-start")}>
+          <span
+            className={cn(
+              "text-sm font-medium",
+              isUser ? "text-gray-700 dark:text-gray-300" : "text-gray-700 dark:text-gray-300"
+            )}
+          >
             {isUser ? "You" : "GenerativeAgent"}
           </span>
           <span className={cn("text-xs text-gray-500 dark:text-gray-400", isUser ? "text-right" : "text-left")}>  
@@ -61,8 +79,12 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCop
         </div>
         {!isUser && (
           <div className="flex items-center gap-1.5">
-            <Button variant="ghost" size="icon" onClick={() => onCopy?.(message.content)}>
-              <Copy className="h-3.5 w-3.5 text-gray-500" />
+            <Button variant="ghost" size="icon" onClick={handleCopy}>
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-green-500" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 text-gray-500" />
+              )}
             </Button>
             <Button variant="ghost" size="icon">
               <Download className="h-3.5 w-3.5 text-gray-500" />

@@ -8,6 +8,7 @@ import EbookViewPage from "@/pages/view/ebook-view-page";
 import SignInPage from "@/pages/auth/sign-in-page";
 import SignUpPage from "@/pages/auth/sign-up-page";
 import EbookViewLayout from "@/layouts/ebook-view-layout";
+import PrivateRoute from "./utils";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -24,7 +25,12 @@ const AppRoutes = () => {
       element: <RootLayout />,
       children: [
         { index: true, element: <HomePage /> },
-        { path: "upload", element: <UploadFilePage /> },
+        {
+          element: <PrivateRoute />,
+          children: [
+            { path: "upload", element: <UploadFilePage /> },
+          ]
+        }
       ],
     },
     {
