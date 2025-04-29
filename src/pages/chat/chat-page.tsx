@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   useWebSocketQueue,
   Message as WSMessage,
+  WebSocketError, // Added import
 } from "@/hooks/use-websocket-queue";
 import { useCreateMessage } from "./hooks/use-create-message";
 import { useGetListMessage } from "./hooks/use-get-list-message";
@@ -27,7 +28,7 @@ export default function ChatPage() {
     setLiveMessages((prev) => [...prev, uiMsg]);
   }, []);
 
-  const onError = useCallback((err) => {
+  const onError = useCallback((err: WebSocketError) => {
     console.error("WebSocket error:", err);
   }, []);
 
