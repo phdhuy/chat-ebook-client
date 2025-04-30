@@ -16,7 +16,7 @@ export const useGetListMessage = (
 ) => {
   return useQuery<ApiResponse<MessageInfoResponse[]>>({
     ...options,
-    queryKey: ["messages", params],
+    queryKey: ["messages", conversationId, params],
     queryFn: () =>
       messageApi.getListMessageInConversation(conversationId, params),
   });

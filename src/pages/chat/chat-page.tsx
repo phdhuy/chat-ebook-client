@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   useWebSocketQueue,
   Message as WSMessage,
-  WebSocketError, // Added import
+  WebSocketError,
 } from "@/hooks/use-websocket-queue";
 import { useCreateMessage } from "./hooks/use-create-message";
 import { useGetListMessage } from "./hooks/use-get-list-message";
@@ -11,6 +11,7 @@ import { formatDateTime } from "@/common";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Message as UIMessage } from "@/components/chat/chat-message-item";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ChatPage() {
   const { id: conversationId = "" } = useParams();
@@ -18,33 +19,33 @@ export default function ChatPage() {
   const [historicalMessages, setHistoricalMessages] = useState<UIMessage[]>([]);
   const [liveMessages, setLiveMessages] = useState<UIMessage[]>([]);
 
+  useEffect(() => {
+    setHistoricalMessages([]);
+    setLiveMessages([]);
+  }, [conversationId]);
+
   const onMessage = useCallback((msg: WSMessage) => {
-    const uiMsg: UIMessage = {
-      id: msg.id,
-      role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
-      content: msg.content,
-      timestamp: formatDateTime(msg.created_at),
-    };
-    setLiveMessages((prev) => [...prev, uiMsg]);
+    if (msg.conversation_id === conversationId) {
+      const uiMsg: UIMessage = {
+        id: msg.id,
+        role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
+        content: msg.content,
+        timestamp: formatDateTime(msg.created_at),
+      };
+      setLiveMessages((prev) => [...prev, uiMsg]);
+    }
   }, []);
 
   const onError = useCallback((err: WebSocketError) => {
     console.error("WebSocket error:", err);
   }, []);
 
-  const {
-    connected,
-    error: wsError,
-  } = useWebSocketQueue({
+  const { error: wsError } = useWebSocketQueue({
     onError,
     onMessage,
   });
 
-  const {
-    data,
-    isLoading,
-    error: restError,
-  } = useGetListMessage(
+  const { data, isLoading, error: restError } = useGetListMessage(
     { sort: "id", order: "asc", page: 1, paging: 50 },
     conversationId
   );
@@ -76,24 +77,35 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto shadow-lg rounded-lg overflow-hidden bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800">
-        <ChatMessageList
-          messages={messagesToDisplay}
-          isLoading={isLoading}
-          error={restError || (wsError ? new Error(wsError) : null)}
-          onCopy={(text) => navigator.clipboard.writeText(text)}
-          onFeedback={(t) => console.log("Feedback:", t)}
-        />
+        {/* Skeleton loading state */}
+        {isLoading ? (
+          <div className="p-4 space-y-4">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <ChatMessageList
+            messages={messagesToDisplay}
+            isLoading={isLoading}
+            error={restError || (wsError ? new Error(wsError) : null)}
+            onCopy={(text) => navigator.clipboard.writeText(text)}
+            onFeedback={(t) => console.log("Feedback:", t)}
+          />
+        )}
+
         <ChatInput
           input={input}
           onChange={setInput}
           onSend={handleSend}
           disabled={isSending}
         />
-        {!connected && (
-          <div className="text-sm text-red-500 text-center p-2">
-            Reconnecting to chat…
-          </div>
-        )}
       </div>
     </div>
   );

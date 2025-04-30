@@ -21,7 +21,7 @@ export default function EbookViewPage() {
   const { pdf, numPages, documentTitle, author, outline, isLoading, pageDimensions } = usePdf(pdfUrl)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [scale, setScale] = useState(1.2)
+  const [scale, setScale] = useState(1)
   const [rotation, setRotation] = useState(0)
   const [darkMode, setDarkMode] = useState(false)
   const [showToc, setShowToc] = useState(false)
