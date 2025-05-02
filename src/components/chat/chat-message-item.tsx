@@ -72,7 +72,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCop
             "p-3.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap leading-relaxed border",
             isUser
               ? "bg-purple-600 text-white border-purple-600"
-              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+              : "bg-white text-black dark:bg-gray-900 border-gray-200 dark:border-gray-800"
           )}
         >
           {message.content}

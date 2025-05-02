@@ -1,8 +1,10 @@
 import { useRef, useEffect } from "react";
-import * as pdfjs from "pdfjs-dist";
+import * as pdfjsLib from "pdfjs-dist";
+import { TextLayerBuilder } from "pdfjs-dist/web/pdf_viewer.mjs";
+import "pdfjs-dist/web/pdf_viewer.css";
 
 interface PdfPageProps {
-  pdf: pdfjs.PDFDocumentProxy;
+  pdf: pdfjsLib.PDFDocumentProxy;
   pageNumber: number;
   scale: number;
   rotation: number;
@@ -17,31 +19,39 @@ export const PdfPage: React.FC<PdfPageProps> = ({
   darkMode,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const textLayerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let renderTask: pdfjs.RenderTask;
+    let renderTask: pdfjsLib.RenderTask | null = null;
+    let textLayerBuilder: TextLayerBuilder | null = null;
+    let cancelled = false;
 
     const renderPage = async () => {
       const page = await pdf.getPage(pageNumber);
-
-      const baseViewport = page.getViewport({ scale: 1, rotation });
-      const targetWidth = Math.round(baseViewport.width * scale);
-      const targetHeight = Math.round(baseViewport.height * scale);
-
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext("2d")!;
-
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      canvas.style.width = `${targetWidth}px`;
-      canvas.style.height = `${targetHeight}px`;
+      if (cancelled) return;
 
       const viewport = page.getViewport({ scale, rotation });
+      const w = Math.round(viewport.width);
+      const h = Math.round(viewport.height);
+
+      const container = containerRef.current!;
+      container.style.width = `${w}px`;
+      container.style.height = `${h}px`;
+
+      const canvas = canvasRef.current!;
+      canvas.width = w;
+      canvas.height = h;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+
+      const ctx = canvas.getContext("2d")!;
       renderTask = page.render({ canvasContext: ctx, viewport });
       await renderTask.promise;
+      if (cancelled) return;
 
       if (darkMode) {
-        const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+        const imageData = ctx.getImageData(0, 0, w, h);
         const d = imageData.data;
         for (let i = 0; i < d.length; i += 4) {
           d[i] = 255 - d[i];
@@ -50,20 +60,55 @@ export const PdfPage: React.FC<PdfPageProps> = ({
         }
         ctx.putImageData(imageData, 0, 0);
       }
+
+      const textDiv = textLayerRef.current!;
+      textDiv.innerHTML = "";
+      textDiv.style.width = `${w}px`;
+      textDiv.style.height = `${h}px`;
+
+      textLayerBuilder = new TextLayerBuilder({
+        pdfPage: page,
+        enablePermissions: false,
+        onAppend: (dv: HTMLDivElement) => textDiv.appendChild(dv),
+      });
+      await textLayerBuilder.render({
+        viewport,
+        textContentParams: {
+          disableCombineTextItems: false,
+          includeMarkedContent: false,
+        },
+      });
     };
 
     renderPage();
-
     return () => {
-      if (renderTask) renderTask.cancel();
+      cancelled = true;
+      renderTask?.cancel();
+      textLayerBuilder?.cancel();
     };
   }, [pdf, pageNumber, scale, rotation, darkMode]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="shadow-lg bg-white dark:bg-gray-900 block"
-      style={{ margin: 0, padding: 0 }}
-    />
+    <div
+      ref={containerRef}
+      style={{ position: "relative", display: "inline-block" }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="shadow-lg"
+        style={{ background: darkMode ? "#333" : "#fff" }}
+      />
+      <div
+        ref={textLayerRef}
+        className="pdfViewer textLayer"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          pointerEvents: "auto",
+          color: "transparent",
+        }}
+      />
+    </div>
   );
 };
