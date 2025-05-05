@@ -23,7 +23,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ input, onChange, onSend, d
             onSend();
           }
         }}
-        className="min-h-[52px] max-h-32 py-3 px-4 resize-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-purple-500 flex-1"
+        className="min-h-[52px] max-h-32 py-3 px-4 resize-none text-black bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-purple-500 flex-1"
       />
       <Button onClick={onSend} disabled={!input.trim() || disabled} className="h-[52px] px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-md">
         <Send className="h-5 w-5 mr-2" /> Send
