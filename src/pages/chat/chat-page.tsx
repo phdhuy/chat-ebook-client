@@ -185,11 +185,6 @@ export default function ChatPage() {
               scrollableTarget="scrollableDiv"
               inverse={true}
               style={{ display: "flex", flexDirection: "column-reverse" }}
-              endMessage={
-                <div className="text-center p-2 text-sm text-gray-500">
-                  You've reached the beginning of this conversation
-                </div>
-              }
             >
               <ChatMessageList
                 messages={messagesToDisplay}
