@@ -1,6 +1,21 @@
 import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Menu, Moon, Sun, Maximize, Minimize, Settings, X, ChevronUp, ChevronDown } from "lucide-react"
+import {
+  Menu,
+  Moon,
+  Sun,
+  Maximize,
+  Minimize,
+  Settings,
+  X,
+  ChevronUp,
+  ChevronDown,
+  Minus,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  RotateCw,
+} from "lucide-react"
 import { usePdf } from "@/hooks/use-pdf"
 import { useFullscreen } from "@/hooks/use-fullscreen"
 import { PdfSidebar } from "@/components/pdf/pdf-sidebar"
@@ -11,6 +26,7 @@ import { FixedSizeList } from "react-window"
 import { useConversationDetail } from "@/hooks/use-conversation-detail"
 import { useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import PDFSkeleton from "@/components/pdf/pdf-skeleton"
 
 export default function EbookViewPage() {
   const params = useParams()
@@ -171,48 +187,68 @@ export default function EbookViewPage() {
 
       {/* Minimal Toolbar - Only shown when controls are visible */}
       {showControls && (
-        <div className="h-10 flex items-center justify-center gap-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-30">
-          <Button variant="ghost" size="sm" onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}>
-            Previous
-          </Button>
-
-          <div className="flex items-center gap-2">
+        <div className="h-10 flex items-center justify-between px-2 sm:px-4 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm sticky top-12 z-30">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
-              className="px-2"
+              size="icon"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="h-8 w-8"
+              aria-label="Previous page"
             >
-              -
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-xs w-12 text-center">{Math.round(scale * 100)}%</span>
+
+            <span className="text-xs font-medium mx-1">
+              {currentPage}/{numPages}
+            </span>
+
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
-              className="px-2"
+              size="icon"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage >= numPages}
+              className="h-8 w-8"
+              aria-label="Next page"
             >
-              +
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage >= numPages}
-          >
-            Next
-          </Button>
+          <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-700/50 rounded-md px-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
+              className="h-8 w-8"
+              aria-label="Zoom out"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRotation((prev) => (prev + 90) % 360)}
-            className="hidden sm:flex"
-          >
-            Rotate
-          </Button>
+            <span className="text-xs w-10 text-center font-medium">{Math.round(scale * 100)}%</span>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
+              className="h-8 w-8"
+              aria-label="Zoom in"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setRotation((prev) => (prev + 90) % 360)}
+              className="h-8 w-8 ml-1 hidden sm:flex"
+              aria-label="Rotate"
+            >
+              <RotateCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
 
@@ -251,12 +287,9 @@ export default function EbookViewPage() {
           )}
 
           {/* PDF Content */}
-          <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900">
+          <main className="flex-1 flex items-center justify-center overflow-hidden bg-white/90 dark:bg-gray-900">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center h-full">
-                <div className="w-8 h-8 border-3 border-gray-300 dark:border-gray-600 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mb-3" />
-                <p className="text-sm text-gray-600 dark:text-gray-300">Loading PDF...</p>
-              </div>
+              <PDFSkeleton />
             ) : (
               <FixedSizeList
                 ref={listRef}
