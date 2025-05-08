@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Download, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
 
 export interface Message {
   id: string;
@@ -16,7 +17,11 @@ interface ChatMessageItemProps {
   onFeedback?: (type: "like" | "dislike") => void;
 }
 
-export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCopy, onFeedback }) => {
+export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
+  message,
+  onCopy,
+  onFeedback,
+}) => {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
 
@@ -54,28 +59,40 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCop
 
       {/* Bubble + Timestamp */}
       <div className="space-y-2">
-        <div className={cn("flex items-center gap-2", isUser ? "justify-end" : "justify-start")}>
+        <div
+          className={cn(
+            "flex items-center gap-2",
+            isUser ? "justify-end" : "justify-start"
+          )}
+        >
           <span
             className={cn(
               "text-sm font-medium",
-              isUser ? "text-gray-700 dark:text-gray-300" : "text-gray-700 dark:text-gray-300"
+              isUser
+                ? "text-gray-700 dark:text-gray-300"
+                : "text-gray-700 dark:text-gray-300"
             )}
           >
             {isUser ? "You" : "GenerativeAgent"}
           </span>
-          <span className={cn("text-xs text-gray-500 dark:text-gray-400", isUser ? "text-right" : "text-left")}>  
+          <span
+            className={cn(
+              "text-xs text-gray-500 dark:text-gray-400",
+              isUser ? "text-right" : "text-left"
+            )}
+          >
             {message.timestamp}
           </span>
         </div>
         <div
           className={cn(
-            "p-3.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap leading-relaxed border",
+            "p-3.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap leading-relaxed border prose",
             isUser
               ? "bg-purple-600 text-white border-purple-600"
               : "bg-white text-black dark:bg-gray-900 border-gray-200 dark:border-gray-800"
           )}
         >
-          {message.content}
+          <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
         {!isUser && (
           <div className="flex items-center gap-1.5">
@@ -90,10 +107,18 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, onCop
               <Download className="h-3.5 w-3.5 text-gray-500" />
             </Button>
             <div className="h-4 border-r border-gray-200 dark:border-gray-700 mx-1" />
-            <Button variant="ghost" size="icon" onClick={() => onFeedback?.("like")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onFeedback?.("like")}
+            >
               <ThumbsUp className="h-3.5 w-3.5 text-gray-500" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onFeedback?.("dislike")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onFeedback?.("dislike")}
+            >
               <ThumbsDown className="h-3.5 w-3.5 text-gray-500" />
             </Button>
           </div>

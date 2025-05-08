@@ -1,5 +1,5 @@
-import type React from "react"
-import { useState, useEffect, useRef, useCallback } from "react"
+import type React from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Menu,
   Moon,
@@ -15,95 +15,103 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCw,
-} from "lucide-react"
-import { usePdf } from "@/hooks/use-pdf"
-import { useFullscreen } from "@/hooks/use-fullscreen"
-import { PdfSidebar } from "@/components/pdf/pdf-sidebar"
-import { PdfSettings } from "@/components/pdf/pdf-setting"
-import { PdfPage } from "@/components/pdf/pdf-page"
-import type { Bookmark } from "@/types/pdf"
-import { FixedSizeList } from "react-window"
-import { useConversationDetail } from "@/hooks/use-conversation-detail"
-import { useParams } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import PDFSkeleton from "@/components/pdf/pdf-skeleton"
+} from "lucide-react";
+import { usePdf } from "@/hooks/use-pdf";
+import { useFullscreen } from "@/hooks/use-fullscreen";
+import { PdfSidebar } from "@/components/pdf/pdf-sidebar";
+import { PdfSettings } from "@/components/pdf/pdf-setting";
+import { PdfPage } from "@/components/pdf/pdf-page";
+import type { Bookmark } from "@/types/pdf";
+import { FixedSizeList } from "react-window";
+import { useConversationDetail } from "@/hooks/use-conversation-detail";
+import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 
 export default function EbookViewPage() {
-  const params = useParams()
-  const conversationId = params.id as string
-  const { data: conversation } = useConversationDetail(conversationId as string)
+  const params = useParams();
+  const conversationId = params.id as string;
+  const { data: conversation } = useConversationDetail(
+    conversationId as string
+  );
 
-  const pdfUrl = conversation?.data?.file?.secure_url || ""
-  const { pdf, numPages, documentTitle, author, outline, isLoading, pageDimensions } = usePdf(pdfUrl)
+  const pdfUrl = conversation?.data?.file?.secure_url || "";
+  const {
+    pdf,
+    numPages,
+    outline,
+    isLoading,
+    pageDimensions,
+  } = usePdf(pdfUrl);
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const [scale, setScale] = useState(1)
-  const [rotation, setRotation] = useState(0)
-  const [darkMode, setDarkMode] = useState(false)
-  const [showToc, setShowToc] = useState(false)
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
-  const [showSettings, setShowSettings] = useState(false)
-  const [showControls, setShowControls] = useState(true)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const listRef = useRef<FixedSizeList>(null)
-  const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef)
-  const [listHeight, setListHeight] = useState(600)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [scale, setScale] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showToc, setShowToc] = useState(false);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<FixedSizeList>(null);
+  const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef);
+  const [listHeight, setListHeight] = useState(600);
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) return;
 
     const updateHeight = () => {
       if (containerRef.current) {
-        const headerHeight = showControls ? 80 : 0
-        const newHeight = containerRef.current.clientHeight - headerHeight
-        setListHeight(newHeight)
+        const headerHeight = showControls ? 80 : 0;
+        const newHeight = containerRef.current.clientHeight - headerHeight;
+        setListHeight(newHeight);
       }
-    }
+    };
 
-    updateHeight()
-    window.addEventListener("resize", updateHeight)
-    return () => window.removeEventListener("resize", updateHeight)
-  }, [showControls])
-
-  useEffect(() => {
-    const savedBookmarks = localStorage.getItem("pdf-bookmarks")
-    if (savedBookmarks) setBookmarks(JSON.parse(savedBookmarks))
-  }, [])
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [showControls]);
 
   useEffect(() => {
-    localStorage.setItem("pdf-bookmarks", JSON.stringify(bookmarks))
-  }, [bookmarks])
+    const savedBookmarks = localStorage.getItem("pdf-bookmarks");
+    if (savedBookmarks) setBookmarks(JSON.parse(savedBookmarks));
+  }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode)
-  }, [darkMode])
+    localStorage.setItem("pdf-bookmarks", JSON.stringify(bookmarks));
+  }, [bookmarks]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   const getItemSize = useCallback(() => {
     if (!pageDimensions) {
-      return 800 * scale
+      return 800 * scale;
     }
-    const { width, height } = pageDimensions
-    const isRotated = rotation % 180 !== 0
-    const baseHeight = isRotated ? width : height
-    return baseHeight * scale
-  }, [pageDimensions, scale, rotation])
+    const { width, height } = pageDimensions;
+    const isRotated = rotation % 180 !== 0;
+    const baseHeight = isRotated ? width : height;
+    return baseHeight * scale;
+  }, [pageDimensions, scale, rotation]);
 
   const handleScroll = useCallback(
     ({ scrollOffset }: { scrollOffset: number }) => {
-      if (!pdf || !numPages) return
-      const itemHeight = getItemSize()
-      const pageIndex = Math.floor(scrollOffset / itemHeight) + 1
-      setCurrentPage(Math.min(Math.max(1, pageIndex), numPages))
+      if (!pdf || !numPages) return;
+      const itemHeight = getItemSize();
+      const pageIndex = Math.floor(scrollOffset / itemHeight) + 1;
+      setCurrentPage(Math.min(Math.max(1, pageIndex), numPages));
     },
-    [pdf, numPages, getItemSize],
-  )
+    [pdf, numPages, getItemSize]
+  );
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= numPages && listRef.current) {
-      listRef.current.scrollToItem(page - 1, "center")
-      setCurrentPage(page)
+      listRef.current.scrollToItem(page - 1, "center");
+      setCurrentPage(page);
     }
-  }
+  };
 
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
@@ -118,13 +126,19 @@ export default function EbookViewPage() {
       >
         {pdf && (
           <div className="flex justify-center">
-            <PdfPage pdf={pdf} pageNumber={index + 1} scale={scale} rotation={rotation} darkMode={darkMode} />
+            <PdfPage
+              pdf={pdf}
+              pageNumber={index + 1}
+              scale={scale}
+              rotation={rotation}
+              darkMode={darkMode}
+            />
           </div>
         )}
       </div>
     ),
-    [pdf, scale, rotation, darkMode],
-  )
+    [pdf, scale, rotation, darkMode]
+  );
 
   return (
     <div
@@ -142,111 +156,118 @@ export default function EbookViewPage() {
         {showControls ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </button>
 
-      {/* Minimal Header - Only shown when controls are visible */}
       {showControls && (
-        <header className="h-12 flex items-center justify-between px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm z-30">
+        <div className="h-12 flex items-center justify-between px-4 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-30">
+          {/* Left controls */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
               onClick={() => setShowToc(!showToc)}
-              className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Toggle table of contents"
             >
-              {showToc ? <X size={18} /> : <Menu size={18} />}
-            </button>
-            <h1 className="text-sm font-medium truncate max-w-[200px] md:max-w-md">{documentTitle || "Loading..."}</h1>
-            {author && <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">by {author}</span>}
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs mr-2">
-              {currentPage} / {numPages}
-            </span>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label={darkMode ? "Light mode" : "Dark mode"}
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <button
-              onClick={toggleFullscreen}
-              className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-            </button>
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Settings"
-            >
-              <Settings size={18} />
-            </button>
-          </div>
-        </header>
-      )}
-
-      {/* Minimal Toolbar - Only shown when controls are visible */}
-      {showControls && (
-        <div className="h-10 flex items-center justify-between px-2 sm:px-4 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm sticky top-12 z-30">
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="h-8 w-8"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-4 w-4" />
+              {showToc ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
             </Button>
-
-            <span className="text-xs font-medium mx-1">
-              {currentPage}/{numPages}
-            </span>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage >= numPages}
-              className="h-8 w-8"
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs font-medium">
+                {currentPage}/{numPages}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage >= numPages}
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-
+          {/* Center controls: zoom */}
           <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-700/50 rounded-md px-1">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
               className="h-8 w-8"
+              onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
               aria-label="Zoom out"
             >
               <Minus className="h-4 w-4" />
             </Button>
-
-            <span className="text-xs w-10 text-center font-medium">{Math.round(scale * 100)}%</span>
-
+            <span className="text-xs w-10 text-center font-medium">
+              {Math.round(scale * 100)}%
+            </span>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
               className="h-8 w-8"
+              onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
               aria-label="Zoom in"
             >
               <Plus className="h-4 w-4" />
             </Button>
-
             <Button
               variant="ghost"
               size="icon"
+              className="h-8 w-8 hidden sm:flex"
               onClick={() => setRotation((prev) => (prev + 90) % 360)}
-              className="h-8 w-8 ml-1 hidden sm:flex"
               aria-label="Rotate"
             >
               <RotateCw className="h-4 w-4" />
+            </Button>
+          </div>
+          {/* Right controls */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setDarkMode(!darkMode)}
+              aria-label={darkMode ? "Light mode" : "Dark mode"}
+            >
+              {darkMode ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={toggleFullscreen}
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
+              {isFullscreen ? (
+                <Minimize className="h-4 w-4" />
+              ) : (
+                <Maximize className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setShowSettings(!showSettings)}
+              aria-label="Settings"
+            >
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -263,7 +284,9 @@ export default function EbookViewPage() {
               pdf={pdf}
               onClose={() => setShowToc(false)}
               onGoToPage={goToPage}
-              onRemoveBookmark={(index) => setBookmarks(bookmarks.filter((_, i) => i !== index))}
+              onRemoveBookmark={(index) =>
+                setBookmarks(bookmarks.filter((_, i) => i !== index))
+              }
             />
           </div>
         )}
@@ -301,7 +324,9 @@ export default function EbookViewPage() {
                 className="pdf-list"
                 style={{
                   scrollbarWidth: "thin",
-                  scrollbarColor: darkMode ? "#4B5563 #1F2937" : "#D1D5DB #F3F4F6",
+                  scrollbarColor: darkMode
+                    ? "#4B5563 #1F2937"
+                    : "#D1D5DB #F3F4F6",
                 }}
               >
                 {Row}
@@ -336,5 +361,5 @@ export default function EbookViewPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

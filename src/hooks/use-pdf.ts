@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import * as pdfjs from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
-import { PDFMetadataInfo, PdfOutlineItem } from "../types/pdf";
+import { PdfOutlineItem } from "../types/pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -11,8 +11,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 export const usePdf = (pdfUrl: string) => {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
-  const [documentTitle, setDocumentTitle] = useState("");
-  const [author, setAuthor] = useState("");
   const [outline, setOutline] = useState<PdfOutlineItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pageDimensions, setPageDimensions] = useState<{
@@ -28,11 +26,6 @@ export const usePdf = (pdfUrl: string) => {
         const pdfDocument = await loadingTask.promise;
         setPdf(pdfDocument);
         setNumPages(pdfDocument.numPages);
-
-        const metadata = await pdfDocument.getMetadata();
-        const info = metadata.info as PDFMetadataInfo;
-        setDocumentTitle(info.Title || "Untitled PDF");
-        setAuthor(info.Author || "");
 
         if (pdfDocument.numPages > 0) {
           const firstPage = await pdfDocument.getPage(1);
@@ -55,5 +48,5 @@ export const usePdf = (pdfUrl: string) => {
     loadPdf();
   }, [pdfUrl]);
 
-  return { pdf, numPages, documentTitle, author, outline, isLoading, pageDimensions };
+  return { pdf, numPages, outline, isLoading, pageDimensions };
 };
