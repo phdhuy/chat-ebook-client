@@ -86,9 +86,9 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         </div>
         <div
           className={cn(
-            "p-3.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap leading-relaxed border prose",
+            "p-3.5 rounded-2xl text-sm shadow-sm leading-relaxed border prose",
             isUser
-              ? "bg-purple-600 text-white border-purple-600"
+              ? "bg-purple-600 text-white border-purple-600 prose-invert"
               : "bg-white text-black dark:bg-gray-900 border-gray-200 dark:border-gray-800"
           )}
         >
