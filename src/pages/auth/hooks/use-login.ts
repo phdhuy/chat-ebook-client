@@ -10,63 +10,87 @@ import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
+import { useToast } from "@/hooks/use-toast";
+import { ApiError } from "@/types/exception";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const loginMutation = useMutation<
+  return useMutation<
     ApiResponse<TokenResponse>,
-    AxiosError<{ message?: string }>,
+    AxiosError<ApiError>,
     LoginRequest
   >({
-    mutationFn: async (data: LoginRequest) => authApi.login(data),
-    onSuccess: (data) => {
-      localStorage.setItem(ACCESS_TOKEN, data.data.access_token);
-      localStorage.setItem(REFRESH_TOKEN, data.data.refresh_token);
+    mutationFn: (data) => authApi.login(data),
+    onSuccess: (res) => {
+      localStorage.setItem(ACCESS_TOKEN, res.data.access_token);
+      localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token);
+      toast({
+        title: "Welcome back! 🎉",
+        description: "You’ve successfully signed in.",
+      });
       navigate("/");
     },
-    onError: (error) => {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed!");
+    onError: (err) => {
+      const message =
+        err.response?.data.error.message ||
+        "Login failed. Please try again.";
+
+      toast({
+        variant: "destructive",
+        title: "Login Error",
+        description: message,
+      });
+      console.error("Login failed:", err);
     },
   });
-
-  return loginMutation;
 };
 
 export const useLoginWithGoogle = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const loginMutation = useMutation<
     ApiResponse<TokenResponse>,
-    AxiosError<{ message?: string }>,
+    AxiosError<ApiError>,
     LoginWithGoogleRequest
   >({
-    mutationFn: async (data: LoginWithGoogleRequest) =>
-      authApi.loginWithGoogle(data),
-    onSuccess: (data) => {
-      localStorage.setItem(ACCESS_TOKEN, data.data.access_token);
-      localStorage.setItem(REFRESH_TOKEN, data.data.refresh_token);
+    mutationFn: (data) => authApi.loginWithGoogle(data),
+    onSuccess: (res) => {
+      localStorage.setItem(ACCESS_TOKEN, res.data.access_token);
+      localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token);
+      toast({
+        title: "Google Sign-In Success! 🎉",
+        description: "You’re now logged in.",
+      });
       navigate("/");
     },
-    onError: (error) => {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed!");
+    onError: (err) => {
+      const message =
+        err.response?.data.error.message ||
+        "Google login failed. Please try again.";
+
+      toast({
+        variant: "destructive",
+        title: "Google Login Error",
+        description: message,
+      });
+      console.error("Google login failed:", err);
     },
   });
 
-  const handleGoogleLogin = useGoogleLogin({
+  return useGoogleLogin({
     onSuccess: (codeResponse) => {
-      const loginData: LoginWithGoogleRequest = {
-        access_token: codeResponse.access_token,
-      };
-      loginMutation.mutate(loginData);
+      loginMutation.mutate({ access_token: codeResponse.access_token });
     },
     onError: (error) => {
-      console.log("Google login failed:", error);
-      alert("Google login failed. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Google OAuth Error",
+        description: "Could not complete Google sign-in.",
+      });
+      console.error("Google OAuth failed:", error);
     },
   });
-
-  return handleGoogleLogin;
 };

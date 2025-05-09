@@ -3,28 +3,37 @@ import { ApiResponse } from "@/types/api";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { ApiError } from "@/types/exception";
 
 export const useRegister = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const registerMutation = useMutation<
+  return useMutation<
     ApiResponse<RegisterResponse>,
-    AxiosError<{ message?: string }>,
+    AxiosError<ApiError>,
     RegisterRequest
   >({
-    mutationFn: async (data: RegisterRequest) => authApi.register(data),
-    onSuccess: (data) => {
-      console.log("User Registered:", data);
+    mutationFn: (data) => authApi.register(data),
+    onSuccess: () => {
+      toast({
+        title: "Welcome aboard! 🎉",
+        description: "Your account has been created successfully.",
+      });
       navigate("/sign-in");
     },
-    onError: (error) => {
-      console.error(
-        "Registration failed:",
-        error.response?.data || error.message
-      );
-      alert(error.response?.data?.message || "Registration failed!");
+    onError: (err) => {
+      const message =
+        err.response?.data.error.message ||
+        "Something went wrong. Please try again.";
+
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description: message,
+      });
+      console.error("Registration error:", err);
     },
   });
-
-  return registerMutation;
 };
