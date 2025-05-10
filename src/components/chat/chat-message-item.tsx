@@ -107,10 +107,10 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           ) : (
             <ReactTyped
               strings={[message.content]}
-              typeSpeed={2}
-              backSpeed={50}
+              typeSpeed={0}
+              backSpeed={0}
               loop={false}
-              showCursor={true}
+              showCursor={false}
               onComplete={handleTypingComplete}
             >
               <div className="react-typed-container" />
