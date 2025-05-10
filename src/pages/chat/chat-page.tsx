@@ -61,6 +61,7 @@ export default function ChatPage() {
         role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
         content: msg.content,
         timestamp: formatDateTime(msg.created_at),
+        isNewBotMessage: false,
       }));
 
       if (data.data.length < messagesPerPage) {
@@ -104,6 +105,7 @@ export default function ChatPage() {
       role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
       content: msg.content,
       timestamp: formatDateTime(msg.created_at),
+      isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
     };
     shouldScrollToBottomRef.current = true;
     setLiveMessages((prev) => [...prev, uiMsg]);
