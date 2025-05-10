@@ -3,14 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check, Download, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { ReactTyped } from "react-typed";
 
 export interface Message {
   id: string;
   role: "bot" | "user";
   content: string;
   timestamp: string;
+  isNewBotMessage?: boolean;
 }
-
 interface ChatMessageItemProps {
   message: Message;
   onCopy?: (content: string) => void;
@@ -24,6 +25,9 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 }) => {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
+  const [isTypingComplete, setIsTypingComplete] = useState(
+    !message.isNewBotMessage
+  );
 
   useEffect(() => {
     if (copied) {
@@ -35,6 +39,10 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const handleCopy = () => {
     onCopy?.(message.content);
     setCopied(true);
+  };
+
+  const handleTypingComplete = () => {
+    setIsTypingComplete(true);
   };
 
   return (
@@ -92,7 +100,22 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               : "bg-white text-black dark:bg-gray-900 border-gray-200 dark:border-gray-800"
           )}
         >
-          <ReactMarkdown>{message.content}</ReactMarkdown>
+          {isUser ? (
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          ) : isTypingComplete ? (
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          ) : (
+            <ReactTyped
+              strings={[message.content]}
+              typeSpeed={2}
+              backSpeed={50}
+              loop={false}
+              showCursor={true}
+              onComplete={handleTypingComplete}
+            >
+              <div className="react-typed-container" />
+            </ReactTyped>
+          )}
         </div>
         {!isUser && (
           <div className="flex items-center gap-1.5">
