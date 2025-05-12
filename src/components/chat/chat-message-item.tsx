@@ -81,7 +81,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 : "text-gray-700 dark:text-gray-300"
             )}
           >
-            {isUser ? "You" : "GenerativeAgent"}
+            {isUser ? "You" : "AI"}
           </span>
           <span
             className={cn(

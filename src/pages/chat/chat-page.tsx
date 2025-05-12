@@ -8,11 +8,18 @@ import {
 } from "@/hooks/use-websocket-queue";
 import { useCreateMessage } from "./hooks/use-create-message";
 import { useGetListMessage } from "./hooks/use-get-list-message";
-import { formatDateTime } from "@/common";
+import { formatDateTime, mapSenderTypeToRole, MESSAGE_PER_PAGE } from "@/common";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatInput } from "@/components/chat/chat-input";
-import { Message as UIMessage } from "@/components/chat/chat-message-item";
 import { Skeleton } from "@/components/ui/skeleton";
+
+type UIMessage = {
+  id: string;
+  role: "user" | "bot";
+  content: string;
+  timestamp: string;
+  isNewBotMessage: boolean;
+};
 
 export default function ChatPage() {
   const { id: conversationId = "" } = useParams();
@@ -22,7 +29,6 @@ export default function ChatPage() {
   const [liveMessages, setLiveMessages] = useState<UIMessage[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const messagesPerPage = 10;
   const isInitialLoadRef = useRef(true);
   const shouldScrollToBottomRef = useRef(true);
   const prevHistoricalLengthRef = useRef(0);
@@ -46,7 +52,7 @@ export default function ChatPage() {
     isLoading,
     error: restError,
   } = useGetListMessage(
-    { sort: "id", order: "desc", page, paging: messagesPerPage },
+    { sort: "id", order: "desc", page, paging: MESSAGE_PER_PAGE },
     conversationId
   );
 
@@ -56,15 +62,16 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (data?.data) {
-      const history: UIMessage[] = data.data.map((msg) => ({
-        id: msg.id.toString(),
-        role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
-        content: msg.content,
-        timestamp: formatDateTime(msg.created_at),
-        isNewBotMessage: false,
-      }));
+      const history: UIMessage[] = data.data
+        .map((msg) => ({
+          id: msg.id.toString(),
+          role: mapSenderTypeToRole(msg.sender_type),
+          content: msg.content,
+          timestamp: formatDateTime(msg.created_at),
+          isNewBotMessage: false,
+        }))
 
-      if (data.data.length < messagesPerPage) {
+      if (data.data.length < MESSAGE_PER_PAGE) {
         setHasMore(false);
       }
 
@@ -101,8 +108,8 @@ export default function ChatPage() {
   const onMessage = useCallback((msg: WSMessage) => {
     if (msg.conversation_id !== conversationRef.current) return;
     const uiMsg: UIMessage = {
-      id: msg.id,
-      role: msg.sender_type.toLowerCase() === "user" ? "user" : "bot",
+      id: msg.id.toString(),
+      role: mapSenderTypeToRole(msg.sender_type),
       content: msg.content,
       timestamp: formatDateTime(msg.created_at),
       isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
