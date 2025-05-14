@@ -1,54 +1,101 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# chat-ebook-client
 
-Currently, two official plugins are available:
+A client-side application built with React and TypeScript.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[![Stars](https://img.shields.io/github/stars/phdhuy/chat-ebook-client?style=social)](https://github.com/phdhuy/chat-ebook-client)
+[![Forks](https://img.shields.io/github/forks/phdhuy/chat-ebook-client?style=social)](https://github.com/phdhuy/chat-ebook-client)
+[![Open Issues](https://img.shields.io/github/issues/phdhuy/chat-ebook-client)](https://github.com/phdhuy/chat-ebook-client/issues)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This project is built using React, TypeScript, and Vite. Follow these instructions to get the project up and running on your local machine.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Prerequisites
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Before you begin, ensure you have the following installed:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+-   [Node.js](https://nodejs.org/) (>=18)
+-   [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### Installation
+
+1.  Clone the repository:
+
+    ```bash
+    git clone https://github.com/phdhuy/chat-ebook-client.git
+    cd chat-ebook-client
+    ```
+
+2.  Install the dependencies:
+
+    ```bash
+    npm install # or yarn install
+    ```
+
+### Development
+
+1.  Start the development server:
+
+    ```bash
+    npm run dev # or yarn dev
+    ```
+
+    This will start the Vite development server, and you can access the application in your browser at the address provided (usually `http://localhost:5173`).
+
+### Building
+
+1.  Build the project for production:
+
+    ```bash
+    npm run build # or yarn build
+    ```
+
+    This will create a `dist` directory containing the production-ready build of your application.
+
+### Linting
+
+1.  Run the linter to check for code quality issues:
+
+    ```bash
+    npm run lint # or yarn lint
+    ```
+
+### Preview
+
+1.  Preview the production build locally:
+
+    ```bash
+    npm run preview # or yarn preview
+    ```
+
+## ✨ Key Features
+
+-   Built with React and TypeScript for a modern and maintainable codebase.
+-   Utilizes Vite for fast development and optimized builds.
+-   Includes ESLint for code linting and style consistency.
+-   Uses Tailwind CSS for styling.
+-   Radix UI components for accessible UI elements.
+-   React Router for navigation.
+-   React Query for data fetching and caching.
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can contribute to this project:
+
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with descriptive commit messages.
+4.  Push your changes to your fork.
+5.  Submit a pull request to the main branch of the original repository.
+
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
+
+## 🔗 Useful Links
+
+-   **Homepage:** [https://chat-ebook.netlify.app/](https://chat-ebook.netlify.app/)
+
+## 🗓️ Last Updated
+
+May 14, 2025
 ```
