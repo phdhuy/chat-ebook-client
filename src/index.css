@@ -258,3 +258,199 @@
   background: #555555;
 }
 
+
+.dropdown-menu-content {
+  --dropdown-bg: #171717;
+  --dropdown-border: #2a2a2a;
+  --dropdown-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8);
+  --dropdown-item-hover: #2d2d2d;
+  --dropdown-item-active: rgba(138, 43, 226, 0.15);
+  --dropdown-text: #e1e1e1;
+  --dropdown-icon: #a1a1a1;
+  --dropdown-separator: #333333;
+  --dropdown-danger: #ff5757;
+  --dropdown-danger-hover: #ff3a3a;
+
+  animation: dropdownFadeIn 0.2s ease-out;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-menu-content[data-state="open"],
+.dropdown-menu-content[data-state="closed"] {
+  background-color: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  box-shadow: var(--dropdown-shadow);
+  padding: 6px;
+}
+
+.dropdown-menu-item {
+  border-radius: 8px;
+  margin: 2px 0;
+  padding: 8px 10px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--dropdown-text);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdown-menu-item:hover {
+  background-color: var(--dropdown-item-hover);
+}
+
+.dropdown-menu-item:active {
+  background-color: var(--dropdown-item-active);
+}
+
+.dropdown-menu-item svg {
+  color: var(--dropdown-icon);
+  margin-right: 10px;
+  transition: color 0.15s ease;
+}
+
+.dropdown-menu-item:hover svg {
+  color: var(--dropdown-text);
+}
+
+.dropdown-menu-separator {
+  height: 1px;
+  background-color: var(--dropdown-separator);
+  margin: 6px 0;
+}
+
+.dropdown-menu-item.danger {
+  color: var(--dropdown-danger);
+}
+
+.dropdown-menu-item.danger:hover {
+  background-color: rgba(255, 87, 87, 0.1);
+}
+
+.dropdown-menu-item.danger svg {
+  color: var(--dropdown-danger);
+}
+
+.language-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.language-dropdown-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #444;
+}
+
+.language-dropdown-trigger[data-state="open"] {
+  background-color: rgba(138, 43, 226, 0.1);
+  border-color: rgba(138, 43, 226, 0.5);
+}
+
+.language-dropdown-trigger .chevron {
+  transition: transform 0.2s ease;
+}
+
+.language-dropdown-trigger[data-state="open"] .chevron {
+  transform: rotate(180deg);
+}
+
+.alert-dialog-content {
+  background-color: #171717;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.9);
+  padding: 24px;
+  max-width: 450px;
+  width: 90vw;
+  animation: alertFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes alertFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.alert-dialog-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.alert-dialog-description {
+  font-size: 14px;
+  color: #a1a1a1;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.alert-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.alert-dialog-cancel {
+  background-color: transparent;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.alert-dialog-cancel:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #444;
+}
+
+.alert-dialog-action {
+  background-color: #ff5757;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.alert-dialog-action:hover {
+  background-color: #ff3a3a;
+}
+
+.alert-dialog-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
