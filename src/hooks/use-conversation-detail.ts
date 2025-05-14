@@ -11,7 +11,7 @@ export const useConversationDetail = (
 ) => {
   return useQuery<ApiResponse<ConversationInfoResponse>>({
     ...options,
-    queryKey: ["conversationDetail", conversationId],
+    queryKey: ["conversation-detail", conversationId],
     queryFn: () => conversationApi.getDetailConversation(conversationId),
   });
 };
