@@ -36,13 +36,7 @@ export default function EbookViewPage() {
   );
 
   const pdfUrl = conversation?.data?.file?.secure_url || "";
-  const {
-    pdf,
-    numPages,
-    outline,
-    isLoading,
-    pageDimensions,
-  } = usePdf(pdfUrl);
+  const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
@@ -117,10 +111,7 @@ export default function EbookViewPage() {
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
       <div
         style={{
-          ...style,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          ...style
         }}
         className="w-full"
       >
@@ -321,13 +312,8 @@ export default function EbookViewPage() {
                 itemCount={numPages}
                 itemSize={getItemSize()}
                 onScroll={handleScroll}
-                className="pdf-list"
-                style={{
-                  scrollbarWidth: "thin",
-                  scrollbarColor: darkMode
-                    ? "#4B5563 #1F2937"
-                    : "#D1D5DB #F3F4F6",
-                }}
+                className="pdf-list pdfViewer"
+                style={{ "--scale-factor": scale } as React.CSSProperties}
               >
                 {Row}
               </FixedSizeList>
@@ -336,7 +322,6 @@ export default function EbookViewPage() {
         </div>
       </div>
 
-      {/* Floating Page Navigation - Only visible when controls are hidden */}
       {!showControls && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-40 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-md flex items-center px-3 py-1.5 backdrop-blur-sm">
           <button
