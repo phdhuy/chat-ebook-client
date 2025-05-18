@@ -6,12 +6,13 @@ import {
   Message as WSMessage,
   WebSocketError,
 } from "@/hooks/use-websocket-queue";
-import { useCreateMessage } from "./hooks/use-create-message";
-import { useGetListMessage } from "./hooks/use-get-list-message";
 import { formatDateTime, mapSenderTypeToRole, MESSAGE_PER_PAGE } from "@/common";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSelectedTextStore } from "@/store/use-selected-text-store";
+import { useGetListMessage } from "./hooks/use-get-list-message";
+import { useCreateMessage } from "./hooks/use-create-message";
 
 type UIMessage = {
   id: string;
@@ -36,10 +37,20 @@ export default function ChatPage() {
   const scrollPosRef = useRef<number | null>(null);
   const scrollableDivRef = useRef<HTMLDivElement | null>(null);
 
+  const { selectedText, clearSelectedText } = useSelectedTextStore();
+
+  useEffect(() => {
+    if (selectedText && !input) {
+      setInput(selectedText);
+      clearSelectedText();
+    }
+  }, [selectedText, input, clearSelectedText]);
+
   useEffect(() => {
     conversationRef.current = conversationId;
     setHistoricalMessages([]);
     setLiveMessages([]);
+    setInput("");
     setPage(1);
     setHasMore(true);
     isInitialLoadRef.current = true;
@@ -57,19 +68,20 @@ export default function ChatPage() {
   );
 
   useEffect(() => {
-    scrollableDivRef.current = document.getElementById("scrollableDiv") as HTMLDivElement;
+    scrollableDivRef.current = document.getElementById(
+      "scrollableDiv"
+    ) as HTMLDivElement;
   }, []);
 
   useEffect(() => {
     if (data?.data) {
-      const history: UIMessage[] = data.data
-        .map((msg) => ({
-          id: msg.id.toString(),
-          role: mapSenderTypeToRole(msg.sender_type),
-          content: msg.content,
-          timestamp: formatDateTime(msg.created_at),
-          isNewBotMessage: false,
-        }))
+      const history: UIMessage[] = data.data.map((msg) => ({
+        id: msg.id.toString(),
+        role: mapSenderTypeToRole(msg.sender_type),
+        content: msg.content,
+        timestamp: formatDateTime(msg.created_at),
+        isNewBotMessage: false,
+      }));
 
       if (data.data.length < MESSAGE_PER_PAGE) {
         setHasMore(false);
@@ -94,7 +106,11 @@ export default function ChatPage() {
   }, [data?.data]);
 
   useEffect(() => {
-    if (!isInitialLoadRef.current && scrollPosRef.current !== null && scrollableDivRef.current) {
+    if (
+      !isInitialLoadRef.current &&
+      scrollPosRef.current !== null &&
+      scrollableDivRef.current
+    ) {
       if (historicalMessages.length > prevHistoricalLengthRef.current) {
         setTimeout(() => {
           if (scrollableDivRef.current) {
@@ -105,21 +121,28 @@ export default function ChatPage() {
     }
   }, [historicalMessages]);
 
-  const onMessage = useCallback((msg: WSMessage) => {
-    if (msg.conversation_id !== conversationRef.current) return;
-    const uiMsg: UIMessage = {
-      id: msg.id.toString(),
-      role: mapSenderTypeToRole(msg.sender_type),
-      content: msg.content,
-      timestamp: formatDateTime(msg.created_at),
-      isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
-    };
-    shouldScrollToBottomRef.current = true;
-    setLiveMessages((prev) => [...prev, uiMsg]);
-  }, []);
+  const onMessage = useCallback(
+    (msg: WSMessage) => {
+      if (msg.conversation_id !== conversationRef.current) return;
+      const uiMsg: UIMessage = {
+        id: msg.id.toString(),
+        role: mapSenderTypeToRole(msg.sender_type),
+        content: msg.content,
+        timestamp: formatDateTime(msg.created_at),
+        isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
+      };
+      shouldScrollToBottomRef.current = true;
+      setLiveMessages((prev) => [...prev, uiMsg]);
+    },
+    []
+  );
 
   useEffect(() => {
-    if (liveMessages.length > 0 && shouldScrollToBottomRef.current && scrollableDivRef.current) {
+    if (
+      liveMessages.length > 0 &&
+      shouldScrollToBottomRef.current &&
+      scrollableDivRef.current
+    ) {
       scrollableDivRef.current.scrollTop = 0;
     }
   }, [liveMessages]);
