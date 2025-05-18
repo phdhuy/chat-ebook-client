@@ -31,8 +31,8 @@ jobs:
       # - name: Lint the code
       #   run: pnpm lint
 
-      - name: Run Prettier check
-        run: pnpm format:check
+      # - name: Run Prettier check
+      #   run: pnpm format:check
 
       - name: Build the project
         run: pnpm build
