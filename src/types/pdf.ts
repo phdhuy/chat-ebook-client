@@ -11,6 +11,6 @@ export interface Bookmark {
 
 export interface PdfOutlineItem {
     title: string;
-    dest?: string | null;
+    dest?: string | null | any[];
     items?: PdfOutlineItem[];
   }
