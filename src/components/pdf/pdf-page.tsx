@@ -1,6 +1,8 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/web/pdf_viewer.css";
+import { useTextSelection } from "@/hooks/use-text-selection";
+import { SelectionToolbar } from "@/components/selection-toolbar";
 
 interface PdfPageProps {
   pdf: pdfjsLib.PDFDocumentProxy;
@@ -15,11 +17,16 @@ export const PdfPage: React.FC<PdfPageProps> = ({
   pageNumber,
   scale,
   rotation,
-  darkMode,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const highlightLayerRef = useRef<HTMLDivElement>(null);
+
+  const { handleCopy, range, clearSelection } = useTextSelection(
+    containerRef,
+    textLayerRef
+  );
 
   useEffect(() => {
     let renderTask: pdfjsLib.RenderTask | null = null;
@@ -29,11 +36,7 @@ export const PdfPage: React.FC<PdfPageProps> = ({
       const page = await pdf.getPage(pageNumber);
       if (cancelled) return;
 
-      const viewport = page.getViewport({
-        scale: scale,
-        rotation,
-      });
-
+      const viewport = page.getViewport({ scale, rotation });
       const cssWidth = Math.round(viewport.width);
       const cssHeight = Math.round(viewport.height);
 
@@ -42,8 +45,8 @@ export const PdfPage: React.FC<PdfPageProps> = ({
       container.style.height = `${cssHeight}px`;
 
       const canvas = canvasRef.current!;
-      canvas.width = Math.round(viewport.width);
-      canvas.height = Math.round(viewport.height);
+      canvas.width = cssWidth;
+      canvas.height = cssHeight;
       canvas.style.width = `${cssWidth}px`;
       canvas.style.height = `${cssHeight}px`;
 
@@ -52,10 +55,14 @@ export const PdfPage: React.FC<PdfPageProps> = ({
       await renderTask.promise;
       if (cancelled) return;
 
+      if (textLayerRef.current) {
+        textLayerRef.current.innerHTML = "";
+      }
+
       const textLayer = new pdfjsLib.TextLayer({
         textContentSource: await page.getTextContent(),
         container: textLayerRef.current!,
-        viewport: viewport,
+        viewport,
       });
       textLayer.render();
     };
@@ -65,14 +72,47 @@ export const PdfPage: React.FC<PdfPageProps> = ({
       cancelled = true;
       renderTask?.cancel();
     };
-  }, [pdf, pageNumber, scale, rotation, darkMode]);
+  }, [pdf, pageNumber, scale, rotation]);
+
+  const onAction = (action: string) => {
+    console.log("Action: ", action);
+    if (action === "copy") {
+      handleCopy();
+    } else {
+      const text = range?.toString() || "";
+      switch (action) {
+        case "explain":
+          console.log("Explain:", text);
+          break;
+        case "summarize":
+          console.log("Summarize:", text);
+          break;
+        case "rewrite":
+          console.log("Rewrite:", text);
+          break;
+        case "comment":
+          console.log("Comment on:", text);
+          break;
+        default:
+          console.log("Unknown action:", action, "Text:", text);
+      }
+    }
+    console.log("aa");
+    clearSelection();
+  };
 
   return (
-    <div ref={containerRef} className="page">
+    <div ref={containerRef} className="page relative select-text">
       <div className="canvasWrapper">
-        <canvas className="canvasWrapper" ref={canvasRef}></canvas>
+        <canvas ref={canvasRef} />
       </div>
       <div ref={textLayerRef} className="textLayer" />
+      <div
+        ref={highlightLayerRef}
+        className="highlightLayer"
+        style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
+      />
+      <SelectionToolbar range={range} onAction={onAction} />
     </div>
   );
 };

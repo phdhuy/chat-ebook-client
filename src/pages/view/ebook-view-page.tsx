@@ -1,32 +1,16 @@
 import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Menu,
-  Moon,
-  Sun,
-  Maximize,
-  Minimize,
-  Settings,
-  X,
-  ChevronUp,
-  ChevronDown,
-  Minus,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  RotateCw,
-} from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { usePdf } from "@/hooks/use-pdf";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { PdfSidebar } from "@/components/pdf/pdf-sidebar";
 import { PdfSettings } from "@/components/pdf/pdf-setting";
 import { PdfPage } from "@/components/pdf/pdf-page";
-import type { Bookmark } from "@/types/pdf";
 import { FixedSizeList } from "react-window";
 import { useConversationDetail } from "@/hooks/use-conversation-detail";
 import { useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import PDFSkeleton from "@/components/pdf/pdf-skeleton";
+import PdfHeader from "@/components/pdf/pdf-header";
 
 export default function EbookViewPage() {
   const params = useParams();
@@ -43,7 +27,6 @@ export default function EbookViewPage() {
   const [rotation, setRotation] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
   const [showToc, setShowToc] = useState(false);
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,15 +49,6 @@ export default function EbookViewPage() {
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
   }, [showControls]);
-
-  useEffect(() => {
-    const savedBookmarks = localStorage.getItem("pdf-bookmarks");
-    if (savedBookmarks) setBookmarks(JSON.parse(savedBookmarks));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("pdf-bookmarks", JSON.stringify(bookmarks));
-  }, [bookmarks]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -111,7 +85,7 @@ export default function EbookViewPage() {
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
       <div
         style={{
-          ...style
+          ...style,
         }}
         className="w-full"
       >
@@ -148,120 +122,23 @@ export default function EbookViewPage() {
       </button>
 
       {showControls && (
-        <div className="h-12 flex items-center justify-between px-4 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-30">
-          {/* Left controls */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setShowToc(!showToc)}
-              aria-label="Toggle table of contents"
-            >
-              {showToc ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Menu className="h-4 w-4" />
-              )}
-            </Button>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage <= 1}
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-xs font-medium">
-                {currentPage}/{numPages}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage >= numPages}
-                aria-label="Next page"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {/* Center controls: zoom */}
-          <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-700/50 rounded-md px-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
-              aria-label="Zoom out"
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="text-xs w-10 text-center font-medium">
-              {Math.round(scale * 100)}%
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
-              aria-label="Zoom in"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 hidden sm:flex"
-              onClick={() => setRotation((prev) => (prev + 90) % 360)}
-              aria-label="Rotate"
-            >
-              <RotateCw className="h-4 w-4" />
-            </Button>
-          </div>
-          {/* Right controls */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setDarkMode(!darkMode)}
-              aria-label={darkMode ? "Light mode" : "Dark mode"}
-            >
-              {darkMode ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              {isFullscreen ? (
-                <Minimize className="h-4 w-4" />
-              ) : (
-                <Maximize className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setShowSettings(!showSettings)}
-              aria-label="Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <PdfHeader
+          showToc={showToc}
+          setShowToc={setShowToc}
+          currentPage={currentPage}
+          numPages={numPages}
+          goToPage={goToPage}
+          scale={scale}
+          setScale={setScale}
+          rotation={rotation}
+          setRotation={setRotation}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          isFullscreen={isFullscreen}
+          toggleFullscreen={toggleFullscreen}
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+        />
       )}
 
       <div className="flex flex-1 overflow-hidden">
@@ -271,13 +148,9 @@ export default function EbookViewPage() {
             <PdfSidebar
               show={showToc}
               outline={outline}
-              bookmarks={bookmarks}
               pdf={pdf}
               onClose={() => setShowToc(false)}
               onGoToPage={goToPage}
-              onRemoveBookmark={(index) =>
-                setBookmarks(bookmarks.filter((_, i) => i !== index))
-              }
             />
           </div>
         )}
@@ -301,7 +174,9 @@ export default function EbookViewPage() {
           )}
 
           {/* PDF Content */}
-          <main className="flex-1 flex items-center justify-center overflow-hidden bg-white/90 dark:bg-gray-900">
+          <main
+            className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900"
+          >
             {isLoading ? (
               <PDFSkeleton />
             ) : (
