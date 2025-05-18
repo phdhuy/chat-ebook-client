@@ -22,11 +22,18 @@ export type ConversationInfoResponse = {
   file: FileInfoResponse;
 };
 
+export type ConversationQueryParams = {
+  sort?: string;
+  order?: "asc" | "desc";
+  page?: number;
+  paging?: number;
+};
+
 export const conversationApi = {
-  getMyConversation: async (): Promise<
-    ApiResponse<ConversationInfoResponse[]>
-  > => {
-    const response = await api.get("/v1/conversations");
+  getMyConversation: async (
+    params: ConversationQueryParams
+  ): Promise<ApiResponse<ConversationInfoResponse[]>> => {
+    const response = await api.get("/v1/conversations", { params });
     return response.data;
   },
 

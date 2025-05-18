@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import SplitPane, { Pane, SashContent } from "split-pane-react";
 import "split-pane-react/esm/themes/default.css";
-import AppSidebar from "@/components/app-sidebar";
+import AppSidebar from "@/components/sidebar/app-sidebar";
 import ChatPage from "@/pages/chat/chat-page";
 
 const EbookViewLayout = () => {
