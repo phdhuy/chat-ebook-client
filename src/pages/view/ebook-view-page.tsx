@@ -11,13 +11,12 @@ import { useConversationDetail } from "@/hooks/use-conversation-detail";
 import { useParams } from "react-router-dom";
 import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 import PdfHeader from "@/components/pdf/pdf-header";
+import { useSelectedTextStore } from "@/store/use-selected-text-store";
 
 export default function EbookViewPage() {
   const params = useParams();
   const conversationId = params.id as string;
-  const { data: conversation } = useConversationDetail(
-    conversationId as string
-  );
+  const { data: conversation } = useConversationDetail(conversationId as string);
 
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
@@ -33,6 +32,14 @@ export default function EbookViewPage() {
   const listRef = useRef<FixedSizeList>(null);
   const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef);
   const [listHeight, setListHeight] = useState(600);
+  const { setSelectedText } = useSelectedTextStore();
+
+  const handleTextSelected = useCallback(
+    (text: string) => {
+      setSelectedText(text);
+    },
+    [setSelectedText]
+  );
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -97,12 +104,13 @@ export default function EbookViewPage() {
               scale={scale}
               rotation={rotation}
               darkMode={darkMode}
+              onTextSelected={handleTextSelected}
             />
           </div>
         )}
       </div>
     ),
-    [pdf, scale, rotation, darkMode]
+    [pdf, scale, rotation, darkMode, handleTextSelected]
   );
 
   return (
@@ -174,9 +182,7 @@ export default function EbookViewPage() {
           )}
 
           {/* PDF Content */}
-          <main
-            className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900"
-          >
+          <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900">
             {isLoading ? (
               <PDFSkeleton />
             ) : (

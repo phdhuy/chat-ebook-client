@@ -10,6 +10,7 @@ interface PdfPageProps {
   scale: number;
   rotation: number;
   darkMode: boolean;
+  onTextSelected?: (text: string) => void;
 }
 
 export const PdfPage: React.FC<PdfPageProps> = ({
@@ -17,6 +18,7 @@ export const PdfPage: React.FC<PdfPageProps> = ({
   pageNumber,
   scale,
   rotation,
+  onTextSelected,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
@@ -75,7 +77,6 @@ export const PdfPage: React.FC<PdfPageProps> = ({
   }, [pdf, pageNumber, scale, rotation]);
 
   const onAction = (action: string) => {
-    console.log("Action: ", action);
     if (action === "copy") {
       handleCopy();
     } else {
@@ -90,14 +91,13 @@ export const PdfPage: React.FC<PdfPageProps> = ({
         case "rewrite":
           console.log("Rewrite:", text);
           break;
-        case "comment":
-          console.log("Comment on:", text);
+        case "ask":
+          onTextSelected?.(text);
           break;
         default:
           console.log("Unknown action:", action, "Text:", text);
       }
     }
-    console.log("aa");
     clearSelection();
   };
 

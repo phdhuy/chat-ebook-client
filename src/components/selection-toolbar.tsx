@@ -56,7 +56,7 @@ export function SelectionToolbar({ range, onAction }: Props) {
         ))}
       </div>
       <div className="h-4 w-px bg-gray-200 dark:bg-zinc-700 mx-0.5" />
-      <ToolbarButton icon={<MessageCircle size={14} />} tooltip="Comment" onClick={() => onAction("comment")} />
+      <ToolbarButton icon={<MessageCircle size={14} />} tooltip="Ask" onClick={() => onAction("ask")} />
       <ToolbarButton icon={<Copy size={14} />} tooltip="Copy" onClick={() => onAction("copy")} />
     </div>
   );
