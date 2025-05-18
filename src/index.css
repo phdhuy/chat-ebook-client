@@ -231,7 +231,40 @@
   margin-right: 8px;
 }
 
-/* VS Code Explorer Styling */
+
+.black-sidebar .overflow-auto::-webkit-scrollbar {
+  width: 5px;
+}
+
+.black-sidebar .overflow-auto::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.black-sidebar .overflow-auto::-webkit-scrollbar-thumb {
+  background: rgba(138, 43, 226, 0.3);
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.black-sidebar .overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 43, 226, 0.5);
+}
+
+.black-sidebar .overflow-auto:not(:hover)::-webkit-scrollbar-thumb {
+  background: rgba(138, 43, 226, 0.15);
+}
+
+.black-sidebar .overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(138, 43, 226, 0.3) transparent;
+}
+
+.black-sidebar .overflow-auto {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
 .vscode-explorer {
   background-color: #000000;
   color: #ffffff;
@@ -257,7 +290,6 @@
 .vscode-explorer::-webkit-scrollbar-thumb:hover {
   background: #555555;
 }
-
 
 .dropdown-menu-content {
   --dropdown-bg: #171717;

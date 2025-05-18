@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AppSidebar from "@/components/app-sidebar";
+import AppSidebar from "@/components/sidebar/app-sidebar";
 import { Outlet } from "react-router-dom";
 import "split-pane-react/esm/themes/default.css";
 
