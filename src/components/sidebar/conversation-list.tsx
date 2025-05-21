@@ -36,8 +36,14 @@ export function ConversationList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
 
+  function toMidnight(date: Date): Date {
+    const midnight = new Date(date);
+    midnight.setHours(0, 0, 0, 0);
+    return midnight;
+  }
+
   function groupByDate(convs: typeof conversations): Grouped {
-    const today = new Date();
+    const todayMidnight = toMidnight(new Date());
     const buckets: Grouped = {
       Today: [],
       Yesterday: [],
@@ -46,9 +52,9 @@ export function ConversationList({
     };
 
     convs.forEach((conv) => {
-      const date = new Date(conv.created_at || Date.now());
+      const convDate = toMidnight(new Date(conv.created_at || Date.now()));
       const diff = Math.floor(
-        (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+        (todayMidnight.getTime() - convDate.getTime()) / (1000 * 60 * 60 * 24)
       );
       const key =
         diff === 0
