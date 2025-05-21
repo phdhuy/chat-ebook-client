@@ -6,13 +6,18 @@ import {
   Message as WSMessage,
   WebSocketError,
 } from "@/hooks/use-websocket-queue";
-import { formatDateTime, mapSenderTypeToRole, MESSAGE_PER_PAGE } from "@/common";
+import {
+  formatDateTime,
+  mapSenderTypeToRole,
+  MESSAGE_PER_PAGE,
+} from "@/common";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSelectedTextStore } from "@/store/use-selected-text-store";
 import { useGetListMessage } from "./hooks/use-get-list-message";
 import { useCreateMessage } from "./hooks/use-create-message";
+import { useSelectedTextStore } from "@/store/use-selected-text-store";
+import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 
 type UIMessage = {
   id: string;
@@ -40,11 +45,11 @@ export default function ChatPage() {
   const { selectedText, clearSelectedText } = useSelectedTextStore();
 
   useEffect(() => {
-    if (selectedText && !input) {
+    if (selectedText) {
       setInput(selectedText);
       clearSelectedText();
     }
-  }, [selectedText, input, clearSelectedText]);
+  }, [selectedText, clearSelectedText]);
 
   useEffect(() => {
     conversationRef.current = conversationId;
@@ -121,21 +126,18 @@ export default function ChatPage() {
     }
   }, [historicalMessages]);
 
-  const onMessage = useCallback(
-    (msg: WSMessage) => {
-      if (msg.conversation_id !== conversationRef.current) return;
-      const uiMsg: UIMessage = {
-        id: msg.id.toString(),
-        role: mapSenderTypeToRole(msg.sender_type),
-        content: msg.content,
-        timestamp: formatDateTime(msg.created_at),
-        isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
-      };
-      shouldScrollToBottomRef.current = true;
-      setLiveMessages((prev) => [...prev, uiMsg]);
-    },
-    []
-  );
+  const onMessage = useCallback((msg: WSMessage) => {
+    if (msg.conversation_id !== conversationRef.current) return;
+    const uiMsg: UIMessage = {
+      id: msg.id.toString(),
+      role: mapSenderTypeToRole(msg.sender_type),
+      content: msg.content,
+      timestamp: formatDateTime(msg.created_at),
+      isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
+    };
+    shouldScrollToBottomRef.current = true;
+    setLiveMessages((prev) => [...prev, uiMsg]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -158,11 +160,25 @@ export default function ChatPage() {
     onError: console.error,
   });
 
+  const { mutate: summarizeEbook, isPending: isSummarizing } =
+    useSummarizeEbook();
+
   const handleSend = useCallback(() => {
     if (!input.trim()) return;
     shouldScrollToBottomRef.current = true;
     createMessage({ conversationId, body: { content: input } });
   }, [input, conversationId, createMessage]);
+
+  const handleSummarize = useCallback(() => {
+    summarizeEbook(
+      { conversationId, body: { content: "Summarize this ebook" } },
+      {
+        onError: (error) => {
+          console.error("Summarize ebook error:", error);
+        },
+      }
+    );
+  }, [summarizeEbook, conversationId]);
 
   const messagesToDisplay = useMemo(() => {
     const seen = new Set<string>();
@@ -229,12 +245,13 @@ export default function ChatPage() {
             </InfiniteScroll>
           </div>
         )}
-
         <ChatInput
           input={input}
           onChange={setInput}
           onSend={handleSend}
+          onSummarize={handleSummarize}
           disabled={isSending}
+          isSummarizing={isSummarizing}
         />
       </div>
     </div>

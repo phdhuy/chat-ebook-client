@@ -42,4 +42,15 @@ export const messageApi = {
     );
     return response.data;
   },
+
+  summarizeEbook: async (
+    conversationId: string,
+    body: CreateMessageRequest
+  ): Promise<ApiResponse<void>> => {
+    const response = await api.post(
+      `/v1/conversations/${conversationId}/ebooks/summarize`,
+      body
+    );
+    return response.data;
+  },
 };
