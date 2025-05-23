@@ -18,6 +18,7 @@ import { useGetListMessage } from "./hooks/use-get-list-message";
 import { useCreateMessage } from "./hooks/use-create-message";
 import { useSelectedTextStore } from "@/store/use-selected-text-store";
 import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
+import { ChatSkeleton } from "@/components/chat/chat-skeleton";
 
 type UIMessage = {
   id: string;
@@ -209,50 +210,42 @@ export default function ChatPage() {
     <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto shadow-lg rounded-lg overflow-hidden bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800">
         {isLoading && page === 1 ? (
-          <div className="p-4 space-y-4">
-            {Array.from({ length: 6 }).map((_, idx) => (
-              <div key={idx} className="flex items-center space-x-4">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <ChatSkeleton />
         ) : (
-          <div
-            id="scrollableDiv"
-            className="flex-1 overflow-auto flex flex-col-reverse"
-          >
-            <InfiniteScroll
-              dataLength={messagesToDisplay.length}
-              next={fetchMoreData}
-              hasMore={hasMore}
-              loader={loader}
-              scrollableTarget="scrollableDiv"
-              inverse={true}
-              style={{ display: "flex", flexDirection: "column-reverse" }}
+          <>
+            <div
+              id="scrollableDiv"
+              className="flex-1 overflow-auto flex flex-col-reverse"
             >
-              <ChatMessageList
-                messages={messagesToDisplay}
-                isLoading={false}
-                error={restError || (wsError ? new Error(wsError) : null)}
-                onCopy={(text) => navigator.clipboard.writeText(text)}
-                onFeedback={(t) => console.log("Feedback:", t)}
-                scrollToBottom={shouldScrollToBottomRef.current}
-              />
-            </InfiniteScroll>
-          </div>
+              <InfiniteScroll
+                dataLength={messagesToDisplay.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                loader={loader}
+                scrollableTarget="scrollableDiv"
+                inverse={true}
+                style={{ display: "flex", flexDirection: "column-reverse" }}
+              >
+                <ChatMessageList
+                  messages={messagesToDisplay}
+                  isLoading={false}
+                  error={restError || (wsError ? new Error(wsError) : null)}
+                  onCopy={(text) => navigator.clipboard.writeText(text)}
+                  onFeedback={(t) => console.log("Feedback:", t)}
+                  scrollToBottom={shouldScrollToBottomRef.current}
+                />
+              </InfiniteScroll>
+            </div>
+            <ChatInput
+              input={input}
+              onChange={setInput}
+              onSend={handleSend}
+              onSummarize={handleSummarize}
+              disabled={isSending}
+              isSummarizing={isSummarizing}
+            />
+          </>
         )}
-        <ChatInput
-          input={input}
-          onChange={setInput}
-          onSend={handleSend}
-          onSummarize={handleSummarize}
-          disabled={isSending}
-          isSummarizing={isSummarizing}
-        />
       </div>
     </div>
   );
