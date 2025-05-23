@@ -16,7 +16,7 @@ import { ChatInput } from "@/components/chat/chat-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetListMessage } from "./hooks/use-get-list-message";
 import { useCreateMessage } from "./hooks/use-create-message";
-import { useSelectedTextStore } from "@/store/use-selected-text-store";
+import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 import { ChatSkeleton } from "@/components/chat/chat-skeleton";
 

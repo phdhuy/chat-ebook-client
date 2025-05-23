@@ -56,7 +56,6 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
   } = useUserQueue({
     onSuccess: (response) => {
       const name = response.data.queue_name;
-      console.log(`Queue created: ${name}`);
       setQueueName(name);
       if (onConnect) onConnect(name);
     },
@@ -97,10 +96,11 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
       const subscriptionHeaders = {
         id: `sub-${queueName}`,
         ack: "auto",
-        "auto-delete": "true",
+        "auto-delete": "false",
         "x-queue-name": queueName,
         durable: "true",
         exclusive: "false",
+        "x-expires": "172800000",
       };
 
       client.subscribe(
