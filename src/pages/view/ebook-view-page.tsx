@@ -11,12 +11,14 @@ import { useConversationDetail } from "@/hooks/use-conversation-detail";
 import { useParams } from "react-router-dom";
 import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 import PdfHeader from "@/components/pdf/pdf-header";
-import { useSelectedTextStore } from "@/store/use-selected-text-store";
+import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 
 export default function EbookViewPage() {
   const params = useParams();
   const conversationId = params.id as string;
-  const { data: conversation } = useConversationDetail(conversationId as string);
+  const { data: conversation } = useConversationDetail(
+    conversationId as string
+  );
 
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
