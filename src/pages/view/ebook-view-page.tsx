@@ -22,11 +22,9 @@ export default function EbookViewPage() {
 
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [darkMode, setDarkMode] = useState(false);
   const [showToc, setShowToc] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -58,10 +56,6 @@ export default function EbookViewPage() {
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
   }, [showControls]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
 
   const getItemSize = useCallback(() => {
     if (!pageDimensions) {
@@ -105,14 +99,13 @@ export default function EbookViewPage() {
               pageNumber={index + 1}
               scale={scale}
               rotation={rotation}
-              darkMode={darkMode}
               onTextSelected={handleTextSelected}
             />
           </div>
         )}
       </div>
     ),
-    [pdf, scale, rotation, darkMode, handleTextSelected]
+    [pdf, scale, rotation, handleTextSelected]
   );
 
   return (
@@ -142,8 +135,6 @@ export default function EbookViewPage() {
           setScale={setScale}
           rotation={rotation}
           setRotation={setRotation}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
           isFullscreen={isFullscreen}
           toggleFullscreen={toggleFullscreen}
           showSettings={showSettings}
@@ -174,11 +165,9 @@ export default function EbookViewPage() {
                 show={showSettings}
                 scale={scale}
                 rotation={rotation}
-                darkMode={darkMode}
                 onClose={() => setShowSettings(false)}
                 onScaleChange={setScale}
                 onRotationChange={setRotation}
-                onDarkModeChange={setDarkMode}
               />
             </div>
           )}

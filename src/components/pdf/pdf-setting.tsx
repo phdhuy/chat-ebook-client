@@ -4,22 +4,18 @@ interface PdfSettingsProps {
   show: boolean;
   scale: number;
   rotation: number;
-  darkMode: boolean;
   onClose: () => void;
   onScaleChange: (scale: number) => void;
   onRotationChange: (rotation: number) => void;
-  onDarkModeChange: (darkMode: boolean) => void;
 }
 
 export const PdfSettings: React.FC<PdfSettingsProps> = ({
   show,
   scale,
   rotation,
-  darkMode,
   onClose,
   onScaleChange,
   onRotationChange,
-  onDarkModeChange,
 }) => {
   if (!show) return null;
 
@@ -69,31 +65,6 @@ export const PdfSettings: React.FC<PdfSettingsProps> = ({
                 {deg}°
               </button>
             ))}
-          </div>
-        </div>
-        <div>
-          <label className="block font-medium mb-2">Display Mode</label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => onDarkModeChange(false)}
-              className={`py-2 px-3 text-sm border rounded-md transition-colors ${
-                !darkMode
-                  ? "bg-purple-600 text-white border-purple-600 dark:bg-purple-700 dark:border-purple-700"
-                  : "border-gray-300 dark:border-gray-600 hover:border-purple-600 dark:hover:border-purple-500"
-              }`}
-            >
-              Light
-            </button>
-            <button
-              onClick={() => onDarkModeChange(true)}
-              className={`py-2 px-3 text-sm border rounded-md transition-colors ${
-                darkMode
-                  ? "bg-purple-600 text-white border-purple-600 dark:bg-purple-700 dark:border-purple-700"
-                  : "border-gray-300 dark:border-gray-600 hover:border-purple-600 dark:hover:border-purple-500"
-              }`}
-            >
-              Dark
-            </button>
           </div>
         </div>
       </div>
