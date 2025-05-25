@@ -19,6 +19,7 @@ import { useCreateMessage } from "./hooks/use-create-message";
 import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 import { ChatSkeleton } from "@/components/chat/chat-skeleton";
+import { ChatHeader } from "@/components/chat/chat-header";
 
 type UIMessage = {
   id: string;
@@ -213,6 +214,12 @@ export default function ChatPage() {
           <ChatSkeleton />
         ) : (
           <>
+            <ChatHeader
+              conversationId={conversationId}
+              conversationTitle="AI Assistant Chat"
+              onSummarizeEbook={handleSummarize}
+              isSummarizing={isSummarizing}
+            />
             <div
               id="scrollableDiv"
               className="flex-1 overflow-auto flex flex-col-reverse"
@@ -240,9 +247,7 @@ export default function ChatPage() {
               input={input}
               onChange={setInput}
               onSend={handleSend}
-              onSummarize={handleSummarize}
               disabled={isSending}
-              isSummarizing={isSummarizing}
             />
           </>
         )}

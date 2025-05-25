@@ -9,7 +9,6 @@ interface PdfPageProps {
   pageNumber: number;
   scale: number;
   rotation: number;
-  darkMode: boolean;
   onTextSelected?: (text: string) => void;
 }
 

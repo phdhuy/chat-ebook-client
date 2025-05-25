@@ -8,8 +8,6 @@ import {
   Minus,
   Plus,
   RotateCw,
-  Sun,
-  Moon,
   Minimize,
   Maximize,
   Settings,
@@ -31,8 +29,6 @@ interface PdfHeaderProps {
   setScale: (scale: number | ((prev: number) => number)) => void
   rotation: number
   setRotation: (rotation: number | ((prev: number) => number)) => void
-  darkMode: boolean
-  setDarkMode: (value: boolean) => void
   isFullscreen: boolean
   toggleFullscreen: () => void
   showSettings: boolean
@@ -52,8 +48,6 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
   scale,
   setScale,
   setRotation,
-  darkMode,
-  setDarkMode,
   isFullscreen,
   toggleFullscreen,
   showSettings,
@@ -282,15 +276,6 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => setDarkMode(!darkMode)}
-          aria-label={darkMode ? "Light mode" : "Dark mode"}
-        >
-          {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
         <Button
           variant="ghost"
           size="icon"

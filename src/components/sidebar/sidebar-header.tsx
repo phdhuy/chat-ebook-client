@@ -35,6 +35,7 @@ export function SidebarHeader({
           variant="ghost"
           onClick={onToggleCollapse}
           title="Expand sidebar"
+          className="p-1"
         >
           <PanelLeftOpen className="h-5 w-5 text-white" />
         </Button>
