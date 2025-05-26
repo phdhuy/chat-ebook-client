@@ -1,4 +1,5 @@
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
+import { useAuthStore } from "@/stores/use-auth-store";
 import axios from "axios";
 
 const api = axios.create({
@@ -14,25 +15,23 @@ const refreshApi = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const { accessToken } = useAuthStore.getState();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
 async function refreshToken() {
   try {
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+    const { refreshToken } = useAuthStore.getState();
     if (!refreshToken) throw new Error("No refresh token available");
 
     const response = await refreshApi.post("/v1/auth/refresh-token", {
@@ -64,13 +63,12 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401) {
       console.error("Unauthorized! Redirecting to login...");
-      localStorage.removeItem(ACCESS_TOKEN);
       window.location.href = "/sign-in";
       return Promise.reject(error);
     }
 
     if (
-      error.response.status === 403 &&
+      error.response?.status === 403 &&
       error.response.data?.error?.code === "ERR.TOK0105" &&
       !originalRequest._retry
     ) {

@@ -9,12 +9,13 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/types/exception";
+import { useAuthActions } from "@/stores/use-auth-store";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuthActions();
   const { toast } = useToast();
 
   return useMutation<
@@ -24,8 +25,7 @@ export const useLogin = () => {
   >({
     mutationFn: (data) => authApi.login(data),
     onSuccess: (res) => {
-      localStorage.setItem(ACCESS_TOKEN, res.data.access_token);
-      localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token);
+      signIn(res.data.access_token, res.data.refresh_token);
       toast({
         title: "Welcome back! 🎉",
         description: "You’ve successfully signed in.",
@@ -34,8 +34,7 @@ export const useLogin = () => {
     },
     onError: (err) => {
       const message =
-        err.response?.data.error.message ||
-        "Login failed. Please try again.";
+        err.response?.data.error.message || "Login failed. Please try again.";
 
       toast({
         variant: "destructive",
@@ -49,6 +48,7 @@ export const useLogin = () => {
 
 export const useLoginWithGoogle = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuthActions();
   const { toast } = useToast();
 
   const loginMutation = useMutation<
@@ -58,8 +58,7 @@ export const useLoginWithGoogle = () => {
   >({
     mutationFn: (data) => authApi.loginWithGoogle(data),
     onSuccess: (res) => {
-      localStorage.setItem(ACCESS_TOKEN, res.data.access_token);
-      localStorage.setItem(REFRESH_TOKEN, res.data.refresh_token);
+      signIn(res.data.access_token, res.data.refresh_token);
       toast({
         title: "Google Sign-In Success! 🎉",
         description: "You’re now logged in.",

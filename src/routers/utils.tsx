@@ -1,8 +1,8 @@
-import { ACCESS_TOKEN } from "@/common";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { Navigate, Outlet } from "react-router-dom";
 
 const PrivateRoute = () => {
-  const isAuthenticated = !!localStorage.getItem(ACCESS_TOKEN);
+  const isAuthenticated = useAuthStore();
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/sign-in" replace />;
 };
