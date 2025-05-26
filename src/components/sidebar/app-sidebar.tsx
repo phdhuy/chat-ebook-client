@@ -8,6 +8,7 @@ import { SidebarHeader } from "./sidebar-header";
 import { NewChatButton } from "./newchat-button";
 import { ConversationList } from "./conversation-list";
 import { SidebarFooter } from "./sidebar-footer";
+import { useAuthActions, useAuthStore } from "@/stores/use-auth-store";
 
 interface AppSidebarProps {
   isCollapsed: boolean;
@@ -30,14 +31,16 @@ export default function AppSidebar({
   const { mutate: revokeToken } = useRevokeToken({
     onSuccess: () => window.location.assign("/sign-in"),
   });
+  const { signOut } = useAuthActions();
 
   const handleSignOut = () => {
-    const token = localStorage.getItem("refreshToken");
-    if (token) {
-      revokeToken({ refresh_token: token });
+    const { refreshToken } = useAuthStore.getState();
+    if (refreshToken) {
+      revokeToken({ refresh_token: refreshToken });
     } else {
       window.location.assign("/sign-in");
     }
+    signOut();
   };
 
   return (
