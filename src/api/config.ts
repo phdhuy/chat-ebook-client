@@ -1,5 +1,5 @@
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
 import { useAuthStore } from "@/stores/use-auth-store";
+import { refreshToken } from "@/utils/auth-utils";
 import axios from "axios";
 
 const api = axios.create({
@@ -8,11 +8,6 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-});
-
-const refreshApi = axios.create({
-  baseURL: import.meta.env.VITE_BASE_ENDPOINT || "",
-  headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use(
@@ -28,28 +23,6 @@ api.interceptors.request.use(
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
-
-async function refreshToken() {
-  try {
-    const { refreshToken } = useAuthStore.getState();
-    if (!refreshToken) throw new Error("No refresh token available");
-
-    const response = await refreshApi.post("/v1/auth/refresh-token", {
-      refresh_token: refreshToken,
-    });
-
-    const newAccessToken = response.data.data.access_token;
-
-    localStorage.setItem(ACCESS_TOKEN, newAccessToken);
-    return newAccessToken;
-  } catch (error) {
-    console.error("Failed to refresh token", error);
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(REFRESH_TOKEN);
-    window.location.href = "/sign-in";
-    return null;
-  }
-}
 
 function onRefreshed(token: string) {
   refreshSubscribers.forEach((callback) => callback(token));
