@@ -2,7 +2,7 @@ import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { usePdf } from "@/hooks/use-pdf";
-import { useFullscreen } from "@/hooks/use-fullscreen";
+import { useFullscreen } from "@/pages/view/hooks/use-fullscreen";
 import { PdfSidebar } from "@/components/pdf/pdf-sidebar";
 import { PdfSettings } from "@/components/pdf/pdf-setting";
 import { PdfPage } from "@/components/pdf/pdf-page";
