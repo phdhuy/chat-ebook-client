@@ -115,7 +115,6 @@ export default function EbookViewPage() {
         isFullscreen ? "fixed inset-0 z-50" : ""
       }`}
     >
-      {/* Toggle Controls Button */}
       <button
         onClick={() => setShowControls(!showControls)}
         className="absolute top-2 right-2 z-40 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -143,7 +142,6 @@ export default function EbookViewPage() {
       )}
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Full height on the left side */}
         {showToc && (
           <div className="w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0">
             <PdfSidebar
@@ -156,9 +154,7 @@ export default function EbookViewPage() {
           </div>
         )}
 
-        {/* Main Content Area */}
         <div className="flex-1 flex flex-col relative">
-          {/* Settings Panel - Fixed position on the right */}
           {showSettings && (
             <div className="absolute top-0 right-0 w-64 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 z-20 overflow-auto">
               <PdfSettings
@@ -172,7 +168,6 @@ export default function EbookViewPage() {
             </div>
           )}
 
-          {/* PDF Content */}
           <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900">
             {isLoading ? (
               <PDFSkeleton />
