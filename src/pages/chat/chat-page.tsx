@@ -27,6 +27,13 @@ type UIMessage = {
   content: string;
   timestamp: string;
   isNewBotMessage: boolean;
+  cited_excerpts?: Array<{
+    id: string;
+    source_id: number;
+    text: string;
+    page: number;
+    score: number;
+  }>;
 };
 
 export default function ChatPage() {
@@ -88,6 +95,7 @@ export default function ChatPage() {
         content: msg.content,
         timestamp: formatDateTime(msg.created_at),
         isNewBotMessage: false,
+        cited_excerpts: msg.cited_excerpts,
       }));
 
       if (data.data.length < MESSAGE_PER_PAGE) {
@@ -136,6 +144,7 @@ export default function ChatPage() {
       content: msg.content,
       timestamp: formatDateTime(msg.created_at),
       isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
+      cited_excerpts: msg.cited_excerpts,
     };
     shouldScrollToBottomRef.current = true;
     setLiveMessages((prev) => [...prev, uiMsg]);

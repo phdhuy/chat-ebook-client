@@ -14,6 +14,13 @@ export type MessageInfoResponse = {
   content: string;
   sender_type: string;
   conversation_id: string;
+  cited_excerpts?: Array<{
+    id: string;
+    source_id: number;
+    text: string;
+    page: number;
+    score: number;
+  }>;
 };
 
 export type CreateMessageRequest = {

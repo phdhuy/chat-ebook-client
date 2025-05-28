@@ -2,12 +2,36 @@ import { useEffect, useRef, useState } from "react";
 import { Client, Frame, IMessage } from "@stomp/stompjs";
 import { useUserQueue } from "@/hooks/use-user-queue";
 
+interface ParsedMessage {
+  id?: string;
+  content?: string;
+  text?: string;
+  created_at?: number;
+  timestamp?: string;
+  sender_type?: string;
+  conversation_id?: string;
+  cited_excerpts?: Array<{
+    id: string;
+    source_id: number;
+    text: string;
+    page: number;
+    score: number;
+  }>;
+}
+
 export interface Message {
   id: string;
   content: string;
   created_at: number;
   sender_type: string;
   conversation_id: string;
+  cited_excerpts?: Array<{
+    id: string;
+    source_id: number;
+    text: string;
+    page: number;
+    score: number;
+  }>;
 }
 
 export interface WebSocketError {
@@ -107,7 +131,7 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
         `/queue/${queueName}`,
         (msg: IMessage) => {
           try {
-            const parsed = JSON.parse(msg.body);
+            const parsed: ParsedMessage = JSON.parse(msg.body);
             const content = parsed.content || parsed.text || "Unknown content";
             const createdAt =
               parsed.created_at ||
@@ -121,6 +145,15 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
               created_at: createdAt,
               sender_type: parsed.sender_type || "bot",
               conversation_id: parsed.conversation_id || "unknown",
+              cited_excerpts: Array.isArray(parsed.cited_excerpts)
+                ? parsed.cited_excerpts.map((e) => ({
+                    id: e.id,
+                    source_id: e.source_id,
+                    text: e.text,
+                    page: e.page,
+                    score: e.score,
+                  }))
+                : [],
             };
 
             setMessages((prev) => [...prev, messageObj]);
