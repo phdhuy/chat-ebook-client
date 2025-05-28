@@ -1,17 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Download, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Download,
+  ThumbsUp,
+  ThumbsDown,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { ReactTyped } from "react-typed";
 import { FeedbackModal } from "../modal/feedback-modal";
 
 export interface Message {
-  id: string;
+  id: string | number;
   role: "bot" | "user";
   content: string;
   timestamp: string;
+  created_at?: number;
+  sender_type?: "BOT" | "USER";
+  conversation_id?: string;
   isNewBotMessage?: boolean;
+  cited_excerpts?: Array<{
+    id: string;
+    source_id: number;
+    text: string;
+    page: number;
+    score: number;
+  }>;
 }
 
 interface ChatMessageItemProps {
@@ -25,12 +42,13 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onCopy,
   onFeedback,
 }) => {
-  const isUser = message.role === "user";
+  const isUser = message.role === "user" || message.sender_type === "USER";
   const [copied, setCopied] = useState(false);
   const [isTypingComplete, setIsTypingComplete] = useState(
     !message.isNewBotMessage
   );
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [showCitations, setShowCitations] = useState(false);
 
   useEffect(() => {
     if (copied) {
@@ -61,6 +79,55 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     setIsFeedbackOpen(false);
   };
 
+  const formatTimestamp = (timestamp: string | number) => {
+    if (typeof timestamp === "number") {
+      return new Date(timestamp).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return timestamp;
+  };
+
+  const processedContent = useMemo(() => {
+    if (!message.cited_excerpts || message.cited_excerpts.length === 0) {
+      return message.content;
+    }
+
+    if (message.isNewBotMessage && !isTypingComplete) {
+      return message.content;
+    }
+
+    return message.content.replace(/\[(\d+)\]/g, (match, p1) => {
+      const sourceId = parseInt(p1);
+      const excerpt = message.cited_excerpts?.find(
+        (e) => e.source_id === sourceId
+      );
+      if (excerpt) {
+        const url = `/source/${sourceId}/page/${excerpt.page}`;
+        return `[${p1}](${url} "Source ${sourceId}, page ${excerpt.page}")`;
+      }
+      return match;
+    });
+  }, [message.content, message.cited_excerpts, isTypingComplete, message.isNewBotMessage]);
+
+  const uniqueCitations = useMemo(() => {
+    if (!message.cited_excerpts) return [];
+
+    const citationMap = new Map();
+    message.cited_excerpts.forEach((excerpt) => {
+      if (!citationMap.has(excerpt.source_id)) {
+        citationMap.set(excerpt.source_id, excerpt);
+      }
+    });
+
+    return Array.from(citationMap.values()).sort(
+      (a, b) => a.source_id - b.source_id
+    );
+  }, [message.cited_excerpts]);
+
+  const shouldShowCitations = !isUser && uniqueCitations.length > 0 && isTypingComplete;
+
   return (
     <>
       <div
@@ -70,16 +137,13 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           isUser ? "ml-auto flex-row-reverse" : ""
         )}
       >
-        {/* Avatar */}
         <div
           className={cn(
             "h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 mt-1",
-            isUser
-              ? "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-              : "bg-purple-600 text-white"
+            isUser ? "bg-blue-500 text-white" : "bg-purple-600 text-white"
           )}
         >
-          <span className="font-semibold text-sm">{isUser ? "You" : "AI"}</span>
+          <span className="font-semibold text-sm">{isUser ? "U" : "AI"}</span>
         </div>
 
         <div className="space-y-2">
@@ -92,79 +156,148 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             <span
               className={cn(
                 "text-sm font-medium",
-                isUser ? "text-gray-700 dark:text-gray-300" : "text-gray-700"
+                isUser
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-purple-600 dark:text-purple-400"
               )}
             >
-              {isUser ? "You" : "AI"}
+              {isUser ? "You" : "AI Assistant"}
             </span>
-            <span
-              className={cn(
-                "text-xs text-gray-500 dark:text-gray-400",
-                isUser ? "text-right" : "text-left"
-              )}
-            >
-              {message.timestamp}
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {formatTimestamp(message.created_at || message.timestamp)}
             </span>
           </div>
 
           <div
             className={cn(
-              "p-3.5 rounded-2xl text-sm shadow-sm leading-relaxed border prose",
+              "p-3.5 rounded-2xl text-sm shadow-sm leading-relaxed border",
               isUser
-                ? "bg-purple-600 text-white border-purple-600 prose-invert"
+                ? "bg-blue-500 text-white border-blue-500"
                 : "bg-white text-black dark:bg-gray-900 border-gray-200 dark:border-gray-800"
             )}
           >
             {isUser ? (
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+              <div className="prose prose-sm prose-invert max-w-none">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
             ) : isTypingComplete ? (
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <ReactMarkdown
+                  components={{
+                    a: ({ href, title, children, ...props }) => (
+                      <a
+                        href={href}
+                        title={title}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline decoration-1 underline-offset-2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          console.log("Navigate to:", href);
+                        }}
+                        {...props}
+                      >
+                        {children}
+                      </a>
+                    ),
+                  }}
+                >
+                  {processedContent}
+                </ReactMarkdown>
+              </div>
             ) : (
               <ReactTyped
-                strings={[message.content]}
-                typeSpeed={0}
+                strings={[processedContent]}
+                typeSpeed={15}
                 backSpeed={0}
                 loop={false}
-                showCursor={false}
+                showCursor={true}
+                cursorChar="|"
                 onComplete={handleTypingComplete}
-              >
-                <div className="react-typed-container" />
-              </ReactTyped>
+              />
             )}
           </div>
 
+          {shouldShowCitations && (
+            <div className="mt-3">
+              <button
+                onClick={() => setShowCitations(!showCitations)}
+                className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+              >
+                <FileText className="h-3 w-3" />
+                <span>References ({uniqueCitations.length})</span>
+                <span
+                  className={cn(
+                    "transition-transform",
+                    showCitations && "rotate-180"
+                  )}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {showCitations && (
+                <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-2">
+                  {uniqueCitations.map((citation) => (
+                    <div key={citation.id} className="text-xs">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-blue-600 dark:text-blue-400">
+                          [{citation.source_id}]
+                        </span>
+                        <span className="text-gray-500">
+                          Page {citation.page} • Confidence:{" "}
+                          {citation.score.toFixed(1)}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 p-2 rounded border-l-2 border-blue-200 dark:border-blue-800">
+                        {citation.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {!isUser && (
-            <div className="flex items-center gap-1.5">
-              <Button variant="ghost" size="icon" onClick={handleCopy}>
+            <div className="flex items-center gap-1.5 pt-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCopy}
+                className="h-7 w-7"
+                title="Copy"
+              >
                 {copied ? (
                   <Check className="h-3.5 w-3.5 text-green-500" />
                 ) : (
                   <Copy className="h-3.5 w-3.5 text-gray-500" />
                 )}
               </Button>
-
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                title="Download"
+              >
                 <Download className="h-3.5 w-3.5 text-gray-500" />
               </Button>
-
               <div className="h-4 border-r border-gray-200 dark:border-gray-700 mx-1" />
-
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleLike}
-                aria-label="Like answer"
+                className="h-7 w-7"
+                title="Helpful"
               >
-                <ThumbsUp className="h-3.5 w-3.5 text-gray-500" />
+                <ThumbsUp className="h-3.5 w-3.5 text-gray-500 hover:text-green-500" />
               </Button>
-
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleDislikeClick}
-                aria-label="Report answer"
+                className="h-7 w-7"
+                title="Report issue"
               >
-                <ThumbsDown className="h-3.5 w-3.5 text-gray-500" />
+                <ThumbsDown className="h-3.5 w-3.5 text-gray-500 hover:text-red-500" />
               </Button>
             </div>
           )}
