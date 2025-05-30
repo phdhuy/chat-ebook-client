@@ -223,7 +223,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             ) : (
               <ReactTyped
                 strings={[processedContent]}
-                typeSpeed={15}
+                typeSpeed={0}
                 backSpeed={0}
                 loop={false}
                 showCursor={true}
