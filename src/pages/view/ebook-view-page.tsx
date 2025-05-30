@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 import PdfHeader from "@/components/pdf/pdf-header";
 import { useSelectedTextStore } from "@/stores/use-selected-text-store";
+import { useReferencePageStore } from "@/stores/use-reference-page-store";
 
 export default function EbookViewPage() {
   const params = useParams();
@@ -33,6 +34,16 @@ export default function EbookViewPage() {
   const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef);
   const [listHeight, setListHeight] = useState(600);
   const { setSelectedText } = useSelectedTextStore();
+
+  const { page, clearReferencePage } = useReferencePageStore();
+
+  useEffect(() => {
+    if (page >= 1 && page <= numPages && listRef.current) {
+      listRef.current.scrollToItem(page - 1, "center");
+      setCurrentPage(page);
+      clearReferencePage();
+    }
+  }, [page, numPages, clearReferencePage]);
 
   const handleTextSelected = useCallback(
     (text: string) => {
