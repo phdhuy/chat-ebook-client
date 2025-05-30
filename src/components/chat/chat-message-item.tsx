@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { ReactTyped } from "react-typed";
 import { FeedbackModal } from "../modal/feedback-modal";
+import { useReferencePageStore } from "@/stores/use-reference-page-store";
 
 export interface Message {
   id: string | number;
@@ -49,6 +50,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   );
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [showCitations, setShowCitations] = useState(false);
+  const { setReferencePage } = useReferencePageStore();
 
   useEffect(() => {
     if (copied) {
@@ -109,7 +111,12 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       }
       return match;
     });
-  }, [message.content, message.cited_excerpts, isTypingComplete, message.isNewBotMessage]);
+  }, [
+    message.content,
+    message.cited_excerpts,
+    isTypingComplete,
+    message.isNewBotMessage,
+  ]);
 
   const uniqueCitations = useMemo(() => {
     if (!message.cited_excerpts) return [];
@@ -126,7 +133,8 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     );
   }, [message.cited_excerpts]);
 
-  const shouldShowCitations = !isUser && uniqueCitations.length > 0 && isTypingComplete;
+  const shouldShowCitations =
+    !isUser && uniqueCitations.length > 0 && isTypingComplete;
 
   return (
     <>
@@ -184,20 +192,29 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown
                   components={{
-                    a: ({ href, title, children, ...props }) => (
-                      <a
-                        href={href}
-                        title={title}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline decoration-1 underline-offset-2"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          console.log("Navigate to:", href);
-                        }}
-                        {...props}
-                      >
-                        {children}
-                      </a>
-                    ),
+                    a: ({ href, title, children, ...props }) => {
+                      if (href && href.match(/^\/source\/\d+\/page\/\d+$/)) {
+                        const pageMatch = href.match(/page\/(\d+)/);
+                        if (pageMatch) {
+                          const page = parseInt(pageMatch[1], 10);
+                          return (
+                            <a
+                              role="button"
+                              title={title}
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline decoration-1 underline-offset-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setReferencePage(page);
+                              }}
+                              {...props}
+                            >
+                              {children}
+                            </a>
+                          );
+                        }
+                      }
+                      return <span>{children}</span>;
+                    },
                   }}
                 >
                   {processedContent}
