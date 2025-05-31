@@ -30,6 +30,7 @@ import {
   MessageSquare,
   Loader2,
   Check,
+  GitBranch,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -39,7 +40,9 @@ interface ChatHeaderProps {
   onSummarizeEbook?: () => void;
   onClearConversation?: () => void;
   onExportConversation?: () => void;
+  onGenerateMindmap?: () => void;
   isSummarizing?: boolean;
+  isGeneratingMindmap?: boolean;
   className?: string;
 }
 
@@ -49,7 +52,9 @@ export function ChatHeader({
   onSummarizeEbook,
   onClearConversation,
   onExportConversation,
+  onGenerateMindmap,
   isSummarizing = false,
+  isGeneratingMindmap = false,
   className = "",
 }: ChatHeaderProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -130,7 +135,6 @@ export function ChatHeader({
     <div
       className={`flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 ${className}`}
     >
-      {/* Left section - Title and info */}
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2">
           <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -140,15 +144,14 @@ export function ChatHeader({
         </div>
       </div>
 
-      {/* Right section - Actions */}
       <div className="flex items-center space-x-2">
-        {/* Share Button */}
         <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outline"
               size="sm"
               className="flex items-center space-x-2"
+              aria-label="Share conversation"
             >
               <Share2 className="h-4 w-4" />
               <span className="hidden sm:inline">Share</span>
@@ -162,7 +165,6 @@ export function ChatHeader({
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              {/* Copy Link Section */}
               <div className="space-y-2">
                 <Label>Share Link</Label>
                 <div className="flex items-center space-x-2">
@@ -172,6 +174,7 @@ export function ChatHeader({
                     size="sm"
                     variant="outline"
                     className="flex items-center space-x-1"
+                    aria-label={isCopied ? "Link copied" : "Copy link"}
                   >
                     {isCopied ? (
                       <Check className="h-4 w-4 text-green-600" />
@@ -182,7 +185,6 @@ export function ChatHeader({
                 </div>
               </div>
 
-              {/* Email Share Section */}
               <div className="space-y-2">
                 <Label htmlFor="share-email">Share via Email</Label>
                 <Input
@@ -202,6 +204,7 @@ export function ChatHeader({
                   onClick={handleEmailShare}
                   disabled={isSharing}
                   className="w-full"
+                  aria-label={isSharing ? "Sharing via email" : "Send email"}
                 >
                   {isSharing ? (
                     <>
@@ -220,13 +223,13 @@ export function ChatHeader({
           </DialogContent>
         </Dialog>
 
-        {/* Summarize Ebook Button */}
         <Button
           variant="outline"
           size="sm"
           onClick={onSummarizeEbook}
           disabled={isSummarizing}
           className="flex items-center space-x-2"
+          aria-label={isSummarizing ? "Summarizing ebook" : "Summarize ebook"}
         >
           {isSummarizing ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -238,10 +241,27 @@ export function ChatHeader({
           </span>
         </Button>
 
-        {/* More Actions Dropdown */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onGenerateMindmap}
+          disabled={isGeneratingMindmap}
+          className="flex items-center space-x-2"
+          aria-label={isGeneratingMindmap ? "Generating mindmap" : "Generate mindmap"}
+        >
+          {isGeneratingMindmap ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <GitBranch className="h-4 w-4" />
+          )}
+          <span className="hidden sm:inline">
+            {isGeneratingMindmap ? "Generating..." : "Mindmap"}
+          </span>
+        </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="More actions">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
