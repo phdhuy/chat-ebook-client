@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   useWebSocketQueue,
   Message as WSMessage,
   WebSocketError,
@@ -20,6 +26,7 @@ import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 import { ChatSkeleton } from "@/components/chat/chat-skeleton";
 import { ChatHeader } from "@/components/chat/chat-header";
+import MindmapPage from "@/pages/mindmap/mindmap-page";
 
 type UIMessage = {
   id: string;
@@ -44,6 +51,7 @@ export default function ChatPage() {
   const [liveMessages, setLiveMessages] = useState<UIMessage[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isMindmapOpen, setIsMindmapOpen] = useState(false);
   const isInitialLoadRef = useRef(true);
   const shouldScrollToBottomRef = useRef(true);
   const prevHistoricalLengthRef = useRef(0);
@@ -191,6 +199,10 @@ export default function ChatPage() {
     );
   }, [summarizeEbook, conversationId]);
 
+  const handleGenerateMindmap = useCallback(() => {
+    setIsMindmapOpen(true);
+  }, []);
+
   const messagesToDisplay = useMemo(() => {
     const seen = new Set<string>();
     return [...historicalMessages, ...liveMessages].filter((msg) => {
@@ -217,50 +229,67 @@ export default function ChatPage() {
   );
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="flex-1 flex flex-col w-full mx-auto shadow-lg rounded-lg overflow-hidden bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800">
-        {isLoading && page === 1 ? (
-          <ChatSkeleton />
-        ) : (
-          <>
-            <ChatHeader
-              conversationId={conversationId}
-              conversationTitle="AI Assistant Chat"
-              onSummarizeEbook={handleSummarize}
-              isSummarizing={isSummarizing}
-            />
-            <div
-              id="scrollableDiv"
-              className="flex-1 overflow-auto flex flex-col-reverse"
-            >
-              <InfiniteScroll
-                dataLength={messagesToDisplay.length}
-                next={fetchMoreData}
-                hasMore={hasMore}
-                loader={loader}
-                scrollableTarget="scrollableDiv"
-                inverse={true}
-                style={{ display: "flex", flexDirection: "column-reverse" }}
+    <>
+      <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex-1 flex flex-col w-full mx-auto shadow-lg rounded-lg overflow-hidden bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800">
+          {isLoading && page === 1 ? (
+            <ChatSkeleton />
+          ) : (
+            <>
+              <ChatHeader
+                conversationId={conversationId}
+                conversationTitle="AI Assistant Chat"
+                onSummarizeEbook={handleSummarize}
+                isSummarizing={isSummarizing}
+                onGenerateMindmap={handleGenerateMindmap}
+              />
+              <div
+                id="scrollableDiv"
+                className="flex-1 overflow-auto flex flex-col-reverse"
               >
-                <ChatMessageList
-                  messages={messagesToDisplay}
-                  isLoading={false}
-                  error={restError || (wsError ? new Error(wsError) : null)}
-                  onCopy={(text) => navigator.clipboard.writeText(text)}
-                  onFeedback={(t) => console.log("Feedback:", t)}
-                  scrollToBottom={shouldScrollToBottomRef.current}
-                />
-              </InfiniteScroll>
-            </div>
-            <ChatInput
-              input={input}
-              onChange={setInput}
-              onSend={handleSend}
-              disabled={isSending}
-            />
-          </>
-        )}
+                <InfiniteScroll
+                  dataLength={messagesToDisplay.length}
+                  next={fetchMoreData}
+                  hasMore={hasMore}
+                  loader={loader}
+                  scrollableTarget="scrollableDiv"
+                  inverse={true}
+                  style={{ display: "flex", flexDirection: "column-reverse" }}
+                >
+                  <ChatMessageList
+                    messages={messagesToDisplay}
+                    isLoading={false}
+                    error={restError || (wsError ? new Error(wsError) : null)}
+                    onCopy={(text) => navigator.clipboard.writeText(text)}
+                    onFeedback={(t) => console.log("Feedback:", t)}
+                    scrollToBottom={shouldScrollToBottomRef.current}
+                  />
+                </InfiniteScroll>
+              </div>
+              <ChatInput
+                input={input}
+                onChange={setInput}
+                onSend={handleSend}
+                disabled={isSending}
+              />
+            </>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Mindmap Modal */}
+      <Dialog open={isMindmapOpen} onOpenChange={setIsMindmapOpen}>
+        <DialogContent className="max-w-7xl h-[90vh] p-6 rounded-xl shadow-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-white flex flex-col">
+          <DialogHeader className="p-6 pb-3 border-b-2 border-gray-300">
+            <DialogTitle className="text-2xl font-bold text-gray-900">
+              Mind Map (Beta)
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 bg-white p-4 rounded-lg shadow-sm">
+            {isMindmapOpen && <MindmapPage conversationId={conversationId} />}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

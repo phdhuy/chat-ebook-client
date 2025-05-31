@@ -27,18 +27,14 @@ const AppRoutes = () => {
         { index: true, element: <HomePage /> },
         {
           element: <PrivateRoute />,
-          children: [
-            { path: "upload", element: <UploadFilePage /> },
-          ]
-        }
+          children: [{ path: "upload", element: <UploadFilePage /> }],
+        },
       ],
     },
     {
       path: "/",
       element: <EbookViewLayout />,
-      children: [
-        { path: "chat/:id", element: <EbookViewPage /> }
-      ],
+      children: [{ path: "chat/:id", element: <EbookViewPage /> }],
     },
     { path: "*", element: <NotFoundPage /> },
   ]);
