@@ -60,7 +60,6 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
             </div>
           </div>
           <Button
-            onClick={onSignOut}
             className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700"
           >
             <Sparkles className="mr-2 h-4 w-4" /> Upgrade to Plus
