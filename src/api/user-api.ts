@@ -15,6 +15,11 @@ export type QueueInfoResponse = {
   queue_name: string;
 };
 
+export type ApiUsageResponse = {
+  count: number;
+  resource_type: string;
+}[];
+
 export const userApi = {
   getMyProfile: async (): Promise<ApiResponse<UserInfoResponse>> => {
     const response = await api.get("/v1/users/me");
@@ -23,6 +28,11 @@ export const userApi = {
 
   createQueue: async (): Promise<ApiResponse<QueueInfoResponse>> => {
     const response = await api.post("/v1/users/queues");
+    return response.data;
+  },
+
+  countApiUsage: async (): Promise<ApiResponse<ApiUsageResponse>> => {
+    const response = await api.get("/v1/usages/count");
     return response.data;
   },
 };
