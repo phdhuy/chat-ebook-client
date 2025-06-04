@@ -107,7 +107,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       );
       if (excerpt) {
         const url = `/source/${sourceId}/page/${excerpt.page}`;
-        return `[${p1}](${url} "Source ${sourceId}, page ${excerpt.page}")`;
+        return `[Page ${excerpt.page}](${url} "Source ${sourceId}, page ${excerpt.page}")`;
       }
       return match;
     });
