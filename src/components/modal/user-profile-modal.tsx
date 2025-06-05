@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { useState } from "react";
 import {
   Bell,
@@ -14,6 +14,8 @@ import {
   FileText,
   Upload,
   Send,
+  CalendarIcon,
+  FilterIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,12 +34,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { format, startOfDay, subDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 import { useApiUsage } from "@/hooks/use-api-usage";
-
-interface ApiUsageData {
-  count: number;
-  resource_type: string;
-}
+import UsageSkeleton from "../skeleton/usage-skeleton";
 
 interface UserProfileModalProps {
   open: boolean;
@@ -57,7 +70,6 @@ export default function UserProfileModal({
   onSignOut,
 }: UserProfileModalProps) {
   const [activeTab, setActiveTab] = useState("profile");
-  const { data: apiUsageResponse, isLoading, error } = useApiUsage();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,18 +144,7 @@ export default function UserProfileModal({
 
           <div className="flex-1 p-8 overflow-y-auto bg-white/30 dark:bg-zinc-950/30">
             {activeTab === "profile" && <ProfileContent profile={profile} />}
-            {activeTab === "usage" &&
-              (isLoading ? (
-                <div className="flex justify-center items-center h-40">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-                </div>
-              ) : error ? (
-                <div className="text-red-500 dark:text-red-400">
-                  Error loading API usage: {error.message}
-                </div>
-              ) : (
-                <UsageContent apiUsage={apiUsageResponse?.data || []} />
-              ))}
+            {activeTab === "usage" && <UsageContent />}
             {activeTab === "preference" && (
               <div className="text-gray-600 dark:text-gray-400">
                 Preference settings coming soon...
@@ -283,8 +284,42 @@ function ProfileContent({
   );
 }
 
-function UsageContent({ apiUsage }: { apiUsage?: ApiUsageData[] }) {
-  const usageData = apiUsage || [];
+function UsageContent() {
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
+  const [quickFilter, setQuickFilter] = useState<string>("30days");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const { data: usageResponse, isLoading, error } = useApiUsage(dateRange);
+  const usageData = usageResponse?.data || [];
+
+  const handleQuickFilterChange = (value: string) => {
+    setQuickFilter(value);
+    const today = new Date();
+
+    switch (value) {
+      case "today":
+        setDateRange({ from: startOfDay(today), to: today });
+        break;
+      case "7days":
+        setDateRange({ from: subDays(today, 7), to: today });
+        break;
+      case "30days":
+        setDateRange({ from: subDays(today, 30), to: today });
+        break;
+      case "90days":
+        setDateRange({ from: subDays(today, 90), to: today });
+        break;
+      case "year":
+        setDateRange({ from: subDays(today, 365), to: today });
+        break;
+      case "custom":
+        setIsCalendarOpen(true);
+        break;
+    }
+  };
 
   const getUsageIcon = (resourceType: string) => {
     switch (resourceType) {
@@ -333,15 +368,89 @@ function UsageContent({ apiUsage }: { apiUsage?: ApiUsageData[] }) {
 
   const totalUsage = usageData.reduce((sum, item) => sum + item.count, 0);
 
+  if (isLoading) {
+    return <UsageSkeleton />;
+  }
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          API Usage Overview
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Track your API usage across different features
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            API Usage Overview
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Track your API usage across different features
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Select value={quickFilter} onValueChange={handleQuickFilterChange}>
+            <SelectTrigger className="w-[180px] bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl">
+              <SelectValue placeholder="Filter period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="7days">Last 7 days</SelectItem>
+              <SelectItem value="30days">Last 30 days</SelectItem>
+              <SelectItem value="90days">Last 90 days</SelectItem>
+              <SelectItem value="year">Last year</SelectItem>
+              <SelectItem value="custom">Custom range</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "justify-start text-left font-normal bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl",
+                  !dateRange.from && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, "LLL dd, y")} -{" "}
+                      {format(dateRange.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(dateRange.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange.from}
+                selected={dateRange}
+                onSelect={(range) => {
+                  setDateRange(range || { from: undefined, to: undefined });
+                  if (range?.from && range?.to) {
+                    setQuickFilter("custom");
+                  }
+                }}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl"
+            onClick={() => console.log("Applying filters:", dateRange)}
+          >
+            <FilterIcon className="h-4 w-4" />
+            <span className="sr-only">Apply filters</span>
+          </Button>
+        </div>
       </div>
 
       <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 backdrop-blur-sm shadow-lg">

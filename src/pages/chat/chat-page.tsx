@@ -2,12 +2,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   useWebSocketQueue,
   Message as WSMessage,
   WebSocketError,
@@ -26,7 +20,7 @@ import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 import { ChatSkeleton } from "@/components/chat/chat-skeleton";
 import { ChatHeader } from "@/components/chat/chat-header";
-import MindmapPage from "@/pages/mindmap/mindmap-page";
+import MindmapModal from "@/components/modal/mindmap-modal";
 
 type UIMessage = {
   id: string;
@@ -278,18 +272,11 @@ export default function ChatPage() {
       </div>
 
       {/* Mindmap Modal */}
-      <Dialog open={isMindmapOpen} onOpenChange={setIsMindmapOpen}>
-        <DialogContent className="max-w-7xl h-[90vh] p-6 rounded-xl shadow-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-white flex flex-col">
-          <DialogHeader className="p-6 pb-3 border-b-2 border-gray-300">
-            <DialogTitle className="text-2xl font-bold text-gray-900">
-              Mind Map (Beta)
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 bg-white p-4 rounded-lg shadow-sm">
-            {isMindmapOpen && <MindmapPage conversationId={conversationId} />}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <MindmapModal
+        isOpen={isMindmapOpen}
+        onOpenChange={setIsMindmapOpen}
+        conversationId={conversationId}
+      />
     </>
   );
 }
