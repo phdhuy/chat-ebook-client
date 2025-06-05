@@ -31,8 +31,13 @@ export const userApi = {
     return response.data;
   },
 
-  countApiUsage: async (): Promise<ApiResponse<ApiUsageResponse>> => {
-    const response = await api.get("/v1/usages/count");
+  countApiUsage: async (
+    params: Record<string, string> = {}
+  ): Promise<ApiResponse<ApiUsageResponse>> => {
+    const query = new URLSearchParams(params).toString();
+    const response = await api.get(
+      `/v1/usages/count${query ? `?${query}` : ""}`
+    );
     return response.data;
   },
 };
