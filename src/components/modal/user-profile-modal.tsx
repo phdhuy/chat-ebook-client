@@ -73,15 +73,15 @@ export default function UserProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[1200px] p-0 gap-0 border-none shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-950 rounded-2xl overflow-hidden">
-        <DialogHeader className="p-8 border-b border-gray-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+      <DialogContent className="sm:max-w-[1200px] p-0 gap-0 border-none shadow-2xl bg-white dark:bg-zinc-950 rounded-2xl overflow-hidden">
+        <DialogHeader className="p-8 border-b border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900">
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             Account Settings
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex h-[600px]">
-          <div className="w-[240px] border-r border-gray-200/50 dark:border-zinc-800/50 bg-gradient-to-b from-gray-50/80 to-white/80 dark:from-zinc-900/80 dark:to-zinc-950/80 backdrop-blur-sm">
+          <div className="w-[240px] border-r border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900">
             <nav className="flex flex-col p-4 space-y-2">
               <NavItem
                 icon={<User size={20} />}
@@ -127,7 +127,7 @@ export default function UserProfileModal({
                 hasExternalLink
               />
             </nav>
-            <div className="absolute bottom-0 left-0 w-[240px] p-4 border-t border-gray-200/50 dark:border-zinc-800/50 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
+            <div className="absolute bottom-0 left-0 w-[240px] p-4 border-t border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900">
               <NavItem
                 icon={<LogOut size={20} />}
                 label="Sign Out"
@@ -142,7 +142,7 @@ export default function UserProfileModal({
             </div>
           </div>
 
-          <div className="flex-1 p-8 overflow-y-auto bg-white/30 dark:bg-zinc-950/30">
+          <div className="flex-1 p-8 overflow-y-auto bg-white dark:bg-zinc-950">
             {activeTab === "profile" && <ProfileContent profile={profile} />}
             {activeTab === "usage" && <UsageContent />}
             {activeTab === "preference" && (
@@ -200,7 +200,7 @@ function NavItem({
           ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]"
           : variant === "danger"
           ? "text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20"
-          : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60 hover:shadow-md"
+          : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800/60 hover:shadow-md"
       )}
       onClick={onClick}
     >
@@ -243,12 +243,12 @@ function ProfileContent({
           </h3>
           <Input
             defaultValue={profile?.username || ""}
-            className="max-w-md border-gray-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm"
+            className="max-w-md border-gray-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white dark:bg-zinc-900"
           />
         </div>
       </div>
 
-      <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm shadow-lg">
+      <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Account Security
@@ -259,7 +259,7 @@ function ProfileContent({
             <h4 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300 uppercase tracking-wide">
               Email Address
             </h4>
-            <p className="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-zinc-800/50 px-4 py-3 rounded-lg">
+            <p className="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-zinc-800 px-4 py-3 rounded-lg">
               {profile?.email || "No email provided"}
             </p>
           </div>
@@ -387,7 +387,7 @@ function UsageContent() {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Select value={quickFilter} onValueChange={handleQuickFilterChange}>
-            <SelectTrigger className="w-[180px] bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl">
+            <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-900 border-gray-200/70 dark:border-zinc-800/70 rounded-xl">
               <SelectValue placeholder="Filter period" />
             </SelectTrigger>
             <SelectContent>
@@ -405,7 +405,7 @@ function UsageContent() {
               <Button
                 variant="outline"
                 className={cn(
-                  "justify-start text-left font-normal bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl",
+                  "justify-start text-left font-normal bg-white dark:bg-zinc-900 border-gray-200/70 dark:border-zinc-800/70 rounded-xl",
                   !dateRange.from && "text-muted-foreground"
                 )}
               >
@@ -444,7 +444,7 @@ function UsageContent() {
           <Button
             variant="outline"
             size="icon"
-            className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-gray-200/70 dark:border-zinc-800/70 rounded-xl"
+            className="bg-white dark:bg-zinc-900 border-gray-200/70 dark:border-zinc-800/70 rounded-xl"
             onClick={() => console.log("Applying filters:", dateRange)}
           >
             <FilterIcon className="h-4 w-4" />
@@ -453,7 +453,7 @@ function UsageContent() {
         </div>
       </div>
 
-      <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 backdrop-blur-sm shadow-lg">
+      <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Total Usage
@@ -461,7 +461,7 @@ function UsageContent() {
           <CardDescription>Your overall API consumption</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="text-4xl font-bold text-gray-900 dark:text-white">
             {totalUsage}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -474,7 +474,7 @@ function UsageContent() {
         {usageData.map((usage) => (
           <Card
             key={usage.resource_type}
-            className="border-gray-200/50 dark:border-zinc-800/50 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+            className="border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
           >
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
@@ -524,7 +524,7 @@ function UsageContent() {
       </div>
 
       {usageData.length === 0 && (
-        <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm shadow-lg">
+        <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 shadow-lg">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BarChart3 className="w-16 h-16 text-gray-400 dark:text-gray-600 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">

@@ -17,7 +17,9 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import InfiniteScroll from "react-infinite-scroll-component";
 import type { ConversationInfoResponse } from "@/api/conversation-api";
+import SkeletonLoader from "../skeleton/loader-skeleton";
 
 type Grouped = Record<string, ConversationInfoResponse[]>;
 
@@ -25,12 +27,16 @@ interface ConversationListProps {
   conversations: ConversationInfoResponse[];
   onRename: (id: string, name: string) => void;
   onDelete: (id: string) => void;
+  loadMore: () => void;
+  hasMore: boolean;
 }
 
 export function ConversationList({
   conversations,
   onRename,
   onDelete,
+  loadMore,
+  hasMore,
 }: ConversationListProps) {
   const location = useLocation();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -72,103 +78,114 @@ export function ConversationList({
   const groups = groupByDate(conversations);
 
   return (
-    <div className="flex-1 overflow-auto px-4 py-2 space-y-4">
-      {Object.entries(groups).map(
-        ([group, convs]) =>
-          convs.length > 0 && (
-            <div key={group} className="space-y-2">
-              <h3 className="text-sm font-semibold text-zinc-500">{group}</h3>
-              {convs.map((conv) => (
-                <div
-                  key={conv.id}
-                  className={`flex items-center justify-between p-2 rounded-lg group transition-all duration-200 ${
-                    location.pathname === `/chat/${conv.id}`
-                      ? "bg-zinc-800/90 shadow-sm"
-                      : "hover:bg-zinc-900/60"
-                  }`}
-                >
-                  {editingId === conv.id ? (
-                    <div className="flex items-center space-x-1 w-full">
-                      <Input
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter")
-                            onRename(conv.id, newName.trim());
-                          if (e.key === "Escape") setEditingId(null);
-                        }}
-                        className="h-8 py-1 bg-zinc-900/90 border-zinc-700 text-white rounded-md focus-visible:ring-purple-600/50"
-                        autoFocus
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onRename(conv.id, newName.trim())}
-                      >
-                        <Check className="h-4 w-4 text-emerald-400" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingId(null)}
-                      >
-                        <X className="h-4 w-4 text-zinc-400" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Link
-                        to={`/chat/${conv.id}`}
-                        className="flex items-center space-x-3 flex-1 min-w-0"
-                      >
-                        <div
-                          className={`${
-                            location.pathname === `/chat/${conv.id}`
-                              ? "bg-purple-600/20 text-purple-400"
-                              : "bg-zinc-800 text-zinc-400 group-hover:text-zinc-300"
-                          } flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center`}
+    <div
+      id="conversation-list"
+      className="flex-1 overflow-auto px-4 py-2 space-y-4"
+    >
+      <InfiniteScroll
+        dataLength={conversations.length}
+        next={loadMore}
+        hasMore={hasMore}
+        loader={<SkeletonLoader />}
+        scrollableTarget="conversation-list"
+      >
+        {Object.entries(groups).map(
+          ([group, convs]) =>
+            convs.length > 0 && (
+              <div key={group} className="space-y-2">
+                <h3 className="text-sm font-semibold text-zinc-500">{group}</h3>
+                {convs.map((conv) => (
+                  <div
+                    key={conv.id}
+                    className={`flex items-center justify-between p-2 rounded-lg group transition-all duration-200 ${
+                      location.pathname === `/chat/${conv.id}`
+                        ? "bg-zinc-800/90 shadow-sm"
+                        : "hover:bg-zinc-900/60"
+                    }`}
+                  >
+                    {editingId === conv.id ? (
+                      <div className="flex items-center space-x-1 w-full">
+                        <Input
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter")
+                              onRename(conv.id, newName.trim());
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                          className="h-8 py-1 bg-zinc-900/90 border-zinc-700 text-white rounded-md focus-visible:ring-purple-600/50"
+                          autoFocus
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onRename(conv.id, newName.trim())}
                         >
-                          <MessageSquare className="h-3.5 w-3.5" />
-                        </div>
-                        <span className="truncate text-sm font-medium">
-                          {conv.name}
-                        </span>
-                      </Link>
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:bg-zinc-800"
+                          <Check className="h-4 w-4 text-emerald-400" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEditingId(null)}
+                        >
+                          <X className="h-4 w-4 text-zinc-400" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <Link
+                          to={`/chat/${conv.id}`}
+                          className="flex items-center space-x-3 flex-1 min-w-0"
+                        >
+                          <div
+                            className={`${
+                              location.pathname === `/chat/${conv.id}`
+                                ? "bg-purple-600/20 text-purple-400"
+                                : "bg-zinc-800 text-zinc-400 group-hover:text-zinc-300"
+                            } flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center`}
                           >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditingId(conv.id);
-                              setNewName(conv.name);
-                            }}
-                          >
-                            <Edit2 className="mr-2 h-4 w-4" /> Rename
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => onDelete(conv.id)}
-                            className="text-red-500"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          )
-      )}
+                            <MessageSquare className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="truncate text-sm font-medium">
+                            {conv.name}
+                          </span>
+                        </Link>
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:bg-zinc-800"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditingId(conv.id);
+                                setNewName(conv.name);
+                              }}
+                            >
+                              <Edit2 className="mr-2 h-4 w-4" /> Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => onDelete(conv.id)}
+                              className="text-red-500"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+        )}
+      </InfiniteScroll>
     </div>
   );
 }

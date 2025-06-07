@@ -15,7 +15,7 @@ export const useMyConversation = (
 ) => {
   return useQuery<ApiResponse<ConversationInfoResponse[]>>({
     ...options,
-    queryKey: ["my-conversations"],
+    queryKey: ["my-conversations", params],
     queryFn: () => conversationApi.getMyConversation(params),
   });
 };
