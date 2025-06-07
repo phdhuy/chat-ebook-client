@@ -22,10 +22,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useCreateConversation } from "@/pages/upload/hooks/use-create-conversation";
+import { useCreateConversationByUrl } from "@/pages/upload/hooks/use-create-conversation-by-url";
 import { useQueryClient } from "@tanstack/react-query";
 import { ALLOW_FILE_TYPES, MAX_FILE_SIZE } from "@/common";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { CreateConversationByUrlRequest } from "@/api/conversation-api";
 
 interface IFileFormInputs {
   file: FileList;
@@ -118,7 +120,7 @@ export default function UploadFilePage() {
   const selectedFile = fileForm.watch("file")?.[0];
   const urlValue = urlForm.watch("url");
 
-  const { mutate: createConversation, isPending } = useCreateConversation({
+  const { mutate: createConversation, isPending: isFilePending } = useCreateConversation({
     onSuccess: (data) => {
       setProgress(100);
       setProcessingMessage("Complete!");
@@ -142,8 +144,32 @@ export default function UploadFilePage() {
     },
   });
 
+  const { mutate: createConversationByUrl, isPending: isUrlPending } = useCreateConversationByUrl({
+    onSuccess: (data) => {
+      setProgress(100);
+      setProcessingMessage("Complete!");
+      setTimeout(() => {
+        setUploadStatus("success");
+        queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+        setTimeout(() => {
+          navigate(`/chat/${data?.data.id}`);
+        }, 1500);
+        fileForm.reset();
+        urlForm.reset();
+      }, 500);
+    },
+    onError: (error) => {
+      console.error("Failed to create conversation from URL:", error);
+      setUploadStatus("error");
+      setErrorMessage("Failed to create conversation from URL. Please try again.");
+      setCurrentStep(0);
+      setProgress(0);
+      setProcessingMessage("");
+    },
+  });
+
   useEffect(() => {
-    if (!isPending) {
+    if (!isFilePending && !isUrlPending) {
       setCurrentStep(0);
       setProgress(0);
       setProcessingMessage("");
@@ -178,7 +204,7 @@ export default function UploadFilePage() {
     return () => {
       clearInterval(stepInterval);
     };
-  }, [isPending]);
+  }, [isFilePending, isUrlPending]);
 
   const onFileSubmit: SubmitHandler<IFileFormInputs> = (data) => {
     const file = data.file[0];
@@ -188,8 +214,8 @@ export default function UploadFilePage() {
 
   const onUrlSubmit: SubmitHandler<IUrlFormInputs> = (data) => {
     setUploadStatus("idle");
-    console.log(data);
-    // createConversation(data.url);
+    const request: CreateConversationByUrlRequest = { url: data.url };
+    createConversationByUrl(request);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -247,7 +273,7 @@ export default function UploadFilePage() {
               </p>
             </div>
 
-            {isPending && (
+            {(isFilePending || isUrlPending) && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
                 <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border-0">
                   <div className="text-center space-y-6">
@@ -476,7 +502,7 @@ export default function UploadFilePage() {
                       type="submit"
                       size="lg"
                       disabled={
-                        isPending ||
+                        isFilePending ||
                         !selectedFile ||
                         !!fileForm.formState.errors.file
                       }
@@ -531,7 +557,7 @@ export default function UploadFilePage() {
                         type="submit"
                         size="lg"
                         disabled={
-                          isPending ||
+                          isUrlPending ||
                           !urlValue ||
                           !!urlForm.formState.errors.url
                         }
