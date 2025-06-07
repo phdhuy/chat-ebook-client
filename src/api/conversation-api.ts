@@ -15,6 +15,10 @@ export type UpdateConversationRequest = {
   name: string;
 };
 
+export type CreateConversationByUrlRequest = {
+  url: string;
+};
+
 export type ConversationInfoResponse = {
   id: string;
   created_at: number;
@@ -70,6 +74,13 @@ export const conversationApi = {
         "Content-Type": "multipart/form-data",
       },
     });
+    return response.data;
+  },
+
+  createConversationByUrl: async (
+    body: CreateConversationByUrlRequest
+  ): Promise<ApiResponse<ConversationInfoResponse>> => {
+    const response = await api.post("/v1/conversations/url", body);
     return response.data;
   },
 };
