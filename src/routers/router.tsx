@@ -1,5 +1,4 @@
 import AuthLayout from "@/layouts/auth-layout";
-import RootLayout from "@/layouts/root-layout";
 import NotFoundPage from "@/pages/error/notfound-page";
 import HomePage from "@/pages/home/home-page";
 import { useRoutes } from "react-router-dom";
@@ -7,8 +6,12 @@ import UploadFilePage from "@/pages/upload/upload-file-page";
 import EbookViewPage from "@/pages/view/ebook-view-page";
 import SignInPage from "@/pages/auth/sign-in-page";
 import SignUpPage from "@/pages/auth/sign-up-page";
-import EbookViewLayout from "@/layouts/ebook-view-layout";
-import PrivateRoute from "./utils";
+import AdminDashboardPage from "@/pages/admin/admin-dashboard";
+import AdminUsersPage from "@/pages/admin/admin-users";
+import UserRoute from "./user-routes";
+import AdminRoute from "./admin-routes";
+import AdminDocumentsPage from "@/pages/admin/admin-documents";
+import AdminConversationsPage from "@/pages/admin/admin-conversations";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -22,19 +25,22 @@ const AppRoutes = () => {
     },
     {
       path: "/",
-      element: <RootLayout />,
+      element: <UserRoute />,
       children: [
         { index: true, element: <HomePage /> },
-        {
-          element: <PrivateRoute />,
-          children: [{ path: "upload", element: <UploadFilePage /> }],
-        },
+        { path: "upload", element: <UploadFilePage /> },
+        { path: "chat/:id", element: <EbookViewPage /> },
       ],
     },
     {
-      path: "/",
-      element: <EbookViewLayout />,
-      children: [{ path: "chat/:id", element: <EbookViewPage /> }],
+      path: "/admin",
+      element: <AdminRoute />,
+      children: [
+        { index: true, element: <AdminDashboardPage /> },
+        { path: "users", element: <AdminUsersPage /> },
+        { path: "documents", element: <AdminDocumentsPage /> },
+        { path: "conversations", element: <AdminConversationsPage /> },
+      ],
     },
     { path: "*", element: <NotFoundPage /> },
   ]);
