@@ -1,9 +1,12 @@
-import { Outlet } from "react-router-dom";
 import AppSidebar from "@/components/sidebar/app-sidebar";
 import "split-pane-react/esm/themes/default.css";
 import useCollapseStore from "@/stores/use-collapse-store";
 
-const RootLayout = () => {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+const RootLayout = ({ children }: RootLayoutProps) => {
   const { isCollapsed, width, toggle } = useCollapseStore();
 
   return (
@@ -12,7 +15,7 @@ const RootLayout = () => {
         <AppSidebar isCollapsed={isCollapsed} onToggleCollapse={toggle} />
       </div>
       <main className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

@@ -20,3 +20,7 @@ export const ALLOW_FILE_TYPES = ["application/pdf"];
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 export const MESSAGE_PER_PAGE = 10;
 export const CONVERSATION_PER_PAGE = 15;
+
+
+export const ADMIN_ROLE = "ROLE_ADMIN";
+export const USER_ROLE = "ROLE_USER";
