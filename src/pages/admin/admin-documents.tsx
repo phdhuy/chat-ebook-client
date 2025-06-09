@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/select";
 import { useGetListDocument } from "./hooks/use-get-list-document";
 import { FileInfoResponse } from "@/api/admin-api";
+import { formatDateTime } from "@/common";
 
 export default function AdminDocumentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,6 +55,7 @@ export default function AdminDocumentsPage() {
     order: "desc",
     page: 1,
     paging: 10000,
+    query: searchTerm,
   });
 
   const documents: FileInfoResponse[] = response?.data || [];
@@ -64,14 +66,6 @@ export default function AdminDocumentsPage() {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   if (error) {
@@ -199,7 +193,7 @@ export default function AdminDocumentsPage() {
                           {doc.id}
                         </a>
                       </TableCell>
-                      <TableCell>{formatDate(doc.created_at)}</TableCell>
+                      <TableCell>{formatDateTime(doc.created_at)}</TableCell>
                       <TableCell>{doc.format.toUpperCase()}</TableCell>
                       <TableCell className="text-center">{doc.pages}</TableCell>
                       <TableCell className="text-center">{formatFileSize(doc.bytes)}</TableCell>

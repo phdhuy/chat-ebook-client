@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetListConversation } from "./hooks/use-get-list-conversation";
+import { formatDateTime } from "@/common";
 
 export default function AdminConversationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +47,7 @@ export default function AdminConversationsPage() {
     order: "desc",
     page: 1,
     paging: 10000,
+    query: searchTerm,
   });
 
   const conversations = response?.data || [];
@@ -56,14 +58,6 @@ export default function AdminConversationsPage() {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   if (error) {
@@ -167,7 +161,7 @@ export default function AdminConversationsPage() {
                     <TableRow key={conversation.id}>
                       <TableCell>{conversation.id}</TableCell>
                       <TableCell>{conversation.name}</TableCell>
-                      <TableCell>{formatDate(conversation.created_at)}</TableCell>
+                      <TableCell>{formatDateTime(conversation.created_at)}</TableCell>
                       <TableCell>{conversation.file.id}</TableCell>
                       <TableCell>{conversation.file.format}</TableCell>
                       <TableCell>{conversation.file.pages}</TableCell>
