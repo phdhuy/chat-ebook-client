@@ -261,7 +261,7 @@ export default function AdminUsersPage() {
                       {"N/A"}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
+                      <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm">
                             <MoreHorizontal className="w-4 h-4" />
