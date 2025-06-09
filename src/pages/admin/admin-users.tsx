@@ -9,6 +9,7 @@ import {
   Shield,
   Ban,
   Eye,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,12 +46,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetListUser } from "./hooks/use-get-list-user";
+import { formatDateTime } from "@/common";
+import UsageModal from "@/pages/admin/modal/usage-content-modal";
 
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
-
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isUsageModalOpen, setIsUsageModalOpen] = useState(false);
   const {
     data: response,
     isLoading,
@@ -60,6 +64,7 @@ export default function AdminUsersPage() {
     order: "desc",
     page: 1,
     paging: 10000,
+    query: searchTerm,
   });
 
   const users = response?.data || [];
@@ -83,19 +88,13 @@ export default function AdminUsersPage() {
 
   const getRoleBadge = (role: string) => {
     switch (role.toLowerCase()) {
-      case "admin":
+      case "role_admin":
         return (
           <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">
             Admin
           </Badge>
         );
-      case "premium":
-        return (
-          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-            Premium
-          </Badge>
-        );
-      case "user":
+      case "role_user":
         return <Badge variant="outline">User</Badge>;
       default:
         return <Badge variant="outline">{role}</Badge>;
@@ -218,8 +217,8 @@ export default function AdminUsersPage() {
                   <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Documents</TableHead>
-                  <TableHead>Conversations</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead>Confirmed At</TableHead>
                   <TableHead>Last Active</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -250,12 +249,16 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{getRoleBadge("USER")}</TableCell>
+                    <TableCell>{getRoleBadge(user.role)}</TableCell>
                     <TableCell>{getStatusBadge("ACTIVE")}</TableCell>
-                    <TableCell className="text-center">10</TableCell>
-                    <TableCell className="text-center">10</TableCell>
+                    <TableCell className="text-center">
+                      {formatDateTime(user.created_at)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {formatDateTime(user.confirmed_at)}
+                    </TableCell>
                     <TableCell className="text-sm text-gray-500 dark:text-gray-400">
-                      10
+                      {"N/A"}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -267,6 +270,15 @@ export default function AdminUsersPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUserId(user.id);
+                              setIsUsageModalOpen(true);
+                            }}
+                          >
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            View API Usage
+                          </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
                             View Details
@@ -294,6 +306,14 @@ export default function AdminUsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {selectedUserId && (
+        <UsageModal
+          open={isUsageModalOpen}
+          onOpenChange={setIsUsageModalOpen}
+          userId={selectedUserId}
+        />
+      )}
     </div>
   );
 }

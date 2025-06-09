@@ -9,6 +9,7 @@ export type UserInfoResponse = {
   is_confirmed: boolean;
   username: string;
   avatar_url: string;
+  role: string;
 };
 
 export type FileInfoResponse = {
@@ -33,7 +34,13 @@ export type AdminQueryParams = {
   order?: "asc" | "desc";
   page?: number;
   paging?: number;
+  query?: string;
 };
+
+export type ApiUsageResponse = {
+  count: number;
+  resource_type: string;
+}[];
 
 export const adminApi = {
   getListUser: async (
@@ -54,6 +61,17 @@ export const adminApi = {
     params: AdminQueryParams
   ): Promise<ApiResponse<ConversationInfoResponse[]>> => {
     const response = await api.get("/v1/admin/conversations", { params });
+    return response.data;
+  },
+
+  getApiUsageByUserId: async (
+    userId: string,
+    params: Record<string, string> = {}
+  ): Promise<ApiResponse<ApiUsageResponse>> => {
+    const query = new URLSearchParams(params).toString();
+    const response = await api.get(
+      `/v1/admin/users/${userId}/api-usage${query ? `?${query}` : ""}`
+    );
     return response.data;
   },
 };
