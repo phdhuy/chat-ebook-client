@@ -1,5 +1,5 @@
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import type React from "react";
+import { useState } from "react";
 import {
   X,
   Menu,
@@ -12,31 +12,25 @@ import {
   Maximize,
   Settings,
   Search,
-  ArrowUp,
-  ArrowDown,
-  XCircle,
-} from "lucide-react"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 interface PdfHeaderProps {
-  showToc: boolean
-  setShowToc: (value: boolean) => void
-  currentPage: number
-  numPages: number
-  goToPage: (page: number) => void
-  scale: number
-  setScale: (scale: number | ((prev: number) => number)) => void
-  rotation: number
-  setRotation: (rotation: number | ((prev: number) => number)) => void
-  isFullscreen: boolean
-  toggleFullscreen: () => void
-  showSettings: boolean
-  setShowSettings: (value: boolean) => void
-  onSearchText?: (searchTerm: string) => Promise<number>
-  onNextMatch?: () => Promise<void>
-  onPrevMatch?: () => Promise<void>
-  onClearSearch?: () => void
+  showToc: boolean;
+  setShowToc: (value: boolean) => void;
+  currentPage: number;
+  numPages: number;
+  goToPage: (page: number) => void;
+  scale: number;
+  setScale: (scale: number | ((prev: number) => number)) => void;
+  rotation: number;
+  setRotation: (rotation: number | ((prev: number) => number)) => void;
+  isFullscreen: boolean;
+  toggleFullscreen: () => void;
+  showSettings: boolean;
+  setShowSettings: (value: boolean) => void;
 }
 
 const PdfHeader: React.FC<PdfHeaderProps> = ({
@@ -52,222 +46,134 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
   toggleFullscreen,
   showSettings,
   setShowSettings,
-  onSearchText,
-  onNextMatch,
-  onPrevMatch,
-  onClearSearch,
 }) => {
-  const [searchValue, setSearchValue] = useState<string>("")
-  const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showTextSearch, setShowTextSearch] = useState<boolean>(false)
-  const [textSearchValue, setTextSearchValue] = useState<string>("")
-  const [searchResults, setSearchResults] = useState<{ current: number; total: number }>({ current: 0, total: 0 })
-  const textSearchInputRef = useRef<HTMLInputElement>(null)
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [showSearch, setShowSearch] = useState<boolean>(false);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    const pageNumber = Number.parseInt(searchValue)
+    e.preventDefault();
+    const pageNumber = Number.parseInt(searchValue);
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= numPages) {
-      goToPage(pageNumber)
-      setSearchValue("")
+      goToPage(pageNumber);
+      setSearchValue("");
+      setShowSearch(false);
     }
-  }
+  };
 
-  const handleTextSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (textSearchValue && onSearchText) {
-      const totalMatches = await onSearchText(textSearchValue)
-      setSearchResults({ current: totalMatches > 0 ? 1 : 0, total: totalMatches })
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setShowSearch(false);
+      setSearchValue("");
     }
-  }
-
-  const handleNextMatch = async () => {
-    if (onNextMatch) {
-      await onNextMatch()
-      setSearchResults((prev) => ({
-        ...prev,
-        current: prev.current < prev.total ? prev.current + 1 : 1,
-      }))
-    }
-  }
-
-  const handlePrevMatch = async () => {
-    if (onPrevMatch) {
-      await onPrevMatch()
-      setSearchResults((prev) => ({
-        ...prev,
-        current: prev.current > 1 ? prev.current - 1 : prev.total,
-      }))
-    }
-  }
-
-  const handleClearSearch = () => {
-    setTextSearchValue("")
-    setSearchResults({ current: 0, total: 0 })
-    if (onClearSearch) {
-      onClearSearch()
-    }
-  }
-
-  useEffect(() => {
-    if (showTextSearch && textSearchInputRef.current) {
-      textSearchInputRef.current.focus()
-    }
-  }, [showTextSearch])
+  };
 
   return (
-    <div className="h-12 flex items-center justify-between px-4 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-30">
-      <div className="flex items-center gap-2 flex-1">
+    <div className="h-14 flex items-center justify-between px-4 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200/80 dark:border-gray-700/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
+      {/* Left Section - TOC and Navigation */}
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           onClick={() => setShowToc(!showToc)}
           aria-label="Toggle table of contents"
         >
           {showToc ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
 
-        {showTextSearch ? (
-          <div className="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden max-w-xs md:max-w-md lg:max-w-lg">
-            <form onSubmit={handleTextSearch} className="flex items-center flex-1">
-              <div className="flex items-center px-2 py-1 border-r border-gray-200 dark:border-gray-700">
-                <Search className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-              </div>
-              <input
-                ref={textSearchInputRef}
-                type="text"
-                value={textSearchValue}
-                onChange={(e) => setTextSearchValue(e.target.value)}
-                className="h-8 flex-1 px-2 py-1 bg-transparent border-none focus:outline-none text-sm"
-                placeholder="Search in document..."
-              />
-              {textSearchValue && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                  aria-label="Clear search"
-                >
-                  <XCircle className="h-4 w-4" />
-                </button>
-              )}
-            </form>
-            <div className="flex items-center px-2 text-xs text-gray-500 dark:text-gray-400 border-l border-gray-200 dark:border-gray-700">
-              {searchResults.total > 0 ? `${searchResults.current}/${searchResults.total}` : "0/0"}
-            </div>
-            <div className="flex items-center border-l border-gray-200 dark:border-gray-700">
-              <button
-                type="button"
-                onClick={handlePrevMatch}
-                disabled={searchResults.total === 0}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 disabled:opacity-50"
-                aria-label="Previous match"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={handleNextMatch}
-                disabled={searchResults.total === 0}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 disabled:opacity-50"
-                aria-label="Next match"
-              >
-                <ArrowDown className="h-4 w-4" />
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowTextSearch(false)}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border-l border-gray-200 dark:border-gray-700"
-              aria-label="Close search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setShowTextSearch(true)}
-            aria-label="Search in document"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        )}
+        <Separator orientation="vertical" className="h-6" />
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            size="sm"
+            className="h-7 w-7 hover:bg-white dark:hover:bg-gray-700 transition-colors"
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage <= 1}
             aria-label="Previous page"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           </Button>
+
           {showSearch ? (
             <form onSubmit={handleSearch} className="flex items-center">
               <Input
                 type="text"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="h-7 w-16 text-xs px-2 py-1 focus-visible:ring-1"
+                onKeyDown={handleKeyDown}
+                className="h-7 w-20 text-xs px-2 border-0 bg-white dark:bg-gray-700 focus-visible:ring-1 focus-visible:ring-blue-500"
                 placeholder={`1-${numPages}`}
                 autoFocus
                 onBlur={() => {
-                  if (!searchValue) setShowSearch(false)
+                  if (!searchValue) setShowSearch(false);
                 }}
               />
             </form>
           ) : (
             <button
-              className="text-xs font-medium px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 hover:bg-white dark:hover:bg-gray-700 rounded transition-colors min-w-0"
               onClick={() => setShowSearch(true)}
               aria-label="Search page"
             >
-              {currentPage}/{numPages}
+              <span className="tabular-nums">{currentPage}</span>
+              <span className="text-gray-400 dark:text-gray-500">/</span>
+              <span className="tabular-nums text-gray-600 dark:text-gray-400">
+                {numPages}
+              </span>
+              <Search className="h-3 w-3 ml-1 text-gray-400" />
             </button>
           )}
+
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            size="sm"
+            className="h-7 w-7 hover:bg-white dark:hover:bg-gray-700 transition-colors"
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage >= numPages}
             aria-label="Next page"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-700/50 rounded-md px-1">
+      {/* Center Section - Zoom Controls */}
+      <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="h-8 w-8 hover:bg-white dark:hover:bg-gray-700 transition-colors"
           onClick={() => setScale((prev) => Math.max(0.5, prev - 0.2))}
+          disabled={scale <= 0.5}
           aria-label="Zoom out"
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="text-xs w-10 text-center font-medium">{Math.round(scale * 100)}%</span>
+
+        <div className="flex items-center px-3 py-1">
+          <span className="text-sm font-medium tabular-nums min-w-[3rem] text-center">
+            {Math.round(scale * 100)}%
+          </span>
+        </div>
+
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="h-8 w-8 hover:bg-white dark:hover:bg-gray-700 transition-colors"
           onClick={() => setScale((prev) => Math.min(3, prev + 0.2))}
+          disabled={scale >= 3}
           aria-label="Zoom in"
         >
           <Plus className="h-4 w-4" />
         </Button>
+
+        <Separator orientation="vertical" className="h-5 mx-1" />
+
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8 hidden sm:flex"
+          size="sm"
+          className="h-8 w-8 hover:bg-white dark:hover:bg-gray-700 transition-colors"
           onClick={() => setRotation((prev) => (prev + 90) % 360)}
           aria-label="Rotate"
         >
@@ -275,20 +181,30 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
         </Button>
       </div>
 
+      {/* Right Section - View Controls */}
       <div className="flex items-center gap-1">
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="h-9 w-9 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           onClick={toggleFullscreen}
           aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
         >
-          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          {isFullscreen ? (
+            <Minimize className="h-4 w-4" />
+          ) : (
+            <Maximize className="h-4 w-4" />
+          )}
         </Button>
+
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className={`h-9 w-9 transition-colors ${
+            showSettings
+              ? "bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400"
+              : "hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
           onClick={() => setShowSettings(!showSettings)}
           aria-label="Settings"
         >
@@ -296,7 +212,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PdfHeader
+export default PdfHeader;

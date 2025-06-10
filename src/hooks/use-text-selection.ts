@@ -59,7 +59,7 @@ export const useTextSelection = (
           });
           copyIconRef.current!.classList.remove("hidden");
         }
-      }, 100);
+      }, 0);
     };
 
     const onSelectionChange = () => {
