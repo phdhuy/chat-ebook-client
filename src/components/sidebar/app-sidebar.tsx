@@ -60,17 +60,13 @@ export default function AppSidebar({
     );
   };
 
-  const { mutate: revokeToken } = useRevokeToken({
-    onSuccess: () => window.location.assign("/sign-in"),
-  });
+  const { mutate: revokeToken } = useRevokeToken();
   const { signOut } = useAuthActions();
 
   const handleSignOut = () => {
     const { refreshToken } = useAuthStore.getState();
     if (refreshToken) {
       revokeToken({ refresh_token: refreshToken });
-    } else {
-      window.location.assign("/sign-in");
     }
     signOut();
   };

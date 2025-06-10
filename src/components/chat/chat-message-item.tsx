@@ -19,7 +19,6 @@ export interface Message {
   role: "bot" | "user";
   content: string;
   timestamp: string;
-  created_at?: number;
   sender_type?: "BOT" | "USER";
   conversation_id?: string;
   isNewBotMessage?: boolean;
@@ -81,42 +80,31 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     setIsFeedbackOpen(false);
   };
 
-  const formatTimestamp = (timestamp: string | number) => {
-    if (typeof timestamp === "number") {
-      return new Date(timestamp).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    return timestamp;
-  };
-
   const processedContent = useMemo(() => {
-    if (!message.cited_excerpts || message.cited_excerpts.length === 0) {
-      return message.content;
-    }
-
     if (message.isNewBotMessage && !isTypingComplete) {
       return message.content;
     }
 
-    return message.content.replace(/\[(\d+)\]/g, (match, p1) => {
-      const sourceId = parseInt(p1);
-      const excerpt = message.cited_excerpts?.find(
-        (e) => e.source_id === sourceId
-      );
-      if (excerpt) {
-        const url = `/source/${sourceId}/page/${excerpt.page}`;
-        return `[Page ${excerpt.page}](${url} "Source ${sourceId}, page ${excerpt.page}")`;
+    return message.content.replace(
+      /\[([^\]]+)\]/g,
+      (_match: string, p1: string) => {
+        const citations = p1.split(",").map((c: string) => c.trim());
+
+        const processedCitations = citations.map((citation: string) => {
+          const pageNumber = parseInt(citation);
+
+          if (!isNaN(pageNumber)) {
+            const url = `/source/${pageNumber}/page/${pageNumber}`;
+            return `[Page ${pageNumber}](${url} "Source ${pageNumber}, page ${pageNumber}")`;
+          }
+
+          return citation;
+        });
+
+        return processedCitations.join(" ");
       }
-      return match;
-    });
-  }, [
-    message.content,
-    message.cited_excerpts,
-    isTypingComplete,
-    message.isNewBotMessage,
-  ]);
+    );
+  }, [message.content, isTypingComplete, message.isNewBotMessage]);
 
   const uniqueCitations = useMemo(() => {
     if (!message.cited_excerpts) return [];
@@ -172,7 +160,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               {isUser ? "You" : "AI Assistant"}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {formatTimestamp(message.created_at || message.timestamp)}
+              {message.timestamp}
             </span>
           </div>
 
