@@ -239,7 +239,7 @@ export default function ChatPage() {
               />
               <div
                 id="scrollableDiv"
-                className="flex-1 overflow-auto flex flex-col-reverse"
+                className="flex-1 overflow-auto flex flex-col-reverse custom-scrollbar"
               >
                 <InfiniteScroll
                   dataLength={messagesToDisplay.length}

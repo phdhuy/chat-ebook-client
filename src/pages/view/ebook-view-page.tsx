@@ -14,6 +14,8 @@ import PdfHeader from "@/components/pdf/pdf-header";
 import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useReferencePageStore } from "@/stores/use-reference-page-store";
 
+const GAP = 20;
+
 export default function EbookViewPage() {
   const params = useParams();
   const conversationId = params.id as string;
@@ -75,7 +77,7 @@ export default function EbookViewPage() {
     const { width, height } = pageDimensions;
     const isRotated = rotation % 180 !== 0;
     const baseHeight = isRotated ? width : height;
-    return baseHeight * scale;
+    return baseHeight * scale + GAP;
   }, [pageDimensions, scale, rotation]);
 
   const handleScroll = useCallback(
@@ -104,7 +106,10 @@ export default function EbookViewPage() {
         className="w-full"
       >
         {pdf && (
-          <div className="flex justify-center">
+          <div
+            className="flex justify-center"
+            style={{ paddingBottom: `${GAP}px` }}
+          >
             <PdfPage
               pdf={pdf}
               pageNumber={index + 1}
@@ -179,7 +184,7 @@ export default function EbookViewPage() {
             </div>
           )}
 
-          <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-900">
+          <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-200 dark:bg-gray-900">
             {isLoading ? (
               <PDFSkeleton />
             ) : (
@@ -190,7 +195,7 @@ export default function EbookViewPage() {
                 itemCount={numPages}
                 itemSize={getItemSize()}
                 onScroll={handleScroll}
-                className="pdf-list pdfViewer"
+                className="pdf-list pdfViewer custom-scrollbar"
                 style={{ "--scale-factor": scale } as React.CSSProperties}
               >
                 {Row}
