@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { useCallback } from "react";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -43,6 +44,7 @@ export const useAuthStore = create<AuthState>(() => initializeState());
 
 export const useAuthActions = () => {
   const set = useAuthStore.setState;
+  const navigate = useNavigate();
 
   const signIn = useCallback(
     (accessToken: string, refreshToken: string) => {
@@ -62,13 +64,16 @@ export const useAuthActions = () => {
   const signOut = useCallback(() => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
+
     set({
       isAuthenticated: false,
       accessToken: null,
       refreshToken: null,
       role: null,
     });
-  }, [set]);
+
+    navigate("/sign-in");
+  }, [set, navigate]);
 
   return { signIn, signOut };
 };
