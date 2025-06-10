@@ -24,7 +24,9 @@ export default function AppSidebar({
   const { data: profile } = useMyProfile();
 
   const [page, setPage] = useState(1);
-  const [allConversations, setAllConversations] = useState<ConversationInfoResponse[]>([]);
+  const [allConversations, setAllConversations] = useState<
+    ConversationInfoResponse[]
+  >([]);
   const [hasMore, setHasMore] = useState(true);
 
   const { data: conversations } = useMyConversation({
@@ -36,8 +38,13 @@ export default function AppSidebar({
 
   useEffect(() => {
     if (conversations?.data) {
-      setAllConversations((prev) => [...prev, ...conversations.data]);
-      console.log(conversations.data.length);
+      setAllConversations((prev) => {
+        const existingIds = new Set(prev.map((conv) => conv.id));
+        const newConvs = conversations.data.filter(
+          (conv) => !existingIds.has(conv.id)
+        );
+        return [...prev, ...newConvs];
+      });
       setHasMore(conversations.data.length === CONVERSATION_PER_PAGE);
     }
   }, [conversations]);
@@ -83,13 +90,18 @@ export default function AppSidebar({
           <ConversationList
             conversations={allConversations}
             onRename={(id, name) =>
-              updateConv.mutate({ conversationId: id, data: { name } }, {
-                onSuccess: (data) => handleUpdateSuccess(data.data),
+              updateConv.mutate(
+                { conversationId: id, data: { name } },
+                {
+                  onSuccess: (data) => handleUpdateSuccess(data.data),
+                }
+              )
+            }
+            onDelete={(id) =>
+              deleteConv.mutate(id, {
+                onSuccess: () => handleDeleteSuccess(id),
               })
             }
-            onDelete={(id) => deleteConv.mutate(id, {
-              onSuccess: () => handleDeleteSuccess(id),
-            })}
             loadMore={loadMore}
             hasMore={hasMore}
           />

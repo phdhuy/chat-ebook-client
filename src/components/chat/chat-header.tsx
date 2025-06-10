@@ -155,12 +155,15 @@ export function ChatHeader({
             disabled={isSummarizing}
             className="h-8 px-2 text-xs"
             aria-label={isSummarizing ? "Summarizing ebook" : "Summarize ebook"}
-            title="Summarize" // Added tooltip for hover
+            title="Summarize"
           >
             {isSummarizing ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <BookOpen className="h-3.5 w-3.5" />
+              <>
+                <BookOpen className="h-3.5 w-3.5" />
+                <span>Summarize</span>
+              </>
             )}
           </Button>
 
@@ -173,12 +176,15 @@ export function ChatHeader({
             aria-label={
               isGeneratingMindmap ? "Generating mindmap" : "Generate mindmap"
             }
-            title="Mindmap" // Added tooltip for hover
+            title="Mindmap"
           >
             {isGeneratingMindmap ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <GitBranch className="h-3.5 w-3.5" />
+              <>
+                <GitBranch className="h-3.5 w-3.5" />
+                <span>Mind Map</span>
+              </>
             )}
           </Button>
         </div>

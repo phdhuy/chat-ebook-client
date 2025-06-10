@@ -24,7 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import { useCreateConversation } from "@/pages/upload/hooks/use-create-conversation";
 import { useCreateConversationByUrl } from "@/pages/upload/hooks/use-create-conversation-by-url";
 import { useQueryClient } from "@tanstack/react-query";
-import { ALLOW_FILE_TYPES, MAX_FILE_SIZE } from "@/common";
+import { ALLOW_FILE_TYPES, isValidDomain, MAX_FILE_SIZE } from "@/common";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import { CreateConversationByUrlRequest } from "@/api/conversation-api";
@@ -63,7 +63,15 @@ const urlSchema = yup.object({
   url: yup
     .string()
     .required("URL is required")
-    .url("Please enter a valid URL"),
+    .url("Please enter a valid URL")
+    .test(
+      "validDomain",
+      "URL must be from an approved academic or institutional domain",
+      (value) => {
+        if (!value) return false;
+        return isValidDomain(value);
+      }
+    ),
 }) as yup.ObjectSchema<IUrlFormInputs>;
 
 function mergeRefs<T>(
