@@ -2,7 +2,7 @@ import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { usePdf } from "@/hooks/use-pdf";
-import { useFullscreen } from "@/pages/view/hooks/use-fullscreen";
+import { useFullscreen } from "@/pages/ebook-view/hooks/use-fullscreen";
 import { PdfSidebar } from "@/components/pdf/pdf-sidebar";
 import { PdfSettings } from "@/components/pdf/pdf-setting";
 import { PdfPage } from "@/components/pdf/pdf-page";
@@ -22,7 +22,6 @@ export default function EbookViewPage() {
   const { data: conversation } = useConversationDetail(
     conversationId as string
   );
-
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,8 +35,13 @@ export default function EbookViewPage() {
   const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef);
   const [listHeight, setListHeight] = useState(600);
   const { setSelectedText } = useSelectedTextStore();
-
   const { page, clearReferencePage } = useReferencePageStore();
+
+  useEffect(() => {
+    setScale(1);
+    setRotation(0);
+    setCurrentPage(1);
+  }, [conversationId]);
 
   useEffect(() => {
     if (page >= 1 && page <= numPages && listRef.current) {
