@@ -29,7 +29,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from "lucide-react";
-import "./css/mindmap-styles.css";
+import "../../styles/mindmap-styles.css";
 import { useMindMapEbook } from "@/pages/mindmap/hooks/use-mindmap-ebook";
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));

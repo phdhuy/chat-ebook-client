@@ -3,7 +3,7 @@ import NotFoundPage from "@/pages/error/notfound-page";
 import HomePage from "@/pages/home/home-page";
 import { useRoutes } from "react-router-dom";
 import UploadFilePage from "@/pages/upload/upload-file-page";
-import EbookViewPage from "@/pages/view/ebook-view-page";
+import EbookViewPage from "@/pages/ebook-view/ebook-view-page";
 import SignInPage from "@/pages/auth/sign-in-page";
 import SignUpPage from "@/pages/auth/sign-up-page";
 import AdminDashboardPage from "@/pages/admin/admin-dashboard";
