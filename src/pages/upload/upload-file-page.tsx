@@ -137,7 +137,7 @@ export default function UploadFilePage() {
         queryClient.refetchQueries({ queryKey: ["my-conversations"] });
         setTimeout(() => {
           navigate(`/chat/${data?.data.id}`);
-        }, 1500);
+        }, 500);
         fileForm.reset();
         urlForm.reset();
       }, 500);
@@ -161,7 +161,7 @@ export default function UploadFilePage() {
         queryClient.refetchQueries({ queryKey: ["my-conversations"] });
         setTimeout(() => {
           navigate(`/chat/${data?.data.id}`);
-        }, 1500);
+        }, 500);
         fileForm.reset();
         urlForm.reset();
       }, 500);
@@ -256,26 +256,26 @@ export default function UploadFilePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950/20 dark:to-indigo-950/30 p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950/20 dark:to-indigo-950/30 p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-br from-blue-400/30 to-indigo-500/30 dark:from-blue-600/20 dark:to-indigo-700/20 rounded-full blur-3xl opacity-60 -translate-y-1/3 translate-x-1/4 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-purple-400/30 to-pink-500/30 dark:from-purple-600/20 dark:to-pink-700/20 rounded-full blur-3xl opacity-50 translate-y-1/3 -translate-x-1/4"></div>
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-r from-cyan-400/20 to-blue-500/20 dark:from-cyan-600/10 dark:to-blue-700/10 rounded-full blur-3xl opacity-40 -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-blue-400/30 to-indigo-500/30 dark:from-blue-600/20 dark:to-indigo-700/20 rounded-full blur-3xl opacity-60 -translate-y-1/3 translate-x-1/4 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-purple-400/30 to-pink-500/30 dark:from-purple-600/20 dark:to-pink-700/20 rounded-full blur-3xl opacity-50 translate-y-1/3 -translate-x-1/4"></div>
+        <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-gradient-to-r from-cyan-400/20 to-blue-500/20 dark:from-cyan-600/10 dark:to-blue-700/10 rounded-full blur-3xl opacity-40 -translate-x-1/2 -translate-y-1/2"></div>
       </div>
 
-      <div className="w-full max-w-4xl relative z-10">
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-[0_32px_64px_rgba(8,_112,_184,_0.15)] dark:shadow-[0_32px_64px_rgba(59,_130,_246,_0.1)] border-0 rounded-3xl overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+      <div className="w-full max-w-3xl relative z-10">
+        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-[0_16px_32px_rgba(8,_112,_184,_0.1)] dark:shadow-[0_16px_32px_rgba(59,_130,_246,_0.05)] border-0 rounded-2xl overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
 
-          <CardContent className="p-8 md:p-12">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-6 shadow-lg shadow-blue-500/25">
-                <Cloud className="w-10 h-10 text-white" />
+          <CardContent className="p-4 md:p-6">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mb-4 shadow-md shadow-blue-500/20">
+                <Cloud className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Upload Your Document
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              <p className="text-base text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
                 Transform your documents into interactive conversations. Upload
                 files or provide URLs to get started.
               </p>
@@ -283,40 +283,40 @@ export default function UploadFilePage() {
 
             {(isFilePending || isUrlPending) && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-                <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border-0">
-                  <div className="text-center space-y-6">
+                <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 border-0">
+                  <div className="text-center space-y-4">
                     <div className="relative">
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25 animate-pulse">
+                      <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-md shadow-blue-500/20 animate-pulse">
                         {currentStep > 0 &&
                         currentStep <= processingSteps.length ? (
                           React.createElement(
                             processingSteps[currentStep - 1].icon,
                             {
-                              className: "w-12 h-12 text-white animate-bounce",
+                              className: "w-10 h-10 text-white animate-bounce",
                             }
                           )
                         ) : (
-                          <Loader2 className="w-12 h-12 text-white animate-spin" />
+                          <Loader2 className="w-10 h-10 text-white animate-spin" />
                         )}
                       </div>
-                      <div className="absolute inset-0 w-24 h-24 border-4 border-transparent border-t-blue-400 rounded-full animate-spin mx-auto"></div>
+                      <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-blue-400 rounded-full animate-spin mx-auto"></div>
                     </div>
 
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
                         {processingMessage || "Initializing..."}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Please wait while we process your document
                       </p>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <Progress
                         value={progress}
-                        className="h-3 bg-gray-200 dark:bg-gray-700"
+                        className="h-2 bg-gray-200 dark:bg-gray-700"
                       />
-                      <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                         <span>
                           Step {currentStep} of {processingSteps.length}
                         </span>
@@ -324,11 +324,11 @@ export default function UploadFilePage() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {processingSteps.map((step, index) => (
                         <div
                           key={step.id}
-                          className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                          className={`flex items-center gap-2 p-1 rounded-lg transition-all duration-300 ${
                             index + 1 === currentStep
                               ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
                               : index + 1 < currentStep
@@ -337,7 +337,7 @@ export default function UploadFilePage() {
                           }`}
                         >
                           <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                               index + 1 === currentStep
                                 ? "bg-blue-500 text-white animate-pulse"
                                 : index + 1 < currentStep
@@ -346,14 +346,14 @@ export default function UploadFilePage() {
                             }`}
                           >
                             {index + 1 < currentStep ? (
-                              <CheckCircle className="w-4 h-4" />
+                              <CheckCircle className="w-3 h-3" />
                             ) : index + 1 === currentStep ? (
-                              <Zap className="w-3 h-3" />
+                              <Zap className="w-2 h-2" />
                             ) : (
                               step.id
                             )}
                           </div>
-                          <span className="text-sm font-medium">
+                          <span className="text-xs font-medium">
                             {step.label}
                           </span>
                         </div>
@@ -369,45 +369,33 @@ export default function UploadFilePage() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100/80 dark:bg-gray-700/50 rounded-2xl p-1 backdrop-blur-sm">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100/80 dark:bg-gray-700/50 rounded-xl p-1 backdrop-blur-sm">
                 <TabsTrigger
                   value="file"
-                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/10 transition-all duration-300"
+                  className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:shadow-blue-500/10 transition-all duration-300"
                   onClick={resetUploadStatus}
                 >
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload className="w-3 h-3 mr-1" />
                   Upload File
                 </TabsTrigger>
                 <TabsTrigger
                   value="url"
-                  className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/10 transition-all duration-300"
+                  className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:shadow-blue-500/10 transition-all duration-300"
                   onClick={resetUploadStatus}
                 >
-                  <Link2 className="w-4 h-4 mr-2" />
+                  <Link2 className="w-3 h-3 mr-1" />
                   From URL
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="file" className="space-y-6">
+              <TabsContent value="file" className="space-y-4">
                 <form onSubmit={fileForm.handleSubmit(onFileSubmit)}>
                   <div
-                    className={`relative border-2 border-dashed rounded-3xl p-12 md:p-16 text-center transition-all duration-300 group cursor-pointer
-                      ${
-                        isDragOver
-                          ? "border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[1.02]"
-                          : ""
-                      }
-                      ${
-                        selectedFile
-                          ? "border-green-400 bg-green-50/50 dark:bg-green-900/20"
-                          : "border-gray-300/70 dark:border-gray-600/50 hover:border-blue-400 dark:hover:border-blue-400/70"
-                      } 
-                      ${
-                        fileForm.formState.errors.file
-                          ? "border-red-400 bg-red-50/50 dark:bg-red-900/20"
-                          : ""
-                      }
-                      hover:shadow-[0_20px_40px_rgba(59,_130,_246,_0.1)] dark:hover:shadow-[0_20px_40px_rgba(59,_130,_246,_0.05)]
+                    className={`relative border-2 border-dashed rounded-2xl p-6 md:p-8 text-center transition-all duration-300 group cursor-pointer
+                      ${isDragOver ? "border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[1.02]" : ""}
+                      ${selectedFile ? "border-green-400 bg-green-50/50 dark:bg-green-900/20" : "border-gray-300/70 dark:border-gray-600/50 hover:border-blue-400 dark:hover:border-blue-400/70"}
+                      ${fileForm.formState.errors.file ? "border-red-400 bg-red-50/50 dark:bg-red-900/20" : ""}
+                      hover:shadow-[0_10px_20px_rgba(59,_130,_246,_0.1)] dark:hover:shadow-[0_10px_20px_rgba(59,_130,_246,_0.05)]
                     `}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -415,44 +403,34 @@ export default function UploadFilePage() {
                     onClick={handleSelectClick}
                   >
                     <div
-                      className={`mx-auto mb-8 w-32 h-32 rounded-3xl flex items-center justify-center transition-all duration-500 shadow-lg
-                        ${
-                          selectedFile
-                            ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-green-500/25"
-                            : "bg-gradient-to-br from-blue-400 to-indigo-500 shadow-blue-500/25"
-                        } 
-                        ${
-                          fileForm.formState.errors.file
-                            ? "bg-gradient-to-br from-red-400 to-pink-500 shadow-red-500/25"
-                            : ""
-                        }
-                        group-hover:scale-110 group-hover:shadow-xl
+                      className={`mx-auto mb-4 w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-md
+                        ${selectedFile ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-green-500/20" : "bg-gradient-to-br from-blue-400 to-indigo-500 shadow-blue-500/20"}
+                        ${fileForm.formState.errors.file ? "bg-gradient-to-br from-red-400 to-pink-500 shadow-red-500/20" : ""}
+                        group-hover:scale-105 group-hover:shadow-lg
                       `}
                     >
                       {selectedFile ? (
-                        <CheckCircle className="h-16 w-16 text-white" />
+                        <CheckCircle className="h-10 w-10 text-white" />
                       ) : fileForm.formState.errors.file ? (
-                        <AlertCircle className="h-16 w-16 text-white" />
+                        <AlertCircle className="h-10 w-10 text-white" />
                       ) : (
-                        <Upload className="h-16 w-16 text-white group-hover:scale-110 transition-transform duration-300" />
+                        <Upload className="h-10 w-10 text-white group-hover:scale-105 transition-transform duration-300" />
                       )}
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200">
-                        {selectedFile
-                          ? "File ready to upload!"
-                          : "Drop your file here"}
+                    <div className="space-y-2">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
+                        {selectedFile ? "File ready to upload!" : "Drop your file here"}
                       </h3>
 
-                      <p className="text-gray-600 dark:text-gray-400 text-lg">
+                      <p className="text-gray-600 dark:text-gray-400 text-base">
                         Supports PDF• Max 10MB
                       </p>
 
                       {!selectedFile && (
                         <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
-                          <Sparkles className="w-5 h-5" />
-                          <span className="font-medium">
+                          <Sparkles className="w-4 h-4" />
+                          <span className="font-medium text-sm">
                             Click to browse or drag & drop
                           </span>
                         </div>
@@ -469,16 +447,16 @@ export default function UploadFilePage() {
                   </div>
 
                   {selectedFile && (
-                    <div className="mt-6 flex items-center justify-between bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/50 dark:border-gray-600/50 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                          <FileText className="w-5 h-5 text-white" />
+                    <div className="mt-4 flex items-center justify-between bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm p-3 rounded-xl border border-gray-200/50 dark:border-gray-600/50 shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800 dark:text-gray-200">
+                          <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">
                             {selectedFile.name}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                           </p>
                         </div>
@@ -493,19 +471,19 @@ export default function UploadFilePage() {
                         }}
                         className="text-gray-500 hover:text-red-500"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3" />
                       </Button>
                     </div>
                   )}
 
                   {fileForm.formState.errors.file && (
-                    <div className="mt-6 flex items-center gap-3 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-4 rounded-2xl border border-red-200/50 dark:border-red-800/50">
-                      <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                      <p>{fileForm.formState.errors.file.message as string}</p>
+                    <div className="mt-4 flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-3 rounded-xl border border-red-200/50 dark:border-red-800/50">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      <p className="text-sm">{fileForm.formState.errors.file.message as string}</p>
                     </div>
                   )}
 
-                  <div className="mt-8 flex justify-center">
+                  <div className="mt-4 flex justify-center">
                     <Button
                       type="submit"
                       size="lg"
@@ -514,7 +492,7 @@ export default function UploadFilePage() {
                         !selectedFile ||
                         !!fileForm.formState.errors.file
                       }
-                      className="px-12 py-4 rounded-2xl text-lg font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-8 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Start Conversation
                     </Button>
@@ -522,45 +500,44 @@ export default function UploadFilePage() {
                 </form>
               </TabsContent>
 
-              <TabsContent value="url" className="space-y-6">
+              <TabsContent value="url" className="space-y-4">
                 <form onSubmit={urlForm.handleSubmit(onUrlSubmit)}>
-                  <div className="space-y-6">
-                    <div className="text-center p-8">
-                      <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/25">
-                        <Link2 className="w-12 h-12 text-white" />
+                  <div className="space-y-4">
+                    <div className="text-center p-6">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-purple-500/20">
+                        <Link2 className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1">
                         Upload from URL
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Provide a direct link to your document and we'll fetch
-                        it for you
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        Provide a direct link to your document and we'll fetch it for you
                       </p>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <Input
                         {...urlForm.register("url")}
                         placeholder="https://example.com/document.pdf"
-                        className="h-14 px-6 text-lg rounded-2xl border-2 border-gray-200/70 dark:border-gray-600/50 focus:border-purple-400 dark:focus:border-purple-400 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm transition-all duration-300"
+                        className="h-12 px-4 text-base rounded-xl border-2 border-gray-200/70 dark:border-gray-600/50 focus:border-purple-400 dark:focus:border-purple-400 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm transition-all duration-300"
                       />
 
                       {urlForm.formState.errors.url && (
-                        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-4 rounded-2xl border border-red-200/50 dark:border-red-800/50">
-                          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                          <p>{urlForm.formState.errors.url.message}</p>
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-3 rounded-xl border border-red-200/50 dark:border-red-800/50">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <p className="text-sm">{urlForm.formState.errors.url.message}</p>
                         </div>
                       )}
 
                       {urlValue && !urlForm.formState.errors.url && (
-                        <div className="flex items-center gap-3 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-4 rounded-2xl border border-green-200/50 dark:border-green-800/50">
-                          <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                          <p>Valid URL detected</p>
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-3 rounded-xl border border-green-200/50 dark:border-green-800/50">
+                          <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                          <p className="text-sm">Valid URL detected</p>
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-8 flex justify-center">
+                    <div className="mt-4 flex justify-center">
                       <Button
                         type="submit"
                         size="lg"
@@ -569,7 +546,7 @@ export default function UploadFilePage() {
                           !urlValue ||
                           !!urlForm.formState.errors.url
                         }
-                        className="px-12 py-4 rounded-2xl text-lg font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-8 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Fetch & Process
                       </Button>
@@ -580,11 +557,11 @@ export default function UploadFilePage() {
             </Tabs>
 
             {uploadStatus === "success" && (
-              <div className="mt-8 flex items-center gap-3 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-6 rounded-2xl border border-green-200/50 dark:border-green-800/50 animate-fade-in">
-                <CheckCircle className="w-6 h-6 flex-shrink-0" />
+              <div className="mt-6 flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-4 rounded-xl border border-green-200/50 dark:border-green-800/50 animate-fade-in">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Upload successful!</p>
-                  <p className="text-sm opacity-80">
+                  <p className="font-medium text-sm">Upload successful!</p>
+                  <p className="text-xs opacity-80">
                     Redirecting to your conversation...
                   </p>
                 </div>
@@ -592,11 +569,11 @@ export default function UploadFilePage() {
             )}
 
             {uploadStatus === "error" && (
-              <div className="mt-8 flex items-center gap-3 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-6 rounded-2xl border border-red-200/50 dark:border-red-800/50 animate-fade-in">
-                <AlertCircle className="w-6 h-6 flex-shrink-0" />
+              <div className="mt-6 flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-4 rounded-xl border border-red-200/50 dark:border-red-800/50 animate-fade-in">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Upload failed</p>
-                  <p className="text-sm opacity-80">{errorMessage}</p>
+                  <p className="font-medium text-sm">Upload failed</p>
+                  <p className="text-xs opacity-80">{errorMessage}</p>
                 </div>
               </div>
             )}

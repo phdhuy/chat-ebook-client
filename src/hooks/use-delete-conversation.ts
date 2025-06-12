@@ -12,7 +12,7 @@ export const useDeleteConversation = () => {
       return conversationApi.deleteConversation(conversationId)
     },
     onSuccess: (_data, conversationId) => {
-      queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["my-conversations"] });
 
       const currentPath = window.location.pathname
       if (currentPath === `/chat/${conversationId}`) {
