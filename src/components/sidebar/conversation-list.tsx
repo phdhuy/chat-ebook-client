@@ -109,8 +109,12 @@ export function ConversationList({
                           value={newName}
                           onChange={(e) => setNewName(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter")
-                              onRename(conv.id, newName.trim());
+                            if (e.key === "Enter") {
+                              if (newName.trim() !== "") {
+                                onRename(conv.id, newName.trim());
+                                setEditingId(null);
+                              }
+                            }
                             if (e.key === "Escape") setEditingId(null);
                           }}
                           className="h-8 py-1 bg-zinc-900/90 border-zinc-700 text-white rounded-md focus-visible:ring-purple-600/50"
@@ -119,7 +123,12 @@ export function ConversationList({
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => onRename(conv.id, newName.trim())}
+                          onClick={() => {
+                            if (newName.trim() !== "") {
+                              onRename(conv.id, newName.trim());
+                              setEditingId(null);
+                            }
+                          }}
                         >
                           <Check className="h-4 w-4 text-emerald-400" />
                         </Button>
@@ -136,6 +145,7 @@ export function ConversationList({
                         <Link
                           to={`/chat/${conv.id}`}
                           className="flex items-center space-x-3 flex-1 min-w-0"
+                          title={conv.name}
                         >
                           <div
                             className={`${
