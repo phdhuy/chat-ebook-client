@@ -13,6 +13,7 @@ import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 import PdfHeader from "@/components/pdf/pdf-header";
 import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useReferencePageStore } from "@/stores/use-reference-page-store";
+import { Helmet } from "react-helmet";
 
 const GAP = 20;
 
@@ -22,6 +23,9 @@ export default function EbookViewPage() {
   const { data: conversation } = useConversationDetail(
     conversationId as string
   );
+  const pageTitle = conversation?.data?.name
+    ? `${conversation.data.name} | ChatEbook`
+    : "ChatEbook";
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,9 +79,7 @@ export default function EbookViewPage() {
   }, [showControls]);
 
   const getItemSize = useCallback(() => {
-    if (!pageDimensions) {
-      return 800 * scale;
-    }
+    if (!pageDimensions) return 800 * scale;
     const { width, height } = pageDimensions;
     const isRotated = rotation % 180 !== 0;
     const baseHeight = isRotated ? width : height;
@@ -103,12 +105,7 @@ export default function EbookViewPage() {
 
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
-      <div
-        style={{
-          ...style,
-        }}
-        className="w-full"
-      >
+      <div style={{ ...style }} className="w-full">
         {pdf && (
           <div
             className="flex justify-center"
@@ -135,6 +132,10 @@ export default function EbookViewPage() {
         isFullscreen ? "fixed inset-0 z-50" : ""
       }`}
     >
+      <Helmet>
+        <title>{`${pageTitle} | ChatEbook`}</title>
+      </Helmet>
+
       <button
         onClick={() => setShowControls(!showControls)}
         className="absolute top-2 right-2 z-40 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
