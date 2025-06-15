@@ -43,7 +43,7 @@ export default function AdminConversationsPage() {
     isLoading,
     error,
   } = useGetListConversation({
-    sort: "id",
+    sort: "created_at",
     order: "desc",
     page: 1,
     paging: 10000,

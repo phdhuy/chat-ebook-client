@@ -60,7 +60,7 @@ export default function AdminUsersPage() {
     isLoading,
     error,
   } = useGetListUser({
-    sort: "id",
+    sort: "created_at",
     order: "desc",
     page: 1,
     paging: 10000,
