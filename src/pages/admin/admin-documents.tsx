@@ -51,7 +51,7 @@ export default function AdminDocumentsPage() {
     isLoading,
     error,
   } = useGetListDocument({
-    sort: "id",
+    sort: "created_at",
     order: "desc",
     page: 1,
     paging: 10000,

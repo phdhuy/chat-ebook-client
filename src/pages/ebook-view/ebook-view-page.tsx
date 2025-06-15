@@ -133,7 +133,7 @@ export default function EbookViewPage() {
       }`}
     >
       <Helmet>
-        <title>{`${pageTitle} | ChatEbook`}</title>
+        <title>{`${pageTitle}`}</title>
       </Helmet>
 
       <button
