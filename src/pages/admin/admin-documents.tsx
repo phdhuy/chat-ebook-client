@@ -43,16 +43,19 @@ import { FileInfoResponse } from "@/api/admin-api";
 import { formatDateTime } from "@/common";
 
 export default function AdminDocumentsPage() {
+  // State for filters and sorting
   const [searchTerm, setSearchTerm] = useState("");
   const [formatFilter, setFormatFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const {
     data: response,
     isLoading,
     error,
   } = useGetListDocument({
-    sort: "created_at",
-    order: "desc",
+    sort: sortField,
+    order: sortOrder,
     page: 1,
     paging: 10000,
     query: searchTerm,
@@ -104,7 +107,7 @@ export default function AdminDocumentsPage() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters Section */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Filters</CardTitle>
@@ -148,6 +151,32 @@ export default function AdminDocumentsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Sorting Controls */}
+          <div className="flex justify-end space-x-2 mb-4">
+            <Select value={sortField} onValueChange={setSortField}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="id">ID</SelectItem>
+                <SelectItem value="created_at">Created At</SelectItem>
+                <SelectItem value="format">Format</SelectItem>
+                <SelectItem value="pages">Pages</SelectItem>
+                <SelectItem value="bytes">Size</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">Ascending</SelectItem>
+                <SelectItem value="desc">Descending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Table */}
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
@@ -175,47 +204,41 @@ export default function AdminDocumentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {documents
-                  .filter((doc) =>
-                    (formatFilter === "all" || doc.format === formatFilter) &&
-                    (doc.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                     doc.format.toLowerCase().includes(searchTerm.toLowerCase()))
-                  )
-                  .map((doc) => (
-                    <TableRow key={doc.id}>
-                      <TableCell>
-                        <a
-                          href={doc.secure_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          {doc.id}
-                        </a>
-                      </TableCell>
-                      <TableCell>{formatDateTime(doc.created_at)}</TableCell>
-                      <TableCell>{doc.format.toUpperCase()}</TableCell>
-                      <TableCell className="text-center">{doc.pages}</TableCell>
-                      <TableCell className="text-center">{formatFileSize(doc.bytes)}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600 dark:text-red-400">
-                              <Ban className="w-4 h-4 mr-2" />
-                              Delete Document
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {documents.map((doc) => (
+                  <TableRow key={doc.id}>
+                    <TableCell>
+                      <a
+                        href={doc.secure_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {doc.id}
+                      </a>
+                    </TableCell>
+                    <TableCell>{formatDateTime(doc.created_at)}</TableCell>
+                    <TableCell>{doc.format.toUpperCase()}</TableCell>
+                    <TableCell className="text-center">{doc.pages}</TableCell>
+                    <TableCell className="text-center">{formatFileSize(doc.bytes)}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600 dark:text-red-400">
+                            <Ban className="w-4 h-4 mr-2" />
+                            Delete Document
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           )}

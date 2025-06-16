@@ -55,13 +55,16 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isUsageModalOpen, setIsUsageModalOpen] = useState(false);
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
+
   const {
     data: response,
     isLoading,
     error,
   } = useGetListUser({
-    sort: "created_at",
-    order: "desc",
+    sort: sortField,
+    order: sortOrder,
     page: 1,
     paging: 10000,
     query: searchTerm,
@@ -195,6 +198,29 @@ export default function AdminUsersPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-end space-x-2 mb-4">
+            <Select value={sortField} onValueChange={setSortField}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="username">Username</SelectItem>
+                <SelectItem value="email">Email</SelectItem>
+                <SelectItem value="created_at">Created At</SelectItem>
+                <SelectItem value="updated_at">Updated At</SelectItem>
+                <SelectItem value="confirmed_at">Confirmed At</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Descending</SelectItem>
+                <SelectItem value="asc">Ascending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
