@@ -42,6 +42,37 @@ export type ApiUsageResponse = {
   resource_type: string;
 }[];
 
+export type FeedbackResponse = {
+  id: string;
+  created_at: number;
+  reason_feedback: string;
+  additional_feedback: string;
+  user: {
+    id: string;
+    email: string;
+    username: string;
+    avatar_url: string;
+    role: string;
+    created_at: number;
+    confirmed_at: number;
+    is_confirmed: boolean;
+  };
+  message: {
+    id: number;
+    created_at: number;
+    content: string;
+    sender_type: "BOT" | "USER";
+    conversation_id: string;
+    cited_excerpts: Array<{
+      id: string;
+      source_id: number;
+      text: string;
+      page: number;
+      score: number;
+    }>;
+  };
+}
+
 export const adminApi = {
   getListUser: async (
     params: AdminQueryParams
@@ -61,6 +92,13 @@ export const adminApi = {
     params: AdminQueryParams
   ): Promise<ApiResponse<ConversationInfoResponse[]>> => {
     const response = await api.get("/v1/admin/conversations", { params });
+    return response.data;
+  },
+
+  getListFeedback: async (
+    params: AdminQueryParams
+  ): Promise<ApiResponse<FeedbackResponse[]>> => {
+    const response = await api.get("/v1/admin/feedbacks", { params });
     return response.data;
   },
 

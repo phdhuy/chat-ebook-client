@@ -12,6 +12,7 @@ import UserRoute from "./user-routes";
 import AdminRoute from "./admin-routes";
 import AdminDocumentsPage from "@/pages/admin/admin-documents";
 import AdminConversationsPage from "@/pages/admin/admin-conversations";
+import AdminFeedbackPage from "@/pages/admin/admin-feedbacks";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -40,6 +41,7 @@ const AppRoutes = () => {
         { path: "users", element: <AdminUsersPage /> },
         { path: "documents", element: <AdminDocumentsPage /> },
         { path: "conversations", element: <AdminConversationsPage /> },
+        { path: "feedbacks", element: <AdminFeedbackPage />}
       ],
     },
     { path: "*", element: <NotFoundPage /> },
