@@ -37,8 +37,8 @@ import { useAuthActions, useAuthStore } from "@/stores/use-auth-store";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, current: true },
-  { name: "Users", href: "/admin/users", icon: Users, badge: "12" },
-  { name: "Documents", href: "/admin/documents", icon: FileText, badge: "45" },
+  { name: "Users", href: "/admin/users", icon: Users},
+  { name: "Documents", href: "/admin/documents", icon: FileText},
   { name: "Conversations", href: "/admin/conversations", icon: MessageSquare },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "System", href: "/admin/system", icon: Database },
@@ -135,19 +135,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     />
                     <span>{item.name}</span>
                   </div>
-                  {item.badge && (
-                    <Badge
-                      variant={isActive ? "secondary" : "default"}
-                      className={cn(
-                        "text-xs",
-                        isActive
-                          ? "bg-white/20 text-white hover:bg-white/30"
-                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                      )}
-                    >
-                      {item.badge}
-                    </Badge>
-                  )}
                 </Link>
               );
             })}

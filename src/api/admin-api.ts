@@ -31,7 +31,7 @@ export type ConversationInfoResponse = {
 
 export type AdminQueryParams = {
   sort?: string;
-  order?: "asc" | "desc";
+  order?: string;
   page?: number;
   paging?: number;
   query?: string;

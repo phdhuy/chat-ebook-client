@@ -32,19 +32,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGetListConversation } from "./hooks/use-get-list-conversation";
 import { formatDateTime } from "@/common";
 
 export default function AdminConversationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [formatFilter, setFormatFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const {
     data: response,
     isLoading,
     error,
   } = useGetListConversation({
-    sort: "created_at",
-    order: "desc",
+    sort: sortField,
+    order: sortOrder,
     page: 1,
     paging: 10000,
     query: searchTerm,
@@ -95,23 +105,36 @@ export default function AdminConversationsPage() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Search</CardTitle>
+          <CardTitle className="text-lg">Filters</CardTitle>
           <CardDescription>
-            Search conversations by name or file ID
+            Filter conversations by search terms or file format
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Search conversations..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={formatFilter} onValueChange={setFormatFilter}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filter by format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Formats</SelectItem>
+                <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="docx">DOCX</SelectItem>
+                <SelectItem value="txt">TXT</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -125,6 +148,30 @@ export default function AdminConversationsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Sorting Controls */}
+          <div className="flex justify-end space-x-2 mb-4">
+            <Select value={sortField} onValueChange={setSortField}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="id">ID</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="created_at">Created At</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">Ascending</SelectItem>
+                <SelectItem value="desc">Descending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Table */}
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
@@ -139,57 +186,51 @@ export default function AdminConversationsPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Conversation ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>File ID</TableHead>
-                  <TableHead>Format</TableHead>
-                  <TableHead>Pages</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {conversations
-                  .filter((conversation) =>
-                    conversation.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    conversation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    conversation.file.id.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map((conversation) => (
-                    <TableRow key={conversation.id}>
-                      <TableCell>{conversation.id}</TableCell>
-                      <TableCell>{conversation.name}</TableCell>
-                      <TableCell>{formatDateTime(conversation.created_at)}</TableCell>
-                      <TableCell>{conversation.file.id}</TableCell>
-                      <TableCell>{conversation.file.format}</TableCell>
-                      <TableCell>{conversation.file.pages}</TableCell>
-                      <TableCell>{formatFileSize(conversation.file.bytes)}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <Eye className="w-4 h-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600 dark:text-red-400">
-                              <Ban className="w-4 h-4 mr-2" />
-                              Delete Conversation
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
+            <TableRow>
+              <TableHead>Conversation ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead>File ID</TableHead>
+              <TableHead>Format</TableHead>
+              <TableHead>Pages</TableHead>
+              <TableHead>Size</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {conversations.map((conversation) => (
+              <TableRow key={conversation.id}>
+                <TableCell>{conversation.id}</TableCell>
+                <TableCell>{conversation.name}</TableCell>
+                <TableCell>{formatDateTime(conversation.created_at)}</TableCell>
+                <TableCell>{conversation.file.id}</TableCell>
+                <TableCell>{conversation.file.format}</TableCell>
+                <TableCell>{conversation.file.pages}</TableCell>
+                <TableCell>{formatFileSize(conversation.file.bytes)}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600 dark:text-red-400">
+                        <Ban className="w-4 h-4 mr-2" />
+                        Delete Conversation
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
             </Table>
           )}
         </CardContent>
