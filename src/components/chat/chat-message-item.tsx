@@ -13,6 +13,8 @@ import ReactMarkdown from "react-markdown";
 import { ReactTyped } from "react-typed";
 import { FeedbackModal } from "../modal/feedback-modal";
 import { useReferencePageStore } from "@/stores/use-reference-page-store";
+import { useCreateFeedback } from "@/pages/chat/hooks/use-create-feedback";
+import { CreateFeedbackRequest } from "@/api/feedback-api";
 
 export interface Message {
   id: string | number;
@@ -50,6 +52,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [showCitations, setShowCitations] = useState(false);
   const { setReferencePage } = useReferencePageStore();
+  const createFeedbackMutation = useCreateFeedback(message.id.toString());
 
   useEffect(() => {
     if (copied) {
@@ -75,9 +78,20 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     setIsFeedbackOpen(true);
   };
 
-  const handleFeedbackSubmit = () => {
-    onFeedback?.("dislike");
-    setIsFeedbackOpen(false);
+  const handleFeedbackSubmit = (data: { reason: string; details: string }) => {
+    const feedback: CreateFeedbackRequest = {
+      reason_feedback: data.reason,
+      additional_feedback: data.details,
+    };
+    createFeedbackMutation.mutate(feedback, {
+      onSuccess: () => {
+        onFeedback?.("dislike");
+        setIsFeedbackOpen(false);
+      },
+      onError: (error) => {
+        console.error("Failed to submit feedback:", error);
+      },
+    });
   };
 
   const processedContent = useMemo(() => {

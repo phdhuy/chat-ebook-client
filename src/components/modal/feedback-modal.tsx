@@ -18,37 +18,37 @@ type FeedbackOption = {
 
 const feedbackOptions: FeedbackOption[] = [
   {
-    id: "too-short",
+    id: "TOO_SHORT",
     label: "Too short",
     description: "The response didn't provide enough information",
   },
   {
-    id: "too-long",
+    id: "TOO_LONG",
     label: "Too long",
     description: "The response was unnecessarily verbose",
   },
   {
-    id: "poor-formatting",
+    id: "POOR_FORMATTING",
     label: "Poor formatting",
     description: "The response was difficult to read",
   },
   {
-    id: "no-citation",
+    id: "MISSING_OR_INCORRECT_CITATION",
     label: "Missing or incorrect citation",
     description: "Sources weren't cited or were cited incorrectly",
   },
   {
-    id: "fabricated",
+    id: "FABRICATED_INFORMATION",
     label: "Fabricated information",
     description: "The response contained made-up information",
   },
   {
-    id: "off-topic",
+    id: "DOESNT_ANSWER_THE_QUESTION",
     label: "Doesn't answer the question",
     description: "The response didn't address my query",
   },
   {
-    id: "wrong-language",
+    id: "WRONG_LANGUAGE",
     label: "Wrong language",
     description: "The response was in the wrong language",
   },

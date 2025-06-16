@@ -40,7 +40,7 @@ const navigation = [
   { name: "Users", href: "/admin/users", icon: Users},
   { name: "Documents", href: "/admin/documents", icon: FileText},
   { name: "Conversations", href: "/admin/conversations", icon: MessageSquare },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: BarChart3 },
   { name: "System", href: "/admin/system", icon: Database },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
