@@ -12,7 +12,6 @@ import {
   X,
   LogOut,
   Shield,
-  Database,
   Activity,
   MessageSquare,
   ChevronDown,
@@ -41,8 +40,6 @@ const navigation = [
   { name: "Documents", href: "/admin/documents", icon: FileText},
   { name: "Conversations", href: "/admin/conversations", icon: MessageSquare },
   { name: "Feedbacks", href: "/admin/feedbacks", icon: BarChart3 },
-  { name: "System", href: "/admin/system", icon: Database },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 interface AdminLayoutProps {

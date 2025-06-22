@@ -23,6 +23,7 @@ export type ConversationInfoResponse = {
   id: string;
   created_at: number;
   name: string;
+  is_favorite?: boolean;
   file: FileInfoResponse;
 };
 
@@ -81,6 +82,13 @@ export const conversationApi = {
     body: CreateConversationByUrlRequest
   ): Promise<ApiResponse<ConversationInfoResponse>> => {
     const response = await api.post("/v1/conversations/url", body);
+    return response.data;
+  },
+
+  favoriteConversation: async (
+    conversationId: string
+  ): Promise<ApiResponse<void>> => {
+    const response = await api.put(`/v1/conversations/${conversationId}/favorites`);
     return response.data;
   },
 };

@@ -28,6 +28,7 @@ type UIMessage = {
   content: string;
   timestamp: string;
   isNewBotMessage: boolean;
+  is_negative_feedback?: boolean;
   cited_excerpts?: Array<{
     id: string;
     source_id: number;
@@ -97,6 +98,7 @@ export default function ChatPage() {
         content: msg.content,
         timestamp: formatDateTime(msg.created_at),
         isNewBotMessage: false,
+        is_negative_feedback: msg.is_negative_feedback,
         cited_excerpts: msg.cited_excerpts,
       }));
 
@@ -146,6 +148,7 @@ export default function ChatPage() {
       content: msg.content,
       timestamp: formatDateTime(msg.created_at),
       isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
+      is_negative_feedback: msg.is_negative_feedback,
       cited_excerpts: msg.cited_excerpts,
     };
     shouldScrollToBottomRef.current = true;

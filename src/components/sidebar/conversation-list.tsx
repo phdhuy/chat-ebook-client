@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import InfiniteScroll from "react-infinite-scroll-component";
 import type { ConversationInfoResponse } from "@/api/conversation-api";
 import SkeletonLoader from "../skeleton/loader-skeleton";
+import { useFavoriteConversation } from "@/hooks/use-favorite-conversation";
 
 type Grouped = Record<string, ConversationInfoResponse[]>;
 
@@ -27,6 +28,7 @@ interface ConversationListProps {
   conversations: ConversationInfoResponse[];
   onRename: (id: string, name: string) => void;
   onDelete: (id: string) => void;
+  onFavorite: (conversationId: string, isFavorite: boolean) => void;
   loadMore: () => void;
   hasMore: boolean;
 }
@@ -35,12 +37,14 @@ export function ConversationList({
   conversations,
   onRename,
   onDelete,
+  onFavorite,
   loadMore,
   hasMore,
 }: ConversationListProps) {
   const location = useLocation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const favoriteMutation = useFavoriteConversation();
 
   function toMidnight(date: Date): Date {
     const midnight = new Date(date);
@@ -48,9 +52,13 @@ export function ConversationList({
     return midnight;
   }
 
-  function groupByDate(convs: typeof conversations): Grouped {
+  function groupConversations(convs: typeof conversations): Grouped {
+    const groups: Grouped = {
+      Favorites: [],
+    };
+
     const todayMidnight = toMidnight(new Date());
-    const buckets: Grouped = {
+    const dateBuckets: Record<string, ConversationInfoResponse[]> = {
       Today: [],
       Yesterday: [],
       "Previous 7 Days": [],
@@ -58,24 +66,35 @@ export function ConversationList({
     };
 
     convs.forEach((conv) => {
-      const convDate = toMidnight(new Date(conv.created_at || Date.now()));
-      const diff = Math.floor(
-        (todayMidnight.getTime() - convDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      const key =
-        diff === 0
-          ? "Today"
-          : diff === 1
-          ? "Yesterday"
-          : diff <= 7
-          ? "Previous 7 Days"
-          : "Older";
-      buckets[key].push(conv);
+      if (conv.is_favorite === true) {
+        groups["Favorites"].push(conv);
+      } else {
+        const convDate = toMidnight(new Date(conv.created_at || Date.now()));
+        const diff = Math.floor(
+          (todayMidnight.getTime() - convDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        const key =
+          diff === 0
+            ? "Today"
+            : diff === 1
+            ? "Yesterday"
+            : diff <= 7
+            ? "Previous 7 Days"
+            : "Older";
+        dateBuckets[key].push(conv);
+      }
     });
-    return buckets;
+
+    Object.entries(dateBuckets).forEach(([key, value]) => {
+      if (value.length > 0) {
+        groups[key] = value;
+      }
+    });
+
+    return groups;
   }
 
-  const groups = groupByDate(conversations);
+  const groups = groupConversations(conversations);
 
   return (
     <div
@@ -178,6 +197,20 @@ export function ConversationList({
                               }}
                             >
                               <Edit2 className="mr-2 h-4 w-4" /> Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                favoriteMutation.mutate(
+                                  { conversationId: conv.id },
+                                  {
+                                    onSuccess: () => {
+                                      onFavorite(conv.id, !conv.is_favorite);
+                                    },
+                                  }
+                                )
+                              }
+                            >
+                              {conv.is_favorite ? "Unfavorite" : "Favorite"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem

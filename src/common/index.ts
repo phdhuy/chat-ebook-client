@@ -17,7 +17,7 @@ export const mapSenderTypeToRole = (senderType: string): "user" | "bot" => {
 export const ACCESS_TOKEN = "accessToken";
 export const REFRESH_TOKEN = "refreshToken";
 export const ALLOW_FILE_TYPES = ["application/pdf"];
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_FILE_SIZE = 50 * 1024 * 1024;
 export const MESSAGE_PER_PAGE = 10;
 export const CONVERSATION_PER_PAGE = 15;
 

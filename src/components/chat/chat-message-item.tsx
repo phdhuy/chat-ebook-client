@@ -24,6 +24,7 @@ export interface Message {
   sender_type?: "BOT" | "USER";
   conversation_id?: string;
   isNewBotMessage?: boolean;
+  is_negative_feedback?: boolean;
   cited_excerpts?: Array<{
     id: string;
     source_id: number;
@@ -71,7 +72,20 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   };
 
   const handleLike = () => {
-    onFeedback?.("like");
+    const feedback: CreateFeedbackRequest = {
+      reason_feedback: "HELPFUL",
+      additional_feedback: "Helpful response",
+      is_negative_feedback: false,
+    };
+
+    createFeedbackMutation.mutate(feedback, {
+      onSuccess: () => {
+        onFeedback?.("like");
+      },
+      onError: (error) => {
+        console.error("Failed to submit positive feedback:", error);
+      },
+    });
   };
 
   const handleDislikeClick = () => {
@@ -82,14 +96,16 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     const feedback: CreateFeedbackRequest = {
       reason_feedback: data.reason,
       additional_feedback: data.details,
+      is_negative_feedback: true,
     };
+
     createFeedbackMutation.mutate(feedback, {
       onSuccess: () => {
         onFeedback?.("dislike");
         setIsFeedbackOpen(false);
       },
       onError: (error) => {
-        console.error("Failed to submit feedback:", error);
+        console.error("Failed to submit negative feedback:", error);
       },
     });
   };
@@ -300,24 +316,34 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 <Download className="h-3.5 w-3.5 text-gray-500" />
               </Button>
               <div className="h-4 border-r border-gray-200 dark:border-gray-700 mx-1" />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLike}
-                className="h-7 w-7"
-                title="Helpful"
-              >
-                <ThumbsUp className="h-3.5 w-3.5 text-gray-500 hover:text-green-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDislikeClick}
-                className="h-7 w-7"
-                title="Report issue"
-              >
-                <ThumbsDown className="h-3.5 w-3.5 text-gray-500 hover:text-red-500" />
-              </Button>
+              {message.is_negative_feedback !== undefined ? (
+                message.is_negative_feedback ? (
+                  <ThumbsDown className="h-3.5 w-3.5 text-red-500" />
+                ) : (
+                  <ThumbsUp className="h-3.5 w-3.5 text-green-500" />
+                )
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleLike}
+                    className="h-7 w-7"
+                    title="Helpful"
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5 text-gray-500 hover:text-green-500" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleDislikeClick}
+                    className="h-7 w-7"
+                    title="Report issue"
+                  >
+                    <ThumbsDown className="h-3.5 w-3.5 text-gray-500 hover:text-red-500" />
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>

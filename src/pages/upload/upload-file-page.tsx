@@ -424,7 +424,7 @@ export default function UploadFilePage() {
                       </h3>
 
                       <p className="text-gray-600 dark:text-gray-400 text-base">
-                        Supports PDF• Max 10MB
+                        Supports PDF• Max 50MB
                       </p>
 
                       {!selectedFile && (

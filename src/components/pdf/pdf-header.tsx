@@ -10,7 +10,6 @@ import {
   RotateCw,
   Minimize,
   Maximize,
-  Settings,
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,8 +28,6 @@ interface PdfHeaderProps {
   setRotation: (rotation: number | ((prev: number) => number)) => void;
   isFullscreen: boolean;
   toggleFullscreen: () => void;
-  showSettings: boolean;
-  setShowSettings: (value: boolean) => void;
 }
 
 const PdfHeader: React.FC<PdfHeaderProps> = ({
@@ -44,8 +41,6 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
   setRotation,
   isFullscreen,
   toggleFullscreen,
-  showSettings,
-  setShowSettings,
 }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -70,7 +65,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
   return (
     <div className="h-14 flex items-center justify-between px-4 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200/80 dark:border-gray-700/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
       {/* Left Section - TOC and Navigation */}
-      <div className="flex items-center gap-3">
+      <div className="left-4 flex items-center gap-3">
         <Button
           variant="ghost"
           size="sm"
@@ -139,7 +134,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
       </div>
 
       {/* Center Section - Zoom Controls */}
-      <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50">
+      <div className="flex items-center gap-1 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg p-1 border border-gray-200/50 dark:border-gray-700/50 mr-[40px]">
         <Button
           variant="ghost"
           size="sm"
@@ -179,10 +174,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
         >
           <RotateCw className="h-4 w-4" />
         </Button>
-      </div>
 
-      {/* Right Section - View Controls */}
-      <div className="flex items-center gap-1">
         <Button
           variant="ghost"
           size="sm"
@@ -195,20 +187,6 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
           ) : (
             <Maximize className="h-4 w-4" />
           )}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`h-9 w-9 transition-colors ${
-            showSettings
-              ? "bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400"
-              : "hover:bg-gray-100 dark:hover:bg-gray-800"
-          }`}
-          onClick={() => setShowSettings(!showSettings)}
-          aria-label="Settings"
-        >
-          <Settings className="h-4 w-4" />
         </Button>
       </div>
     </div>
