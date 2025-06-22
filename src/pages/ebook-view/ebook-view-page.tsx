@@ -4,7 +4,6 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import { usePdf } from "@/hooks/use-pdf";
 import { useFullscreen } from "@/pages/ebook-view/hooks/use-fullscreen";
 import { PdfSidebar } from "@/components/pdf/pdf-sidebar";
-import { PdfSettings } from "@/components/pdf/pdf-setting";
 import { PdfPage } from "@/components/pdf/pdf-page";
 import { FixedSizeList } from "react-window";
 import { useConversationDetail } from "@/hooks/use-conversation-detail";
@@ -32,7 +31,6 @@ export default function EbookViewPage() {
   const [scale, setScale] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [showToc, setShowToc] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<FixedSizeList>(null);
@@ -157,8 +155,6 @@ export default function EbookViewPage() {
           setRotation={setRotation}
           isFullscreen={isFullscreen}
           toggleFullscreen={toggleFullscreen}
-          showSettings={showSettings}
-          setShowSettings={setShowSettings}
         />
       )}
 
@@ -176,19 +172,6 @@ export default function EbookViewPage() {
         )}
 
         <div className="flex-1 flex flex-col relative">
-          {showSettings && (
-            <div className="absolute top-0 right-0 w-64 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 z-20 overflow-auto">
-              <PdfSettings
-                show={showSettings}
-                scale={scale}
-                rotation={rotation}
-                onClose={() => setShowSettings(false)}
-                onScaleChange={setScale}
-                onRotationChange={setRotation}
-              />
-            </div>
-          )}
-
           <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-200 dark:bg-gray-900">
             {isLoading ? (
               <PDFSkeleton />

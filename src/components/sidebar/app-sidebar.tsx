@@ -67,6 +67,14 @@ export default function AppSidebar({
     );
   };
 
+  const handleFavoriteSuccess = (conversationId: string, isFavorite: boolean) => {
+    setAllConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === conversationId ? { ...conv, is_favorite: isFavorite } : conv
+      )
+    );
+  };
+
   const { mutate: revokeToken } = useRevokeToken();
   const { signOut } = useAuthActions();
 
@@ -102,6 +110,7 @@ export default function AppSidebar({
                 onSuccess: () => handleDeleteSuccess(id),
               })
             }
+            onFavorite={handleFavoriteSuccess}
             loadMore={loadMore}
             hasMore={hasMore}
           />

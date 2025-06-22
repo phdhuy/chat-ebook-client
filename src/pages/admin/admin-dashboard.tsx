@@ -7,9 +7,10 @@ import {
   Activity,
   Clock,
   AlertTriangle,
-  CheckCircle,
   BarChart3,
   Calendar,
+  Star,
+  Server,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,9 +24,16 @@ const fetchDashboardStats = async () => {
     totalDocuments: 3456,
     totalConversations: 8923,
     activeUsers: 234,
+    totalFeedback: 456,
+    totalApiCalls: 12345,
     userGrowth: 12.5,
     documentGrowth: 8.3,
     conversationGrowth: 15.7,
+    feedbackGrowth: 10.2,
+    apiCallsGrowth: 20.1,
+    averageRating: 4.2,
+    positiveFeedbackPercentage: 85,
+    apiRateLimitUsed: 75,
     systemHealth: 98.5,
   }
 }
@@ -71,16 +79,6 @@ const fetchRecentActivity = async () => {
   ]
 }
 
-const fetchSystemMetrics = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 600))
-  return {
-    cpuUsage: 45,
-    memoryUsage: 67,
-    diskUsage: 34,
-    networkTraffic: 78,
-  }
-}
-
 export default function AdminDashboardPage() {
   const {
     data: stats,
@@ -98,15 +96,6 @@ export default function AdminDashboardPage() {
   } = useQuery({
     queryKey: ["recent-activity"],
     queryFn: fetchRecentActivity,
-  })
-
-  const {
-    data: metrics,
-    isLoading: metricsLoading,
-    error: metricsError,
-  } = useQuery({
-    queryKey: ["system-metrics"],
-    queryFn: fetchSystemMetrics,
   })
 
   const getActivityIcon = (type: string) => {
@@ -139,7 +128,7 @@ export default function AdminDashboardPage() {
     }
   }
 
-  if (statsError || activitiesError || metricsError) {
+  if (statsError || activitiesError) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -174,7 +163,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -235,6 +224,46 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
+        <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-200/50 dark:border-yellow-800/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Total Feedback</CardTitle>
+              <Star className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-yellow-900 dark:text-yellow-100">
+              {statsLoading ? "..." : stats?.totalFeedback.toLocaleString()}
+            </div>
+            <div className="flex items-center mt-2">
+              <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+              <span className="text-sm text-green-600 dark:text-green-400">
+                +{statsLoading ? "..." : stats?.feedbackGrowth}% from last month
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-cyan-50 to-teal-50 dark:from-cyan-950/20 dark:to-teal-950/20 border-cyan-200/50 dark:border-cyan-800/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-cyan-700 dark:text-cyan-300">Total API Calls</CardTitle>
+              <Server className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">
+              {statsLoading ? "..." : stats?.totalApiCalls.toLocaleString()}
+            </div>
+            <div className="flex items-center mt-2">
+              <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+              <span className="text-sm text-green-600 dark:text-green-400">
+                +{statsLoading ? "..." : stats?.apiCallsGrowth}% from last month
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-orange-200/50 dark:border-orange-800/50">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -256,73 +285,8 @@ export default function AdminDashboardPage() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* System Metrics */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Activity className="w-5 h-5" />
-              <span>System Metrics</span>
-            </CardTitle>
-            <CardDescription>Real-time system performance</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {metricsLoading ? (
-              <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">CPU Usage</span>
-                    <span className="font-medium">{metrics?.cpuUsage}%</span>
-                  </div>
-                  <Progress value={metrics?.cpuUsage} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Memory Usage</span>
-                    <span className="font-medium">{metrics?.memoryUsage}%</span>
-                  </div>
-                  <Progress value={metrics?.memoryUsage} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Disk Usage</span>
-                    <span className="font-medium">{metrics?.diskUsage}%</span>
-                  </div>
-                  <Progress value={metrics?.diskUsage} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Network Traffic</span>
-                    <span className="font-medium">{metrics?.networkTraffic}%</span>
-                  </div>
-                  <Progress value={metrics?.networkTraffic} className="h-2" />
-                </div>
-              </>
-            )}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">System Health</span>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                    {statsLoading ? "..." : stats?.systemHealth}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recent Activity */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Clock className="w-5 h-5" />
@@ -362,6 +326,68 @@ export default function AdminDashboardPage() {
                     </Badge>
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Feedback Analytics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Star className="w-5 h-5" />
+              <span>Feedback Analytics</span>
+            </CardTitle>
+            <CardDescription>Overview of user feedback and ratings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {statsLoading ? (
+              <div className="space-y-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Average Rating</p>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl font-bold">{stats?.averageRating.toFixed(1)}</span>
+                    <span className="text-sm text-gray-500">/ 5</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Positive Feedback</p>
+                  <div className="flex items-center space-x-2">
+                    <Progress value={stats?.positiveFeedbackPercentage} className="w-1/2" />
+                    <span>{stats?.positiveFeedbackPercentage}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* API Usage Monitor */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Server className="w-5 h-5" />
+              <span>API Usage Monitor</span>
+            </CardTitle>
+            <CardDescription>Current API usage statistics</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {statsLoading ? (
+              <div className="space-y-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Rate Limit Usage</p>
+                <div className="flex items-center space-x-2">
+                  <Progress value={stats?.apiRateLimitUsed} className="w-3/4" />
+                  <span>{stats?.apiRateLimitUsed}%</span>
+                </div>
               </div>
             )}
           </CardContent>

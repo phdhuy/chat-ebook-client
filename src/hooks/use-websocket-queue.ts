@@ -25,6 +25,7 @@ export interface Message {
   created_at: number;
   sender_type: string;
   conversation_id: string;
+  is_negative_feedback?: boolean;
   cited_excerpts?: Array<{
     id: string;
     source_id: number;
