@@ -1,39 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Client, Frame, IMessage } from "@stomp/stompjs";
 import { useUserQueue } from "@/hooks/use-user-queue";
-
-interface ParsedMessage {
-  id?: string;
-  content?: string;
-  text?: string;
-  created_at?: number;
-  timestamp?: string;
-  sender_type?: string;
-  conversation_id?: string;
-  cited_excerpts?: Array<{
-    id: string;
-    source_id: number;
-    text: string;
-    page: number;
-    score: number;
-  }>;
-}
-
-export interface Message {
-  id: string;
-  content: string;
-  created_at: number;
-  sender_type: string;
-  conversation_id: string;
-  is_negative_feedback?: boolean;
-  cited_excerpts?: Array<{
-    id: string;
-    source_id: number;
-    text: string;
-    page: number;
-    score: number;
-  }>;
-}
+import { Message } from "@/types/message";
+import { PASSCODE_QUEUE, USERNAME_QUEUE } from "@/common";
 
 export interface WebSocketError {
   message: string;
@@ -60,7 +29,7 @@ export interface UseWebSocketQueueOptions {
 export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
   const {
     wsUrl = import.meta.env.VITE_WS_ENDPOINT || "",
-    credentials = { login: "guest", passcode: "guest" },
+    credentials = { login: USERNAME_QUEUE, passcode: PASSCODE_QUEUE },
     heartbeat = { incoming: 4000, outgoing: 4000 },
     reconnectDelay = 5000,
     onConnect,
@@ -132,19 +101,16 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
         `/queue/${queueName}`,
         (msg: IMessage) => {
           try {
-            const parsed: ParsedMessage = JSON.parse(msg.body);
-            const content = parsed.content || parsed.text || "Unknown content";
+            const parsed: Message = JSON.parse(msg.body);
+            const content = parsed.content || "Unknown content";
             const createdAt =
-              parsed.created_at ||
-              (parsed.timestamp
-                ? new Date(parsed.timestamp).getTime()
-                : Date.now());
+              parsed.created_at;
 
             const messageObj: Message = {
               id: parsed.id || `ws-${Date.now()}`,
               content,
               created_at: createdAt,
-              sender_type: parsed.sender_type || "bot",
+              sender_type: parsed.sender_type,
               conversation_id: parsed.conversation_id || "unknown",
               cited_excerpts: Array.isArray(parsed.cited_excerpts)
                 ? parsed.cited_excerpts.map((e) => ({
@@ -162,16 +128,6 @@ export const useWebSocketQueue = (options: UseWebSocketQueueOptions = {}) => {
           } catch (e) {
             console.warn("Failed to parse message:", msg.body);
             console.log(e);
-
-            const messageObj: Message = {
-              id: `error-${Date.now()}`,
-              content: msg.body,
-              created_at: Date.now(),
-              sender_type: "error",
-              conversation_id: "unknown",
-            };
-            setMessages((prev) => [...prev, messageObj]);
-            if (onMessage) onMessage(messageObj);
           }
         },
         subscriptionHeaders

@@ -15,24 +15,8 @@ import { FeedbackModal } from "../modal/feedback-modal";
 import { useReferencePageStore } from "@/stores/use-reference-page-store";
 import { useCreateFeedback } from "@/pages/chat/hooks/use-create-feedback";
 import { CreateFeedbackRequest } from "@/api/feedback-api";
-
-export interface Message {
-  id: string | number;
-  role: "bot" | "user";
-  content: string;
-  timestamp: string;
-  sender_type?: "BOT" | "USER";
-  conversation_id?: string;
-  isNewBotMessage?: boolean;
-  is_negative_feedback?: boolean;
-  cited_excerpts?: Array<{
-    id: string;
-    source_id: number;
-    text: string;
-    page: number;
-    score: number;
-  }>;
-}
+import { Message } from "@/types/message";
+import { formatDateTime } from '../../common/index';
 
 interface ChatMessageItemProps {
   message: Message;
@@ -45,7 +29,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onCopy,
   onFeedback,
 }) => {
-  const isUser = message.role === "user" || message.sender_type === "USER";
+  const isUser = message.sender_type == "USER";
   const [copied, setCopied] = useState(false);
   const [isTypingComplete, setIsTypingComplete] = useState(
     !message.isNewBotMessage
@@ -190,7 +174,7 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               {isUser ? "You" : "AI Assistant"}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {message.timestamp}
+              {formatDateTime(message.created_at)}
             </span>
           </div>
 

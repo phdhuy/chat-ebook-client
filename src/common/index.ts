@@ -1,4 +1,4 @@
-export const formatDateTime = (timestamp: number) => {
+export const formatDateTime = (timestamp: string | number) => {
   return new Date(timestamp).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
@@ -10,10 +10,6 @@ export const formatDateTime = (timestamp: number) => {
   });
 };
 
-export const mapSenderTypeToRole = (senderType: string): "user" | "bot" => {
-  return senderType.toLowerCase() === "user" ? "user" : "bot";
-};
-
 export const ACCESS_TOKEN = "accessToken";
 export const REFRESH_TOKEN = "refreshToken";
 export const ALLOW_FILE_TYPES = ["application/pdf"];
@@ -23,6 +19,9 @@ export const CONVERSATION_PER_PAGE = 15;
 
 export const ADMIN_ROLE = "ROLE_ADMIN";
 export const USER_ROLE = "ROLE_USER";
+
+export const USERNAME_QUEUE = "guest";
+export const PASSCODE_QUEUE = "guest";
 
 export const ALLOWED_DOMAINS = [
   "arxiv.org",
