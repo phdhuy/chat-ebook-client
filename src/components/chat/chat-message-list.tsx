@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatMessageItem, Message } from "./chat-message-item";
+import { ChatMessageItem } from "./chat-message-item";
+import { Message } from "@/types/message";
 
 interface ChatMessageListProps {
   messages: Message[];

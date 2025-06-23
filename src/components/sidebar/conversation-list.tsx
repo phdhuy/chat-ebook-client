@@ -7,6 +7,7 @@ import {
   Trash2,
   Check,
   X,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -184,7 +185,7 @@ export function ConversationList({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:bg-zinc-800"
+                              className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:bg-zinc-800 transition-opacity"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
@@ -210,12 +211,13 @@ export function ConversationList({
                                 )
                               }
                             >
+                              <Star className="mr-2 h-4 w-4" />
                               {conv.is_favorite ? "Unfavorite" : "Favorite"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => onDelete(conv.id)}
-                              className="text-red-500"
+                              className="text-red-500 focus:text-red-500"
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>

@@ -3,12 +3,10 @@ import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
   useWebSocketQueue,
-  Message as WSMessage,
   WebSocketError,
 } from "@/hooks/use-websocket-queue";
 import {
   formatDateTime,
-  mapSenderTypeToRole,
   MESSAGE_PER_PAGE,
 } from "@/common";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
@@ -21,29 +19,14 @@ import { useSummarizeEbook } from "./hooks/use-summarize-ebook";
 import { ChatSkeleton } from "@/components/chat/chat-skeleton";
 import { ChatHeader } from "@/components/chat/chat-header";
 import MindmapModal from "@/components/modal/mindmap-modal";
-
-type UIMessage = {
-  id: string;
-  role: "user" | "bot";
-  content: string;
-  timestamp: string;
-  isNewBotMessage: boolean;
-  is_negative_feedback?: boolean;
-  cited_excerpts?: Array<{
-    id: string;
-    source_id: number;
-    text: string;
-    page: number;
-    score: number;
-  }>;
-};
+import { Message } from "@/types/message";
 
 export default function ChatPage() {
   const { id: conversationId = "" } = useParams();
   const conversationRef = useRef<string>(conversationId);
   const [input, setInput] = useState("");
-  const [historicalMessages, setHistoricalMessages] = useState<UIMessage[]>([]);
-  const [liveMessages, setLiveMessages] = useState<UIMessage[]>([]);
+  const [historicalMessages, setHistoricalMessages] = useState<Message[]>([]);
+  const [liveMessages, setLiveMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isMindmapOpen, setIsMindmapOpen] = useState(false);
@@ -92,14 +75,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (data?.data) {
-      const history: UIMessage[] = data.data.map((msg) => ({
+      const history: Message[] = data.data.map((msg) => ({
         id: msg.id.toString(),
-        role: mapSenderTypeToRole(msg.sender_type),
         content: msg.content,
-        timestamp: formatDateTime(msg.created_at),
+        created_at: formatDateTime(msg.created_at),
         isNewBotMessage: false,
         is_negative_feedback: msg.is_negative_feedback,
         cited_excerpts: msg.cited_excerpts,
+        sender_type: msg.sender_type
       }));
 
       if (data.data.length < MESSAGE_PER_PAGE) {
@@ -140,16 +123,16 @@ export default function ChatPage() {
     }
   }, [historicalMessages]);
 
-  const onMessage = useCallback((msg: WSMessage) => {
+  const onMessage = useCallback((msg: Message) => {
     if (msg.conversation_id !== conversationRef.current) return;
-    const uiMsg: UIMessage = {
+    const uiMsg: Message = {
       id: msg.id.toString(),
-      role: mapSenderTypeToRole(msg.sender_type),
       content: msg.content,
-      timestamp: formatDateTime(msg.created_at),
-      isNewBotMessage: msg.sender_type.toLowerCase() === "bot",
+      created_at: msg.created_at,
+      isNewBotMessage: msg.sender_type === "BOT",
       is_negative_feedback: msg.is_negative_feedback,
       cited_excerpts: msg.cited_excerpts,
+      sender_type: msg.sender_type
     };
     shouldScrollToBottomRef.current = true;
     setLiveMessages((prev) => [...prev, uiMsg]);
