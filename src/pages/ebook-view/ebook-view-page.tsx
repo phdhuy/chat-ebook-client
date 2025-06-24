@@ -32,10 +32,13 @@ export default function EbookViewPage() {
   const [rotation, setRotation] = useState(0);
   const [showToc, setShowToc] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [fitMode, setFitMode] = useState<"none" | "width">("none");
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<FixedSizeList>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
   const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef);
   const [listHeight, setListHeight] = useState(600);
+  const [containerWidth, setContainerWidth] = useState(0);
   const { setSelectedText } = useSelectedTextStore();
   const { page, clearReferencePage } = useReferencePageStore();
 
@@ -43,6 +46,7 @@ export default function EbookViewPage() {
     setScale(1);
     setRotation(0);
     setCurrentPage(1);
+    setFitMode("none");
   }, [conversationId]);
 
   useEffect(() => {
@@ -60,20 +64,63 @@ export default function EbookViewPage() {
     [setSelectedText]
   );
 
+  const calculateFitWidthScale = useCallback(() => {
+    if (!pageDimensions || !mainContentRef.current) {
+      return 1;
+    }
+
+    const containerRect = mainContentRef.current.getBoundingClientRect();
+    const availableWidth = containerRect.width - 40;
+
+    const { width: pageWidth, height: pageHeight } = pageDimensions;
+    const isRotated = rotation % 180 !== 0;
+    const actualPageWidth = isRotated ? pageHeight : pageWidth;
+
+    const fitWidthScale = availableWidth / actualPageWidth;
+
+    return Math.max(0.1, Math.min(3, fitWidthScale));
+  }, [pageDimensions, rotation]);
+
+  useEffect(() => {
+    if (fitMode === "none") return;
+
+    const fitWidthScale = calculateFitWidthScale();
+
+    if (fitMode === "width") {
+      setScale(fitWidthScale);
+    }
+  }, [
+    fitMode,
+    calculateFitWidthScale,
+    pageDimensions,
+    rotation,
+    containerWidth,
+  ]);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const updateHeight = () => {
-      if (containerRef.current) {
+    const updateDimensions = () => {
+      if (containerRef.current && mainContentRef.current) {
         const headerHeight = showControls ? 80 : 0;
         const newHeight = containerRef.current.clientHeight - headerHeight;
+        const newWidth = mainContentRef.current.clientWidth;
+
         setListHeight(newHeight);
+        setContainerWidth(newWidth);
       }
     };
 
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
+    updateDimensions();
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    resizeObserver.observe(containerRef.current);
+
+    window.addEventListener("resize", updateDimensions);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+    };
   }, [showControls]);
 
   const getItemSize = useCallback(() => {
@@ -99,6 +146,15 @@ export default function EbookViewPage() {
       listRef.current.scrollToItem(page - 1, "center");
       setCurrentPage(page);
     }
+  };
+
+  const handleScaleChange = (newScale: number | ((prev: number) => number)) => {
+    setScale(newScale);
+    setFitMode("none");
+  };
+
+  const handleFitWidth = () => {
+    setFitMode("width");
   };
 
   const Row = useCallback(
@@ -150,11 +206,12 @@ export default function EbookViewPage() {
           numPages={numPages}
           goToPage={goToPage}
           scale={scale}
-          setScale={setScale}
+          setScale={handleScaleChange}
           rotation={rotation}
           setRotation={setRotation}
           isFullscreen={isFullscreen}
           toggleFullscreen={toggleFullscreen}
+          fitToWidth={handleFitWidth}
         />
       )}
 
@@ -172,7 +229,10 @@ export default function EbookViewPage() {
         )}
 
         <div className="flex-1 flex flex-col relative">
-          <main className="flex-1 flex items-center justify-center overflow-hidden bg-gray-200 dark:bg-gray-900">
+          <main
+            ref={mainContentRef}
+            className="flex-1 flex items-center justify-center overflow-hidden bg-gray-200 dark:bg-gray-900"
+          >
             {isLoading ? (
               <PDFSkeleton />
             ) : (
