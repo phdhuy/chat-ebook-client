@@ -11,6 +11,7 @@ import {
   Minimize,
   Maximize,
   Search,
+  RectangleHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ interface PdfHeaderProps {
   setRotation: (rotation: number | ((prev: number) => number)) => void;
   isFullscreen: boolean;
   toggleFullscreen: () => void;
+  fitToWidth?: () => void;
 }
 
 const PdfHeader: React.FC<PdfHeaderProps> = ({
@@ -41,6 +43,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
   setRotation,
   isFullscreen,
   toggleFullscreen,
+  fitToWidth,
 }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -173,6 +176,16 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
           aria-label="Rotate"
         >
           <RotateCw className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+          onClick={fitToWidth}
+          aria-label="Fit to width"
+        >
+          <RectangleHorizontal className="h-4 w-4" />
         </Button>
 
         <Button
