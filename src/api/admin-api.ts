@@ -71,7 +71,21 @@ export type FeedbackResponse = {
       score: number;
     }>;
   };
-}
+};
+
+export type InfoDashboardResponse = {
+  user_count: number;
+  user_active_count: number;
+  user_change_percent: number;
+  document_count: number;
+  document_change_percent: number;
+  conversation_count: number;
+  conversation_change_percent: number;
+  feedback_count: number;
+  feedback_change_percent: number;
+  api_usage_count: number;
+  api_usage_change_percent: number;
+};
 
 export const adminApi = {
   getListUser: async (
@@ -109,6 +123,16 @@ export const adminApi = {
     const query = new URLSearchParams(params).toString();
     const response = await api.get(
       `/v1/admin/users/${userId}/api-usage${query ? `?${query}` : ""}`
+    );
+    return response.data;
+  },
+
+  dashboard: async (
+    params: Record<string, string> = {}
+  ): Promise<ApiResponse<InfoDashboardResponse>> => {
+    const query = new URLSearchParams(params).toString();
+    const response = await api.get(
+      `/v1/admin/dashboards${query ? `?${query}` : ""}`
     );
     return response.data;
   },
