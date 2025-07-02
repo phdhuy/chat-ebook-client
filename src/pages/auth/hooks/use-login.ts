@@ -30,7 +30,7 @@ export const useLogin = () => {
         title: "Welcome back! 🎉",
         description: "You’ve successfully signed in.",
       });
-      navigate("/");
+      navigate("/app");
     },
     onError: (err) => {
       const message =
@@ -63,7 +63,7 @@ export const useLoginWithGoogle = () => {
         title: "Google Sign-In Success! 🎉",
         description: "You’re now logged in.",
       });
-      navigate("/");
+      navigate("/app");
     },
     onError: (err) => {
       const message =
