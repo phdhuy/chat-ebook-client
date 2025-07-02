@@ -13,9 +13,14 @@ import AdminRoute from "./admin-routes";
 import AdminDocumentsPage from "@/pages/admin/admin-documents";
 import AdminConversationsPage from "@/pages/admin/admin-conversations";
 import AdminFeedbackPage from "@/pages/admin/admin-feedbacks";
+import LandingPage from "@/pages/landing/landing-page";
 
 const AppRoutes = () => {
   const routes = useRoutes([
+      {
+      path: "/",
+      element: <LandingPage />,
+    },
     {
       path: "/",
       element: <AuthLayout />,
@@ -28,7 +33,7 @@ const AppRoutes = () => {
       path: "/",
       element: <UserRoute />,
       children: [
-        { index: true, element: <HomePage /> },
+        { path: "app", element: <HomePage /> },
         { path: "upload", element: <UploadFilePage /> },
         { path: "chat/:id", element: <EbookViewPage /> },
       ],
