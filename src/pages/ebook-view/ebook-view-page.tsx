@@ -11,6 +11,8 @@ import PDFSkeleton from "@/components/pdf/pdf-skeleton";
 import PdfHeader from "@/components/pdf/pdf-header";
 import { useSelectedTextStore } from "@/stores/use-selected-text-store";
 import { useReferencePageStore } from "@/stores/use-reference-page-store";
+import { useReadingProgress } from "@/hooks/use-reading-progress";
+import { useRestoreReadingPosition } from "@/hooks/use-restore-reading-position";
 import { Helmet } from "react-helmet";
 
 const GAP = 20;
@@ -18,8 +20,12 @@ const GAP = 20;
 export default function EbookViewPage() {
   const params = useParams();
   const conversationId = params.id as string;
-  const { data: conversation } = useConversationDetail(conversationId as string);
-  const pageTitle = conversation?.data?.name ? `${conversation.data.name} | ChatEbook` : "ChatEbook";
+  const { data: conversation } = useConversationDetail(
+    conversationId as string
+  );
+  const pageTitle = conversation?.data?.name
+    ? `${conversation.data.name} | ChatEbook`
+    : "ChatEbook";
   const pdfUrl = conversation?.data?.file?.secure_url || "";
   const { pdf, numPages, outline, isLoading, pageDimensions } = usePdf(pdfUrl);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +41,24 @@ export default function EbookViewPage() {
   const [containerWidth, setContainerWidth] = useState(0);
   const { setSelectedText } = useSelectedTextStore();
   const { page, clearReferencePage } = useReferencePageStore();
+
+  const { updateCurrentPage } = useReadingProgress({
+    conversationId,
+    totalPages: numPages,
+    bookTitle: conversation?.data?.name,
+  });
+
+  useRestoreReadingPosition({
+    conversationId,
+    numPages,
+    isLoading,
+    onPageRestore: (page) => {
+      if (listRef.current) {
+        listRef.current.scrollToItem(page - 1, "center");
+        setCurrentPage(page);
+      }
+    },
+  });
 
   useEffect(() => {
     setScale(1);
@@ -83,7 +107,13 @@ export default function EbookViewPage() {
     if (fitMode === "width") {
       setScale(fitWidthScale);
     }
-  }, [fitMode, calculateFitWidthScale, pageDimensions, rotation, containerWidth]);
+  }, [
+    fitMode,
+    calculateFitWidthScale,
+    pageDimensions,
+    rotation,
+    containerWidth,
+  ]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -122,21 +152,30 @@ export default function EbookViewPage() {
       if (!pdf || !numPages) return;
       const itemHeight = getItemSize();
       const pageIndex = Math.floor(scrollOffset / itemHeight) + 1;
-      setCurrentPage(Math.min(Math.max(1, pageIndex), numPages));
+      const newPage = Math.min(Math.max(1, pageIndex), numPages);
+      setCurrentPage(newPage);
+      updateCurrentPage(newPage);
     },
-    [pdf, numPages, getItemSize]
+    [pdf, numPages, getItemSize, updateCurrentPage]
   );
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= numPages && listRef.current) {
       listRef.current.scrollToItem(page - 1, "center");
       setCurrentPage(page);
+      updateCurrentPage(page);
     }
   };
 
   const handleScaleChange = (newScale: number | ((prev: number) => number)) => {
     setScale(newScale);
     setFitMode("none");
+  };
+
+  const handleRotationChange = (
+    newRotation: number | ((prev: number) => number)
+  ) => {
+    setRotation(newRotation);
   };
 
   const handleFitWidth = () => {
@@ -147,7 +186,10 @@ export default function EbookViewPage() {
     ({ index, style }: { index: number; style: React.CSSProperties }) => (
       <div style={{ ...style }} className="w-full">
         {pdf && (
-          <div className="flex justify-center" style={{ paddingBottom: `${GAP}px` }}>
+          <div
+            className="flex justify-center"
+            style={{ paddingBottom: `${GAP}px` }}
+          >
             <PdfPage
               pdf={pdf}
               pageNumber={index + 1}
@@ -182,7 +224,7 @@ export default function EbookViewPage() {
         scale={scale}
         setScale={handleScaleChange}
         rotation={rotation}
-        setRotation={setRotation}
+        setRotation={handleRotationChange}
         isFullscreen={isFullscreen}
         toggleFullscreen={toggleFullscreen}
         fitToWidth={handleFitWidth}

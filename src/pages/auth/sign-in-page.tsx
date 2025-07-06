@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin, useLoginWithGoogle } from "./hooks/use-login";
 import { InferType } from "yup";
+import { ADMIN_ROLE } from "@/common";
+import { useAuthStore } from "@/stores/use-auth-store";
+import { areTokensValid } from "@/utils/auth-utils";
 
 type LoginForm = InferType<typeof schema>;
 
@@ -27,6 +30,20 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const loginMutation = useLogin();
   const loginWithGoogle = useLoginWithGoogle();
+  const navigate = useNavigate();
+  const { role } = useAuthStore();
+
+  // Check for existing tokens and redirect if authenticated
+  useEffect(() => {
+    if (areTokensValid()) {
+      // User is already authenticated, redirect based on role
+      if (role === ADMIN_ROLE) {
+        navigate("/admin");
+      } else {
+        navigate("/app");
+      }
+    }
+  }, [navigate, role]);
 
   const {
     register,

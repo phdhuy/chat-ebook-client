@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { FileText, Upload } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button";
+import { FileText, Upload } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ReadingHistory } from "@/components/reading-progress";
 
 export default function HomePage() {
   return (
@@ -23,8 +24,8 @@ export default function HomePage() {
             </span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Upload your PDF and ask questions about its content. Our AI will analyze the document and provide accurate
-            answers.
+            Upload your PDF and ask questions about its content. Our AI will
+            analyze the document and provide accurate answers.
           </p>
         </div>
 
@@ -33,8 +34,12 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 rounded-full mb-4 group-hover:shadow-lg group-hover:shadow-purple-500/20 transition-all duration-300">
               <Upload className="h-10 w-10 text-white" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Upload New PDF</h2>
-            <p className="text-gray-500 dark:text-gray-300 mb-4">Upload a new Ebook document to chat with it</p>
+            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Upload New PDF
+            </h2>
+            <p className="text-gray-500 dark:text-gray-300 mb-4">
+              Upload a new Ebook document to chat with it
+            </p>
             <Link to="/upload">
               <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30">
                 Upload Ebook
@@ -46,8 +51,12 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-4 rounded-full mb-4 group-hover:shadow-lg group-hover:shadow-blue-500/20 transition-all duration-300">
               <FileText className="h-10 w-10 text-white" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Recent Documents</h2>
-            <p className="text-gray-500 dark:text-gray-300 mb-4">Continue chatting with your recent documents</p>
+            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Recent Documents
+            </h2>
+            <p className="text-gray-500 dark:text-gray-300 mb-4">
+              Continue chatting with your recent documents
+            </p>
             <Button
               variant="outline"
               className="border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 font-medium px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg"
@@ -57,16 +66,34 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Reading History Section */}
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Continue Reading
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Pick up where you left off in your recent books
+            </p>
+          </div>
+          <ReadingHistory
+            limit={3}
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+          />
+        </div>
+
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full border border-gray-100 dark:border-gray-700">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
             </span>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Powered by AI and RAG technology</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Powered by AI and RAG technology
+            </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -90,7 +90,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="h-16 flex items-center justify-between px-6 bg-gradient-to-r from-white/98 to-gray-50/98 dark:from-gray-900/98 dark:to-gray-800/98 border-b border-gray-200/60 dark:border-gray-700/60 backdrop-blur-xl sticky top-0 z-40 shadow-lg shadow-black/5">
+      <div className="h-14 flex items-center justify-between px-6 bg-white dark:bg-gray-950 border-b border-gray-200/60 dark:border-gray-700/60 backdrop-blur-xl sticky top-0 z-40 shadow-lg shadow-black/5">
         {/* Left Section - TOC and Navigation */}
         <div className="flex items-center gap-4">
           <Tooltip>

@@ -1,11 +1,38 @@
 import { useAuthStore } from "@/stores/use-auth-store";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/common";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const refreshApi = axios.create({
   baseURL: import.meta.env.VITE_BASE_ENDPOINT || "",
   headers: { "Content-Type": "application/json" },
 });
+
+interface DecodedToken {
+  exp: number;
+  role: string;
+}
+
+export const isTokenValid = (token: string | null): boolean => {
+  if (!token) return false;
+
+  try {
+    const decoded: DecodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    return decoded.exp > currentTime + 300;
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return false;
+  }
+};
+
+export const areTokensValid = (): boolean => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+
+  return isTokenValid(accessToken) && !!refreshToken;
+};
 
 export const refreshToken = async () => {
   const { refreshToken: currentRefreshToken } = useAuthStore.getState();
