@@ -10,6 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { areTokensValid } from "@/utils/auth-utils";
 
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -47,7 +48,17 @@ export default function LandingPage() {
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
                 ChatEbook
               </span>
+              {areTokensValid() && (
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-400 font-medium">
+                    Signed In
+                  </span>
+                </div>
+              )}
             </div>
+
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <a
                 href="#features"
@@ -67,14 +78,50 @@ export default function LandingPage() {
               >
                 Pricing
               </a>
-              <Link to="/sign-in">
-                <Button
-                  variant="outline"
-                  className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black bg-transparent"
-                >
-                  Sign In
-                </Button>
-              </Link>
+              {areTokensValid() ? (
+                <Link to="/app">
+                  <Button
+                    variant="outline"
+                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black bg-transparent"
+                  >
+                    Go to App
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/sign-in">
+                  <Button
+                    variant="outline"
+                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black bg-transparent"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile Navigation Button */}
+            <div className="md:hidden">
+              {areTokensValid() ? (
+                <Link to="/app">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black bg-transparent"
+                  >
+                    App
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/sign-in">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black bg-transparent"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </nav>
@@ -114,7 +161,9 @@ export default function LandingPage() {
                     size="lg"
                     className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-8 py-4 text-lg group"
                   >
-                    Start Reading Free
+                    {areTokensValid()
+                      ? "Continue Reading"
+                      : "Start Reading Free"}
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
@@ -141,11 +190,21 @@ export default function LandingPage() {
                       <div className="flex items-center space-x-2 text-purple-400">
                         <BookOpen className="h-5 w-5" />
                         <span className="text-sm font-medium">
-                          Currently Reading
+                          {areTokensValid()
+                            ? "Your Reading"
+                            : "Currently Reading"}
                         </span>
                       </div>
-                      <h3 className="text-2xl font-bold">The Art of War</h3>
-                      <p className="text-gray-400">by Sun Tzu</p>
+                      <h3 className="text-2xl font-bold">
+                        {areTokensValid()
+                          ? "Continue Your Journey"
+                          : "The Art of War"}
+                      </h3>
+                      <p className="text-gray-400">
+                        {areTokensValid()
+                          ? "Pick up where you left off"
+                          : "by Sun Tzu"}
+                      </p>
                       <div className="w-full bg-gray-700 rounded-full h-2">
                         <div className="bg-gradient-to-r from-purple-600 to-purple-400 h-2 rounded-full w-3/4 animate-pulse"></div>
                       </div>
@@ -153,14 +212,16 @@ export default function LandingPage() {
                     <div className="space-y-3">
                       <div className="bg-black/50 rounded-lg p-4 border-l-4 border-purple-400">
                         <p className="text-sm text-gray-300">
-                          "What are the key principles of strategic thinking?"
+                          {areTokensValid()
+                            ? "Ask anything about your books..."
+                            : "What are the key principles of strategic thinking?"}
                         </p>
                       </div>
                       <div className="bg-purple-900/30 rounded-lg p-4">
                         <p className="text-sm">
-                          The key principles include knowing yourself and your
-                          enemy, adapting to circumstances, and using deception
-                          strategically...
+                          {areTokensValid()
+                            ? "Get instant AI-powered answers and insights from your personal library..."
+                            : "The key principles include knowing yourself and your enemy, adapting to circumstances, and using deception strategically..."}
                         </p>
                       </div>
                     </div>

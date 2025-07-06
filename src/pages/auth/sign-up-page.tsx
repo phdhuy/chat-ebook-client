@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRegister } from "./hooks/use-register";
 import { useLoginWithGoogle } from "./hooks/use-login";
+import { ADMIN_ROLE } from "@/common";
+import { useAuthStore } from "@/stores/use-auth-store";
+import { areTokensValid } from "@/utils/auth-utils";
 
 interface FormData {
   email: string;
@@ -34,6 +37,20 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const registerMutation = useRegister();
   const loginWithGoogle = useLoginWithGoogle();
+  const navigate = useNavigate();
+  const { role } = useAuthStore();
+
+  // Check for existing tokens and redirect if authenticated
+  useEffect(() => {
+    if (areTokensValid()) {
+      // User is already authenticated, redirect based on role
+      if (role === ADMIN_ROLE) {
+        navigate("/admin");
+      } else {
+        navigate("/app");
+      }
+    }
+  }, [navigate, role]);
 
   const {
     register,
