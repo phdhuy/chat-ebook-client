@@ -15,7 +15,7 @@ export function SidebarHeader({
     <div className="flex items-center justify-between p-4">
       {!isCollapsed ? (
         <>
-          <Link to="/">
+          <Link to="/app">
             <div className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-white" />
               <span className="brand-name truncate">ChatEbook</span>

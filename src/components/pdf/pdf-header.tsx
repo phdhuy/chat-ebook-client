@@ -119,7 +119,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
             className="h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600"
           />
 
-          <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-1.5 border border-gray-200/80 dark:border-gray-700/80 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-0.5 border border-gray-200/80 dark:border-gray-700/80 shadow-sm backdrop-blur-sm">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -199,7 +199,7 @@ const PdfHeader: React.FC<PdfHeaderProps> = ({
 
         {/* Center Section - Enhanced Zoom Controls */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-1.5 border border-gray-200/80 dark:border-gray-700/80 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-0.5 border border-gray-200/80 dark:border-gray-700/80 shadow-sm backdrop-blur-sm">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
