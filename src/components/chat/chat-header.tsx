@@ -132,7 +132,7 @@ export function ChatHeader({
 
   return (
     <div
-      className={`flex items-center justify-between px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 ${className}`}
+      className={`h-14 flex items-center justify-between px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 ${className}`}
     >
       {/* Title Section - Optimized */}
       <div className="flex items-center min-w-0 flex-1">
