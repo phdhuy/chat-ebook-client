@@ -1,0 +1,23 @@
+{
+  "sidebar": {
+    "language_en": "Tiếng Anh",
+    "language_vi": "Tiếng Việt",
+    "free_plan": "Gói miễn phí",
+    "upgrade": "Nâng cấp lên Plus",
+    "sign_in": "Đăng nhập",
+    "new_chat": "Tạo cuộc trò chuyện mới"
+  },
+  "home": {
+    "title": "Trò chuyện với bất kỳ <1>Ebook</1>",
+    "subtitle": "Tải lên tệp PDF của bạn và đặt câu hỏi về nội dung của nó. AI của chúng tôi sẽ phân tích tài liệu và cung cấp câu trả lời chính xác.",
+    "upload_title": "Tải lên PDF mới",
+    "upload_desc": "Tải lên một tài liệu Ebook mới để trò chuyện",
+    "upload_button": "Tải lên Ebook",
+    "recent_title": "Tài liệu gần đây",
+    "recent_desc": "Tiếp tục trò chuyện với các tài liệu gần đây của bạn",
+    "recent_button": "Xem gần đây",
+    "continue_title": "Tiếp tục đọc",
+    "continue_desc": "Tiếp tục từ nơi bạn đã dừng lại trong các cuốn sách gần đây",
+    "powered": "Được hỗ trợ bởi công nghệ AI và RAG"
+  }
+}
