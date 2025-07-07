@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import UserProfileModal from "../modal/user-profile-modal";
 import type { UserInfoResponse } from "@/api/user-api";
+import i18n from "@/i18n";
+import { useTranslation } from "react-i18next";
 
 interface SidebarFooterProps {
   profile: UserInfoResponse | null;
@@ -27,6 +29,12 @@ interface SidebarFooterProps {
 export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { t, i18n: i18nInstance } = useTranslation();
+  const currentLang = i18nInstance.language === "vi" ? "vi" : "en";
+  const languages = [
+    { code: "en", label: t("sidebar.language_en") },
+    { code: "vi", label: t("sidebar.language_vi") },
+  ];
 
   return (
     <div className="p-4 space-y-3 border-t border-zinc-800/50 bg-gradient-to-t from-zinc-950/50 to-transparent">
@@ -34,18 +42,30 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex items-center justify-between w-full hover:bg-zinc-800/60 transition-all duration-200 rounded-xl"
+            className="flex items-center justify-between w-full hover:bg-purple-900/40 focus:bg-purple-900/40 transition-all duration-200 rounded-xl text-white hover:text-white focus:text-white"
           >
             <div className="flex items-center">
               <Languages className="mr-2 h-4 w-4 text-zinc-400" />
-              <span className="text-sm">EN</span>
+              <span className="text-sm text-white group-hover:text-white">
+                {currentLang === "en"
+                  ? t("sidebar.language_en")
+                  : t("sidebar.language_vi")}
+              </span>
             </div>
             <ChevronDown className="h-4 w-4 text-zinc-400" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          {["English", "Vietnamese", "French", "German"].map((lang) => (
-            <DropdownMenuItem key={lang}>{lang}</DropdownMenuItem>
+          {languages.map((lang) => (
+            <DropdownMenuItem
+              key={lang.code}
+              onClick={() => i18n.changeLanguage(lang.code)}
+              className={
+                currentLang === lang.code ? "font-semibold text-purple-500" : ""
+              }
+            >
+              {lang.label}
+            </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,7 +100,7 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
                 </span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors duration-200">
-                    Free Plan
+                  {t("sidebar.free_plan")}
                   </span>
                   <div className="w-1 h-1 bg-zinc-600 rounded-full" />
                 </div>
@@ -107,7 +127,7 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
 
           <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-[1.02] active:scale-[0.98] group">
             <Sparkles className="mr-2 h-4 w-4 group-hover:animate-pulse" />
-            Upgrade to Plus
+            {t("sidebar.upgrade")}
           </Button>
 
           <UserProfileModal

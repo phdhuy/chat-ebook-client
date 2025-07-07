@@ -1,0 +1,23 @@
+{
+  "sidebar": {
+    "language_en": "English",
+    "language_vi": "Vietnamese",
+    "free_plan": "Free Plan",
+    "upgrade": "Upgrade to Plus",
+    "sign_in": "Sign In",
+    "new_chat": "New Chat"
+  },
+  "home": {
+    "title": "Chat with any <1>Ebook</1>",
+    "subtitle": "Upload your PDF and ask questions about its content. Our AI will analyze the document and provide accurate answers.",
+    "upload_title": "Upload New PDF",
+    "upload_desc": "Upload a new Ebook document to chat with it",
+    "upload_button": "Upload Ebook",
+    "recent_title": "Recent Documents",
+    "recent_desc": "Continue chatting with your recent documents",
+    "recent_button": "View Recent",
+    "continue_title": "Continue Reading",
+    "continue_desc": "Pick up where you left off in your recent books",
+    "powered": "Powered by AI and RAG technology"
+  }
+}

@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { FileText, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ReadingHistory } from "@/components/reading-progress";
+import { useTranslation, Trans } from "react-i18next";
 
 export default function HomePage() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -15,17 +17,19 @@ export default function HomePage() {
       <div className="w-full flex flex-col items-center gap-10 relative z-10">
         <div className="text-center space-y-5 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Chat with any{" "}
-            <span className="relative">
-              <span className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-3 py-1 rounded-lg">
-                Ebook
-              </span>
-              <span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-violet-600 blur-sm"></span>
-            </span>
+            <Trans
+              i18nKey="home.title"
+              components={{
+                1: (
+                  <span className="relative bg-gradient-to-r from-purple-600 to-violet-600 text-white px-3 py-1 rounded-lg" />
+                ),
+              }}
+            >
+              Chat with any <span>Ebook</span>
+            </Trans>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Upload your PDF and ask questions about its content. Our AI will
-            analyze the document and provide accurate answers.
+            {t("home.subtitle")}
           </p>
         </div>
 
@@ -35,14 +39,14 @@ export default function HomePage() {
               <Upload className="h-10 w-10 text-white" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-              Upload New PDF
+              {t("home.upload_title")}
             </h2>
             <p className="text-gray-500 dark:text-gray-300 mb-4">
-              Upload a new Ebook document to chat with it
+              {t("home.upload_desc")}
             </p>
             <Link to="/upload">
               <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30">
-                Upload Ebook
+                {t("home.upload_button")}
               </Button>
             </Link>
           </div>
@@ -52,16 +56,16 @@ export default function HomePage() {
               <FileText className="h-10 w-10 text-white" />
             </div>
             <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-              Recent Documents
+              {t("home.recent_title")}
             </h2>
             <p className="text-gray-500 dark:text-gray-300 mb-4">
-              Continue chatting with your recent documents
+              {t("home.recent_desc")}
             </p>
             <Button
               variant="outline"
               className="border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 font-medium px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg"
             >
-              View Recent
+              {t("home.recent_button")}
             </Button>
           </div>
         </div>
@@ -70,10 +74,10 @@ export default function HomePage() {
         <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Continue Reading
+              {t("home.continue_title")}
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              Pick up where you left off in your recent books
+              {t("home.continue_desc")}
             </p>
           </div>
           <ReadingHistory
@@ -89,7 +93,7 @@ export default function HomePage() {
               <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
             </span>
             <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-              Powered by AI and RAG technology
+              {t("home.powered")}
             </p>
           </div>
         </div>
