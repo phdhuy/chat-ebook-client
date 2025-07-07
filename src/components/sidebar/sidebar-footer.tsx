@@ -30,11 +30,13 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { t, i18n: i18nInstance } = useTranslation();
-  const currentLang = i18nInstance.language === "vi" ? "vi" : "en";
   const languages = [
     { code: "en", label: t("sidebar.language_en") },
     { code: "vi", label: t("sidebar.language_vi") },
   ];
+  const currentLang =
+    languages.find((l) => i18nInstance.language.startsWith(l.code))?.code ||
+    "en";
 
   return (
     <div className="p-4 space-y-3 border-t border-zinc-800/50 bg-gradient-to-t from-zinc-950/50 to-transparent">
@@ -47,9 +49,7 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
             <div className="flex items-center">
               <Languages className="mr-2 h-4 w-4 text-zinc-400" />
               <span className="text-sm text-white group-hover:text-white">
-                {currentLang === "en"
-                  ? t("sidebar.language_en")
-                  : t("sidebar.language_vi")}
+                {languages.find((lang) => lang.code === currentLang)?.label}
               </span>
             </div>
             <ChevronDown className="h-4 w-4 text-zinc-400" />
@@ -100,7 +100,7 @@ export function SidebarFooter({ profile, onSignOut }: SidebarFooterProps) {
                 </span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors duration-200">
-                  {t("sidebar.free_plan")}
+                    {t("sidebar.free_plan")}
                   </span>
                   <div className="w-1 h-1 bg-zinc-600 rounded-full" />
                 </div>
