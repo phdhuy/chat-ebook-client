@@ -218,7 +218,6 @@ export default function ChatPage() {
             <>
               <ChatHeader
                 conversationId={conversationId}
-                conversationTitle="AI Assistant Chat"
                 onSummarizeEbook={handleSummarize}
                 isSummarizing={isSummarizing}
                 onGenerateMindmap={handleGenerateMindmap}

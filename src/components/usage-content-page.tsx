@@ -4,15 +4,41 @@ import { useApiUsage } from "@/hooks/use-api-usage";
 import { cn } from "@/lib/utils";
 import { format, startOfDay, subDays } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { BarChart3, Brain, FileText, Upload, Send, CalendarIcon, FilterIcon } from "lucide-react";
+import {
+  BarChart3,
+  Brain,
+  FileText,
+  Upload,
+  Send,
+  CalendarIcon,
+  FilterIcon,
+} from "lucide-react";
 import UsageSkeleton from "@/components/skeleton/usage-skeleton";
+import { useTranslation } from "react-i18next";
 
 export default function UsageContent() {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -67,13 +93,13 @@ export default function UsageContent() {
   const getUsageLabel = (resourceType: string) => {
     switch (resourceType) {
       case "GENERATE_MIND_MAP":
-        return "Mind Maps Generated";
+        return t("usage_content.mind_maps_generated");
       case "SEND_MESSAGE":
-        return "Messages Sent";
+        return t("usage_content.messages_sent");
       case "SUMMARIZE_EBOOK":
-        return "Ebooks Summarized";
+        return t("usage_content.ebooks_summarized");
       case "UPLOAD_EBOOK":
-        return "Ebooks Uploaded";
+        return t("usage_content.ebooks_uploaded");
       default:
         return resourceType.replace(/_/g, " ").toLowerCase();
     }
@@ -99,32 +125,47 @@ export default function UsageContent() {
   if (isLoading) {
     return <UsageSkeleton />;
   }
-  if (error) return <div>Error: {error.message}</div>;
+  if (error)
+    return (
+      <div>
+        {t("usage_content.error")}: {error.message}
+      </div>
+    );
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            API Usage Overview
+            {t("usage_content.title")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Track your API usage across different features
+            {t("usage_content.subtitle")}
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Select value={quickFilter} onValueChange={handleQuickFilterChange}>
             <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-900 border-gray-200/70 dark:border-zinc-800/70 rounded-xl">
-              <SelectValue placeholder="Filter period" />
+              <SelectValue placeholder={t("usage_content.filter_period")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="7days">Last 7 days</SelectItem>
-              <SelectItem value="30days">Last 30 days</SelectItem>
-              <SelectItem value="90days">Last 90 days</SelectItem>
-              <SelectItem value="year">Last year</SelectItem>
-              <SelectItem value="custom">Custom range</SelectItem>
+              <SelectItem value="today">{t("usage_content.today")}</SelectItem>
+              <SelectItem value="7days">
+                {t("usage_content.last_7_days")}
+              </SelectItem>
+              <SelectItem value="30days">
+                {t("usage_content.last_30_days")}
+              </SelectItem>
+              <SelectItem value="90days">
+                {t("usage_content.last_90_days")}
+              </SelectItem>
+              <SelectItem value="year">
+                {t("usage_content.last_year")}
+              </SelectItem>
+              <SelectItem value="custom">
+                {t("usage_content.custom_range")}
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -148,7 +189,7 @@ export default function UsageContent() {
                     format(dateRange.from, "LLL dd, y")
                   )
                 ) : (
-                  <span>Pick a date</span>
+                  <span>{t("usage_content.pick_date")}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -176,7 +217,7 @@ export default function UsageContent() {
             onClick={() => console.log("Applying filters:", dateRange)}
           >
             <FilterIcon className="h-4 w-4" />
-            <span className="sr-only">Apply filters</span>
+            <span className="sr-only">{t("usage_content.apply_filters")}</span>
           </Button>
         </div>
       </div>
@@ -184,16 +225,18 @@ export default function UsageContent() {
       <Card className="border-gray-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900 shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Total Usage
+            {t("usage_content.total_usage")}
           </CardTitle>
-          <CardDescription>Your overall API consumption</CardDescription>
+          <CardDescription>
+            {t("usage_content.total_usage_desc")}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold text-gray-900 dark:text-white">
             {totalUsage}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Total API calls made
+            {t("usage_content.total_api_calls")}
           </p>
         </CardContent>
       </Card>
@@ -221,7 +264,7 @@ export default function UsageContent() {
                     {getUsageLabel(usage.resource_type)}
                   </CardTitle>
                   <CardDescription className="text-sm">
-                    Current usage count
+                    {t("usage_content.current_usage_count")}
                   </CardDescription>
                 </div>
               </div>
@@ -232,7 +275,7 @@ export default function UsageContent() {
                   {usage.count}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  calls
+                  {t("usage_content.calls")}
                 </span>
               </div>
               <Progress
@@ -244,7 +287,7 @@ export default function UsageContent() {
                   ? `${((usage.count / totalUsage) * 100).toFixed(
                       1
                     )}% of total usage`
-                  : "No usage yet"}
+                  : t("usage_content.no_usage_yet")}
               </p>
             </CardContent>
           </Card>
@@ -256,10 +299,10 @@ export default function UsageContent() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BarChart3 className="w-16 h-16 text-gray-400 dark:text-gray-600 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              No Usage Data
+              {t("usage_content.no_usage_data")}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 text-center">
-              Start using the API features to see your usage statistics here.
+              {t("usage_content.no_usage_data_desc")}
             </p>
           </CardContent>
         </Card>
