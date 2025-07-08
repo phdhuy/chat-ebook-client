@@ -28,6 +28,7 @@ import { ALLOW_FILE_TYPES, isValidDomain, MAX_FILE_SIZE } from "@/common";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import { CreateConversationByUrlRequest } from "@/api/conversation-api";
+import { useTranslation } from "react-i18next";
 
 interface IFileFormInputs {
   file: FileList;
@@ -36,43 +37,6 @@ interface IFileFormInputs {
 interface IUrlFormInputs {
   url: string;
 }
-
-const fileSchema = yup.object({
-  file: yup
-    .mixed()
-    .test(
-      "fileRequired",
-      "A file is required",
-      (value) => value && value instanceof FileList && value.length > 0
-    )
-    .test("fileType", "Unsupported file format", (value) => {
-      if (value && value instanceof FileList && value.length > 0) {
-        return ALLOW_FILE_TYPES.includes(value[0].type);
-      }
-      return true;
-    })
-    .test("fileSize", "File size must not exceed 10 MB", (value) => {
-      if (value && value instanceof FileList && value.length > 0) {
-        return value[0].size <= MAX_FILE_SIZE;
-      }
-      return true;
-    }),
-}) as yup.ObjectSchema<IFileFormInputs>;
-
-const urlSchema = yup.object({
-  url: yup
-    .string()
-    .required("URL is required")
-    .url("Please enter a valid URL")
-    .test(
-      "validDomain",
-      "URL must be from an approved academic or institutional domain",
-      (value) => {
-        if (!value) return false;
-        return isValidDomain(value);
-      }
-    ),
-}) as yup.ObjectSchema<IUrlFormInputs>;
 
 function mergeRefs<T>(
   ...refs: (React.Ref<T> | undefined)[]
@@ -89,14 +53,8 @@ function mergeRefs<T>(
   };
 }
 
-const processingSteps = [
-  { id: 1, label: "Uploading file", icon: Upload, duration: 2000 },
-  { id: 2, label: "Analyzing content", icon: Brain, duration: 3000 },
-  { id: 3, label: "Processing text", icon: FileText, duration: 2500 },
-  { id: 4, label: "Preparing conversation", icon: BookOpen, duration: 1500 },
-];
-
 export default function UploadFilePage() {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "success" | "error"
@@ -109,6 +67,66 @@ export default function UploadFilePage() {
   const [processingMessage, setProcessingMessage] = useState("");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const fileSchema = yup.object({
+    file: yup
+      .mixed()
+      .test(
+        "fileRequired",
+        t("upload_file.file_required"),
+        (value) => value && value instanceof FileList && value.length > 0
+      )
+      .test("fileType", t("upload_file.unsupported_format"), (value) => {
+        if (value && value instanceof FileList && value.length > 0) {
+          return ALLOW_FILE_TYPES.includes(value[0].type);
+        }
+        return true;
+      })
+      .test("fileSize", t("upload_file.file_size_limit"), (value) => {
+        if (value && value instanceof FileList && value.length > 0) {
+          return value[0].size <= MAX_FILE_SIZE;
+        }
+        return true;
+      }),
+  }) as yup.ObjectSchema<IFileFormInputs>;
+
+  const urlSchema = yup.object({
+    url: yup
+      .string()
+      .required(t("upload_file.url_required"))
+      .url(t("upload_file.invalid_url"))
+      .test("validDomain", t("upload_file.invalid_domain"), (value) => {
+        if (!value) return false;
+        return isValidDomain(value);
+      }),
+  }) as yup.ObjectSchema<IUrlFormInputs>;
+
+  const processingSteps = [
+    {
+      id: 1,
+      label: t("upload_file.uploading_file"),
+      icon: Upload,
+      duration: 2000,
+    },
+    {
+      id: 2,
+      label: t("upload_file.analyzing_content"),
+      icon: Brain,
+      duration: 3000,
+    },
+    {
+      id: 3,
+      label: t("upload_file.processing_text"),
+      icon: FileText,
+      duration: 2500,
+    },
+    {
+      id: 4,
+      label: t("upload_file.preparing_conversation"),
+      icon: BookOpen,
+      duration: 1500,
+    },
+  ];
 
   const handleSelectClick = () => {
     fileInputRef.current?.click();
@@ -128,53 +146,55 @@ export default function UploadFilePage() {
   const selectedFile = fileForm.watch("file")?.[0];
   const urlValue = urlForm.watch("url");
 
-  const { mutate: createConversation, isPending: isFilePending } = useCreateConversation({
-    onSuccess: (data) => {
-      setProgress(100);
-      setProcessingMessage("Complete!");
-      setTimeout(() => {
-        setUploadStatus("success");
-        queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+  const { mutate: createConversation, isPending: isFilePending } =
+    useCreateConversation({
+      onSuccess: (data) => {
+        setProgress(100);
+        setProcessingMessage(t("upload_file.complete"));
         setTimeout(() => {
-          navigate(`/chat/${data?.data.id}`);
+          setUploadStatus("success");
+          queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+          setTimeout(() => {
+            navigate(`/chat/${data?.data.id}`);
+          }, 500);
+          fileForm.reset();
+          urlForm.reset();
         }, 500);
-        fileForm.reset();
-        urlForm.reset();
-      }, 500);
-    },
-    onError: (error) => {
-      console.error("Failed to upload file:", error);
-      setUploadStatus("error");
-      setErrorMessage("Failed to upload file. Please try again.");
-      setCurrentStep(0);
-      setProgress(0);
-      setProcessingMessage("");
-    },
-  });
+      },
+      onError: (error) => {
+        console.error("Failed to upload file:", error);
+        setUploadStatus("error");
+        setErrorMessage(t("upload_file.failed_upload_file"));
+        setCurrentStep(0);
+        setProgress(0);
+        setProcessingMessage("");
+      },
+    });
 
-  const { mutate: createConversationByUrl, isPending: isUrlPending } = useCreateConversationByUrl({
-    onSuccess: (data) => {
-      setProgress(100);
-      setProcessingMessage("Complete!");
-      setTimeout(() => {
-        setUploadStatus("success");
-        queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+  const { mutate: createConversationByUrl, isPending: isUrlPending } =
+    useCreateConversationByUrl({
+      onSuccess: (data) => {
+        setProgress(100);
+        setProcessingMessage(t("upload_file.complete"));
         setTimeout(() => {
-          navigate(`/chat/${data?.data.id}`);
+          setUploadStatus("success");
+          queryClient.refetchQueries({ queryKey: ["my-conversations"] });
+          setTimeout(() => {
+            navigate(`/chat/${data?.data.id}`);
+          }, 500);
+          fileForm.reset();
+          urlForm.reset();
         }, 500);
-        fileForm.reset();
-        urlForm.reset();
-      }, 500);
-    },
-    onError: (error) => {
-      console.error("Failed to create conversation from URL:", error);
-      setUploadStatus("error");
-      setErrorMessage("Failed to create conversation from URL. Please try again.");
-      setCurrentStep(0);
-      setProgress(0);
-      setProcessingMessage("");
-    },
-  });
+      },
+      onError: (error) => {
+        console.error("Failed to create conversation from URL:", error);
+        setUploadStatus("error");
+        setErrorMessage(t("upload_file.failed_upload_url"));
+        setCurrentStep(0);
+        setProgress(0);
+        setProcessingMessage("");
+      },
+    });
 
   useEffect(() => {
     if (!isFilePending && !isUrlPending) {
@@ -273,11 +293,10 @@ export default function UploadFilePage() {
                 <Cloud className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Upload Your Document
+                {t("upload_file.title")}
               </h1>
               <p className="text-base text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-                Transform your documents into interactive conversations. Upload
-                files or provide URLs to get started.
+                {t("upload_file.subtitle")}
               </p>
             </div>
 
@@ -304,10 +323,10 @@ export default function UploadFilePage() {
 
                     <div className="space-y-1">
                       <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                        {processingMessage || "Initializing..."}
+                        {processingMessage || t("upload_file.initializing")}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Please wait while we process your document
+                        {t("upload_file.please_wait")}
                       </p>
                     </div>
 
@@ -318,7 +337,10 @@ export default function UploadFilePage() {
                       />
                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                         <span>
-                          Step {currentStep} of {processingSteps.length}
+                          {t("upload_file.step_of", {
+                            current: currentStep,
+                            total: processingSteps.length,
+                          })}
                         </span>
                         <span>{Math.round(progress)}%</span>
                       </div>
@@ -376,7 +398,7 @@ export default function UploadFilePage() {
                   onClick={resetUploadStatus}
                 >
                   <Upload className="w-3 h-3 mr-1" />
-                  Upload File
+                  {t("upload_file.upload_file_tab")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="url"
@@ -384,7 +406,7 @@ export default function UploadFilePage() {
                   onClick={resetUploadStatus}
                 >
                   <Link2 className="w-3 h-3 mr-1" />
-                  From URL
+                  {t("upload_file.from_url_tab")}
                 </TabsTrigger>
               </TabsList>
 
@@ -392,9 +414,21 @@ export default function UploadFilePage() {
                 <form onSubmit={fileForm.handleSubmit(onFileSubmit)}>
                   <div
                     className={`relative border-2 border-dashed rounded-2xl p-6 md:p-8 text-center transition-all duration-300 group cursor-pointer
-                      ${isDragOver ? "border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[1.02]" : ""}
-                      ${selectedFile ? "border-green-400 bg-green-50/50 dark:bg-green-900/20" : "border-gray-300/70 dark:border-gray-600/50 hover:border-blue-400 dark:hover:border-blue-400/70"}
-                      ${fileForm.formState.errors.file ? "border-red-400 bg-red-50/50 dark:bg-red-900/20" : ""}
+                      ${
+                        isDragOver
+                          ? "border-blue-400 bg-blue-50/50 dark:bg-blue-900/20 scale-[1.02]"
+                          : ""
+                      }
+                      ${
+                        selectedFile
+                          ? "border-green-400 bg-green-50/50 dark:bg-green-900/20"
+                          : "border-gray-300/70 dark:border-gray-600/50 hover:border-blue-400 dark:hover:border-blue-400/70"
+                      }
+                      ${
+                        fileForm.formState.errors.file
+                          ? "border-red-400 bg-red-50/50 dark:bg-red-900/20"
+                          : ""
+                      }
                       hover:shadow-[0_10px_20px_rgba(59,_130,_246,_0.1)] dark:hover:shadow-[0_10px_20px_rgba(59,_130,_246,_0.05)]
                     `}
                     onDragOver={handleDragOver}
@@ -404,8 +438,16 @@ export default function UploadFilePage() {
                   >
                     <div
                       className={`mx-auto mb-4 w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-md
-                        ${selectedFile ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-green-500/20" : "bg-gradient-to-br from-blue-400 to-indigo-500 shadow-blue-500/20"}
-                        ${fileForm.formState.errors.file ? "bg-gradient-to-br from-red-400 to-pink-500 shadow-red-500/20" : ""}
+                        ${
+                          selectedFile
+                            ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-green-500/20"
+                            : "bg-gradient-to-br from-blue-400 to-indigo-500 shadow-blue-500/20"
+                        }
+                        ${
+                          fileForm.formState.errors.file
+                            ? "bg-gradient-to-br from-red-400 to-pink-500 shadow-red-500/20"
+                            : ""
+                        }
                         group-hover:scale-105 group-hover:shadow-lg
                       `}
                     >
@@ -420,18 +462,20 @@ export default function UploadFilePage() {
 
                     <div className="space-y-2">
                       <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        {selectedFile ? "File ready to upload!" : "Drop your file here"}
+                        {selectedFile
+                          ? t("upload_file.file_ready")
+                          : t("upload_file.drop_file_here")}
                       </h3>
 
                       <p className="text-gray-600 dark:text-gray-400 text-base">
-                        Supports PDF• Max 50MB
+                        {t("upload_file.file_support")}
                       </p>
 
                       {!selectedFile && (
                         <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
                           <Sparkles className="w-4 h-4" />
                           <span className="font-medium text-sm">
-                            Click to browse or drag & drop
+                            {t("upload_file.click_to_browse")}
                           </span>
                         </div>
                       )}
@@ -479,7 +523,9 @@ export default function UploadFilePage() {
                   {fileForm.formState.errors.file && (
                     <div className="mt-4 flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-3 rounded-xl border border-red-200/50 dark:border-red-800/50">
                       <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      <p className="text-sm">{fileForm.formState.errors.file.message as string}</p>
+                      <p className="text-sm">
+                        {fileForm.formState.errors.file.message as string}
+                      </p>
                     </div>
                   )}
 
@@ -494,7 +540,7 @@ export default function UploadFilePage() {
                       }
                       className="px-8 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Start Conversation
+                      {t("upload_file.start_conversation")}
                     </Button>
                   </div>
                 </form>
@@ -508,31 +554,35 @@ export default function UploadFilePage() {
                         <Link2 className="w-8 h-8 text-white" />
                       </div>
                       <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1">
-                        Upload from URL
+                        {t("upload_file.upload_from_url")}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        Provide a direct link to your document and we'll fetch it for you
+                        {t("upload_file.url_subtitle")}
                       </p>
                     </div>
 
                     <div className="space-y-3">
                       <Input
                         {...urlForm.register("url")}
-                        placeholder="https://example.com/document.pdf"
+                        placeholder={t("upload_file.url_placeholder")}
                         className="h-12 px-4 text-base rounded-xl border-2 border-gray-200/70 dark:border-gray-600/50 focus:border-purple-400 dark:focus:border-purple-400 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm transition-all duration-300"
                       />
 
                       {urlForm.formState.errors.url && (
                         <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-3 rounded-xl border border-red-200/50 dark:border-red-800/50">
                           <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                          <p className="text-sm">{urlForm.formState.errors.url.message}</p>
+                          <p className="text-sm">
+                            {urlForm.formState.errors.url.message}
+                          </p>
                         </div>
                       )}
 
                       {urlValue && !urlForm.formState.errors.url && (
                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-3 rounded-xl border border-green-200/50 dark:border-green-800/50">
                           <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                          <p className="text-sm">Valid URL detected</p>
+                          <p className="text-sm">
+                            {t("upload_file.valid_url")}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -548,7 +598,7 @@ export default function UploadFilePage() {
                         }
                         className="px-8 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Fetch & Process
+                        {t("upload_file.fetch_process")}
                       </Button>
                     </div>
                   </div>
@@ -560,9 +610,11 @@ export default function UploadFilePage() {
               <div className="mt-6 flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50/80 dark:bg-green-900/20 p-4 rounded-xl border border-green-200/50 dark:border-green-800/50 animate-fade-in">
                 <CheckCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Upload successful!</p>
+                  <p className="font-medium text-sm">
+                    {t("upload_file.upload_successful")}
+                  </p>
                   <p className="text-xs opacity-80">
-                    Redirecting to your conversation...
+                    {t("upload_file.redirecting")}
                   </p>
                 </div>
               </div>
@@ -572,7 +624,9 @@ export default function UploadFilePage() {
               <div className="mt-6 flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/20 p-4 rounded-xl border border-red-200/50 dark:border-red-800/50 animate-fade-in">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Upload failed</p>
+                  <p className="font-medium text-sm">
+                    {t("upload_file.upload_failed")}
+                  </p>
                   <p className="text-xs opacity-80">{errorMessage}</p>
                 </div>
               </div>
