@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import "../../styles/mindmap-styles.css";
 import { useMindMapEbook } from "@/pages/mindmap/hooks/use-mindmap-ebook";
+import { useTranslation } from "react-i18next";
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -82,6 +83,7 @@ export default function MindmapModal({
   onOpenChange,
   conversationId,
 }: MindmapModalProps) {
+  const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -218,7 +220,7 @@ export default function MindmapModal({
         <DialogHeader className="px-8 py-6 border-b border-blue-200/50 bg-white/50 backdrop-blur-md">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
-              Mind Map Visualization
+              {t("mindmap_modal.title")}
             </DialogTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -228,7 +230,7 @@ export default function MindmapModal({
                 onClick={handleDownload}
               >
                 <Download className="h-4 w-4" />
-                <span className="sr-only">Download</span>
+                <span className="sr-only">{t("mindmap_modal.download")}</span>
               </Button>
               <Button
                 variant="outline"
@@ -237,12 +239,14 @@ export default function MindmapModal({
                 onClick={toggleFullscreen}
               >
                 <Maximize2 className="h-4 w-4" />
-                <span className="sr-only">Toggle fullscreen</span>
+                <span className="sr-only">
+                  {t("mindmap_modal.toggle_fullscreen")}
+                </span>
               </Button>
             </div>
           </div>
           <p className="text-sm text-blue-700/70 mt-1">
-            Explore the connections between concepts in your conversation
+            {t("mindmap_modal.subtitle")}
           </p>
         </DialogHeader>
 
@@ -253,10 +257,10 @@ export default function MindmapModal({
                 <Loader2 size={40} />
               </div>
               <p className="text-lg font-medium text-blue-800">
-                Generating your mind map...
+                {t("mindmap_modal.generating")}
               </p>
               <p className="text-sm text-blue-600/80 mt-2">
-                This may take a few moments
+                {t("mindmap_modal.generating_desc")}
               </p>
             </div>
           ) : isError ? (
@@ -265,23 +269,23 @@ export default function MindmapModal({
                 <AlertCircle size={40} />
               </div>
               <p className="text-lg font-medium text-red-800">
-                Failed to generate mind map
+                {t("mindmap_modal.failed_generate")}
               </p>
               <p className="text-sm text-red-600/80 mt-2 mb-4">
-                {error?.message || "An unknown error occurred"}
+                {error?.message || t("mindmap_modal.unknown_error")}
               </p>
               <Button onClick={handleRetry} variant="outline" className="gap-2">
                 <RefreshCw className="h-4 w-4" />
-                Try Again
+                {t("mindmap_modal.try_again")}
               </Button>
             </div>
           ) : !mindMapData?.data?.payload ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm">
               <p className="text-lg font-medium text-blue-800">
-                No mind map data available
+                {t("mindmap_modal.no_data")}
               </p>
               <p className="text-sm text-blue-600/80 mt-2">
-                Try with a different conversation
+                {t("mindmap_modal.no_data_desc")}
               </p>
             </div>
           ) : (

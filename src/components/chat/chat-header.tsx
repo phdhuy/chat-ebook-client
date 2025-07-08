@@ -32,6 +32,7 @@ import {
   Zap,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface ChatHeaderProps {
   conversationId: string;
@@ -47,7 +48,6 @@ interface ChatHeaderProps {
 
 export function ChatHeader({
   conversationId,
-  conversationTitle = "AI Chat",
   onSummarizeEbook,
   onClearConversation,
   onExportConversation,
@@ -56,6 +56,7 @@ export function ChatHeader({
   isGeneratingMindmap = false,
   className = "",
 }: ChatHeaderProps) {
+  const { t } = useTranslation();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareEmail, setShareEmail] = useState("");
   const [shareMessage, setShareMessage] = useState("");
@@ -69,15 +70,15 @@ export function ChatHeader({
       await navigator.clipboard.writeText(shareUrl);
       setIsCopied(true);
       toast({
-        title: "Link copied!",
-        description: "Share link has been copied to clipboard",
+        title: t("chat_header.link_copied"),
+        description: t("chat_header.link_copied_desc"),
       });
       setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
       console.log(error);
       toast({
-        title: "Failed to copy",
-        description: "Could not copy link to clipboard",
+        title: t("chat_header.failed_copy"),
+        description: t("chat_header.failed_copy_desc"),
         variant: "destructive",
       });
     }
@@ -86,8 +87,8 @@ export function ChatHeader({
   const handleEmailShare = async () => {
     if (!shareEmail.trim()) {
       toast({
-        title: "Email required",
-        description: "Please enter an email address",
+        title: t("chat_header.email_required"),
+        description: t("chat_header.email_required_desc"),
         variant: "destructive",
       });
       return;
@@ -98,8 +99,10 @@ export function ChatHeader({
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       toast({
-        title: "Conversation shared!",
-        description: `Conversation has been shared with ${shareEmail}`,
+        title: t("chat_header.conversation_shared"),
+        description: t("chat_header.conversation_shared_desc", {
+          email: shareEmail,
+        }),
       });
       setShareDialogOpen(false);
       setShareEmail("");
@@ -107,8 +110,8 @@ export function ChatHeader({
     } catch (error) {
       console.log(error);
       toast({
-        title: "Failed to share",
-        description: "Could not share conversation via email",
+        title: t("chat_header.failed_share"),
+        description: t("chat_header.failed_share_desc"),
         variant: "destructive",
       });
     } finally {
@@ -117,15 +120,11 @@ export function ChatHeader({
   };
 
   const handleClearConversation = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear this conversation? This action cannot be undone."
-      )
-    ) {
+    if (window.confirm(t("chat_header.clear_confirm"))) {
       onClearConversation?.();
       toast({
-        title: "Conversation cleared",
-        description: "All messages have been removed",
+        title: t("chat_header.conversation_cleared"),
+        description: t("chat_header.conversation_cleared_desc"),
       });
     }
   };
@@ -139,7 +138,7 @@ export function ChatHeader({
         <div className="flex items-center space-x-2 min-w-0">
           <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
           <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
-            {conversationTitle}
+            {t("chat_header.title")}
           </h1>
         </div>
       </div>
@@ -154,15 +153,19 @@ export function ChatHeader({
             onClick={onSummarizeEbook}
             disabled={isSummarizing}
             className="h-8 px-2 text-xs"
-            aria-label={isSummarizing ? "Summarizing ebook" : "Summarize ebook"}
-            title="Summarize"
+            aria-label={
+              isSummarizing
+                ? t("chat_header.summarizing")
+                : t("chat_header.summarize")
+            }
+            title={t("chat_header.summarize")}
           >
             {isSummarizing ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
               <>
                 <BookOpen className="h-3.5 w-3.5" />
-                <span>Summarize</span>
+                <span>{t("chat_header.summarize")}</span>
               </>
             )}
           </Button>
@@ -174,16 +177,18 @@ export function ChatHeader({
             disabled={isGeneratingMindmap}
             className="h-8 px-2 text-xs"
             aria-label={
-              isGeneratingMindmap ? "Generating mindmap" : "Generate mindmap"
+              isGeneratingMindmap
+                ? t("chat_header.generating")
+                : t("chat_header.mindmap")
             }
-            title="Mindmap"
+            title={t("chat_header.mindmap")}
           >
             {isGeneratingMindmap ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
               <>
                 <GitBranch className="h-3.5 w-3.5" />
-                <span>Mind Map</span>
+                <span>{t("chat_header.mindmap")}</span>
               </>
             )}
           </Button>
@@ -197,7 +202,7 @@ export function ChatHeader({
                 variant="ghost"
                 size="sm"
                 className="h-8 px-2"
-                aria-label="Quick actions"
+                aria-label={t("chat_header.quick_actions")}
               >
                 <Zap className="h-3.5 w-3.5" />
               </Button>
@@ -212,7 +217,9 @@ export function ChatHeader({
                 ) : (
                   <BookOpen className="h-4 w-4 mr-2" />
                 )}
-                {isSummarizing ? "Summarizing..." : "Summarize"}
+                {isSummarizing
+                  ? t("chat_header.summarizing")
+                  : t("chat_header.summarize")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={onGenerateMindmap}
@@ -223,7 +230,9 @@ export function ChatHeader({
                 ) : (
                   <GitBranch className="h-4 w-4 mr-2" />
                 )}
-                {isGeneratingMindmap ? "Generating..." : "Mindmap"}
+                {isGeneratingMindmap
+                  ? t("chat_header.generating")
+                  : t("chat_header.mindmap")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -236,7 +245,7 @@ export function ChatHeader({
               variant="ghost"
               size="sm"
               className="h-8 px-2"
-              aria-label="More actions"
+              aria-label={t("chat_header.more_actions")}
             >
               <MoreVertical className="h-3.5 w-3.5" />
             </Button>
@@ -244,11 +253,11 @@ export function ChatHeader({
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={() => setShareDialogOpen(true)}>
               <Share2 className="h-4 w-4 mr-2" />
-              Share Chat
+              {t("chat_header.share_chat")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onExportConversation}>
               <Download className="h-4 w-4 mr-2" />
-              Export Chat
+              {t("chat_header.export_chat")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -256,7 +265,7 @@ export function ChatHeader({
               className="text-red-600 dark:text-red-400"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Conversation
+              {t("chat_header.clear_conversation")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -266,14 +275,14 @@ export function ChatHeader({
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Share Conversation</DialogTitle>
+            <DialogTitle>{t("chat_header.share_conversation")}</DialogTitle>
             <DialogDescription>
-              Share this conversation with others via link or email
+              {t("chat_header.share_description")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Share Link</Label>
+              <Label>{t("chat_header.share_link")}</Label>
               <div className="flex items-center space-x-2">
                 <Input value={shareUrl} readOnly className="flex-1" />
                 <Button
@@ -281,7 +290,11 @@ export function ChatHeader({
                   size="sm"
                   variant="outline"
                   className="flex items-center space-x-1"
-                  aria-label={isCopied ? "Link copied" : "Copy link"}
+                  aria-label={
+                    isCopied
+                      ? t("chat_header.link_copied")
+                      : t("chat_header.copy_link")
+                  }
                 >
                   {isCopied ? (
                     <Check className="h-4 w-4 text-green-600" />
@@ -293,16 +306,18 @@ export function ChatHeader({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="share-email">Share via Email</Label>
+              <Label htmlFor="share-email">
+                {t("chat_header.share_via_email")}
+              </Label>
               <Input
                 id="share-email"
                 type="email"
-                placeholder="Enter email address"
+                placeholder={t("chat_header.email_placeholder")}
                 value={shareEmail}
                 onChange={(e) => setShareEmail(e.target.value)}
               />
               <Textarea
-                placeholder="Add a message (optional)"
+                placeholder={t("chat_header.message_placeholder")}
                 value={shareMessage}
                 onChange={(e) => setShareMessage(e.target.value)}
                 rows={3}
@@ -311,17 +326,21 @@ export function ChatHeader({
                 onClick={handleEmailShare}
                 disabled={isSharing}
                 className="w-full"
-                aria-label={isSharing ? "Sharing via email" : "Send email"}
+                aria-label={
+                  isSharing
+                    ? t("chat_header.sharing")
+                    : t("chat_header.send_email")
+                }
               >
                 {isSharing ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sharing...
+                    {t("chat_header.sharing")}
                   </>
                 ) : (
                   <>
                     <Mail className="h-4 w-4 mr-2" />
-                    Send Email
+                    {t("chat_header.send_email")}
                   </>
                 )}
               </Button>

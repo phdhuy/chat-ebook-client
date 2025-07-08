@@ -9,50 +9,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type FeedbackOption = {
   id: string;
   label: string;
   description?: string;
 };
-
-const feedbackOptions: FeedbackOption[] = [
-  {
-    id: "TOO_SHORT",
-    label: "Too short",
-    description: "The response didn't provide enough information",
-  },
-  {
-    id: "TOO_LONG",
-    label: "Too long",
-    description: "The response was unnecessarily verbose",
-  },
-  {
-    id: "POOR_FORMATTING",
-    label: "Poor formatting",
-    description: "The response was difficult to read",
-  },
-  {
-    id: "MISSING_OR_INCORRECT_CITATION",
-    label: "Missing or incorrect citation",
-    description: "Sources weren't cited or were cited incorrectly",
-  },
-  {
-    id: "FABRICATED_INFORMATION",
-    label: "Fabricated information",
-    description: "The response contained made-up information",
-  },
-  {
-    id: "DOESNT_ANSWER_THE_QUESTION",
-    label: "Doesn't answer the question",
-    description: "The response didn't address my query",
-  },
-  {
-    id: "WRONG_LANGUAGE",
-    label: "Wrong language",
-    description: "The response was in the wrong language",
-  },
-];
 
 interface FeedbackModalProps {
   open: boolean;
@@ -65,10 +28,49 @@ export function FeedbackModal({
   onOpenChange,
   onSubmit,
 }: FeedbackModalProps) {
+  const { t } = useTranslation();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [otherFeedback, setOtherFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const feedbackOptions: FeedbackOption[] = [
+    {
+      id: "TOO_SHORT",
+      label: t("feedback_modal.too_short"),
+      description: t("feedback_modal.too_short_desc"),
+    },
+    {
+      id: "TOO_LONG",
+      label: t("feedback_modal.too_long"),
+      description: t("feedback_modal.too_long_desc"),
+    },
+    {
+      id: "POOR_FORMATTING",
+      label: t("feedback_modal.poor_formatting"),
+      description: t("feedback_modal.poor_formatting_desc"),
+    },
+    {
+      id: "MISSING_OR_INCORRECT_CITATION",
+      label: t("feedback_modal.missing_citation"),
+      description: t("feedback_modal.missing_citation_desc"),
+    },
+    {
+      id: "FABRICATED_INFORMATION",
+      label: t("feedback_modal.fabricated_info"),
+      description: t("feedback_modal.fabricated_info_desc"),
+    },
+    {
+      id: "DOESNT_ANSWER_THE_QUESTION",
+      label: t("feedback_modal.doesnt_answer"),
+      description: t("feedback_modal.doesnt_answer_desc"),
+    },
+    {
+      id: "WRONG_LANGUAGE",
+      label: t("feedback_modal.wrong_language"),
+      description: t("feedback_modal.wrong_language_desc"),
+    },
+  ];
 
   const handleSubmit = () => {
     if (!selectedReason && !otherFeedback) return;
@@ -103,10 +105,10 @@ export function FeedbackModal({
               <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Thank you for your feedback
+              {t("feedback_modal.thank_you")}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Your feedback helps us improve our responses.
+              {t("feedback_modal.thank_you_desc")}
             </p>
           </div>
         ) : (
@@ -114,11 +116,11 @@ export function FeedbackModal({
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-zinc-800">
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  How can we improve this response?
+                  {t("feedback_modal.title")}
                 </DialogTitle>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Select a reason or provide details to help us improve
+                {t("feedback_modal.subtitle")}
               </p>
             </DialogHeader>
 
@@ -174,11 +176,11 @@ export function FeedbackModal({
                   htmlFor="other-feedback"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Additional feedback
+                  {t("feedback_modal.additional_feedback")}
                 </label>
                 <Textarea
                   id="other-feedback"
-                  placeholder="Tell us more about how we can improve..."
+                  placeholder={t("feedback_modal.feedback_placeholder")}
                   value={otherFeedback}
                   onChange={(e) => setOtherFeedback(e.target.value)}
                   className="min-h-[80px] resize-none border-gray-200 dark:border-zinc-700 focus:border-purple-500 focus:ring-purple-500/20"
@@ -192,7 +194,9 @@ export function FeedbackModal({
                 disabled={isSubmitting || (!selectedReason && !otherFeedback)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5"
               >
-                {isSubmitting ? "Submitting..." : "Submit feedback"}
+                {isSubmitting
+                  ? t("feedback_modal.submitting")
+                  : t("feedback_modal.submit_feedback")}
               </Button>
             </div>
           </>
